@@ -73,6 +73,7 @@ func (a *ServerChi) Run() (err error) {
 	// - endpoints
 	rt.Route("/api/v1", func(r chi.Router) {
 		r.Route("/sellers", func(r chi.Router) {
+			r.Get("/", )
 		})
 	
 		r.Route("/warehouses", func(r chi.Router) {

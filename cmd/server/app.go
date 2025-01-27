@@ -71,29 +71,26 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Logger)
 	rt.Use(middleware.Recoverer)
 	// - endpoints
-	rt.Route("/sellers", func(rt chi.Router) {
-
+	rt.Route("/api/v1", func(r chi.Router) {
+		r.Route("/sellers", func(r chi.Router) {
+		})
+	
+		r.Route("/warehouses", func(r chi.Router) {
+		})
+	
+		r.Route("/sections", func(r chi.Router) {
+		})
+	
+		r.Route("/products", func(r chi.Router) {
+		})
+	
+		r.Route("/employees", func(r chi.Router) {
+		})
+	
+		r.Route("/buyers", func(r chi.Router) {
+		})
 	})
-
-	rt.Route("/warehouses", func(rt chi.Router) {
-
-	})
-
-	rt.Route("/sections", func(rt chi.Router) {
-
-	})
-
-	rt.Route("/products", func(rt chi.Router) {
-
-	})
-
-	rt.Route("/employees", func(rt chi.Router) {
-
-	})
-
-	rt.Route("/buyers", func(rt chi.Router) {
-
-	})
+	
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)

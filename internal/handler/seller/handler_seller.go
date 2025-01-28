@@ -1,5 +1,5 @@
 package seller
 
-type SellerDefault struct {
-
+type SellerController struct {
+    
 }

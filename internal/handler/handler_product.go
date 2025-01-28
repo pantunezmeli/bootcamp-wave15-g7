@@ -49,3 +49,32 @@ func (h *ProductHandle) GetById() http.HandlerFunc {
 		response.JSON(w, http.StatusOK, dto.GenericResponse{Data: productSearch})
 	}
 }
+
+func (h *ProductHandle) DeleteProduct() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		idPath, errPath := strconv.Atoi(chi.URLParam(r, "id"))
+		if errPath != nil {
+			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid ID"})
+			return
+		}
+
+		errDelete := h.sv.DeleteProduct(idPath)
+		if errDelete != nil {
+			if errors.As(errDelete, &pr.ErrProductRepository{}) {
+
+				if errors.Is(errDelete, pr.ErrProductNotFound) {
+					response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: errDelete.Error()})
+				}
+
+				response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: errDelete.Error()})
+				return
+			}
+
+			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			return
+		}
+
+		response.JSON(w, http.StatusOK, nil)
+	}
+}

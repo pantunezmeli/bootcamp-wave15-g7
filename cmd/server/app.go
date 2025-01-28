@@ -1,10 +1,10 @@
 package server
 
 import (
-	product4 "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/product"
-	product2 "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
-	product3 "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
+	product_hd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
+	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
+	product_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
+	product_sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -59,20 +59,15 @@ func (a *ServerChi) Run() (err error) {
 	// 	return
 	// }
 
-	ld := product2.NewProductJSONFile("/Users/matromero/GIT-Bootcamp/bootcamp-wave15-g7/docs/db/product_data.json")
+	ld := product_ld.NewProductJSONFile("/Users/matromero/GIT-Bootcamp/bootcamp-wave15-g7/docs/db/product_data.json")
 	dbProduct, err := ld.Load()
 	if err != nil {
 		return
 	}
 
-	// - repository
-	rpProduct := product.NewProductRepositoryMap(dbProduct)
-
-	// - service
-	svProduct := product3.NewProductService(rpProduct)
-
-	// - handler
-	hdProduct := product4.NewProductHandler(svProduct)
+	rpProduct := product_rp.NewProductRepositoryMap(dbProduct)
+	svProduct := product_sv.NewProductService(rpProduct)
+	hdProduct := product_hd.NewProductHandler(svProduct)
 
 	// router
 	rt := chi.NewRouter()
@@ -92,6 +87,7 @@ func (a *ServerChi) Run() (err error) {
 
 		r.Route("/products", func(r chi.Router) {
 			r.Get("/", hdProduct.GetAll())
+			r.Get("/{id}", hdProduct.GetById())
 		})
 
 		r.Route("/employees", func(r chi.Router) {

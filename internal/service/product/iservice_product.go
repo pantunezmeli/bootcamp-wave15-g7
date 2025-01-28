@@ -7,4 +7,5 @@ import (
 type IProductService interface {
 	GetAll() ([]dto.ProductDTO, error)
 	GetByID(id int) (dto.ProductDTO, error)
+	DeleteProduct(id int) error
 }

@@ -78,6 +78,20 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 			return
 		}
 
-		res, err := h.sv.Save()
+		res, err := h.sv.Save(reqBody)
+		if err != nil {
+			switch{
+			case errors.Is(err, repo.ErrCidAlreadyExists):
+				response.Error(w, http.StatusConflict, "cid already exists")
+			default:
+				response.Error(w, http.StatusInternalServerError, "please try again later")
+			}
+			return
+		}
+
+		response.JSON(w, http.StatusOK, map[string]any{
+			"data": res,
+		})
+
 	}
 }

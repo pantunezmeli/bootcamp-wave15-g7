@@ -46,7 +46,7 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 	if err = s.CheckCid(modelWithoutId.Cid.Value(), sellersMap); err != nil{
 		return
 	}
-	
+
 	newId := nextId(sellersMap)
 	
 	id, err := domain.NewId(newId)
@@ -57,6 +57,8 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 	seller = modelWithoutId
 
 	sellersMap[newId] = seller
+
+	err = s.loader.Save(sellersMap)
 
 	return
 

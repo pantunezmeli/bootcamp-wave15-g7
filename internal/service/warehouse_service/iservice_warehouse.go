@@ -6,5 +6,8 @@ import (
 
 type IWareHouseService interface {
 	// ! 1)
-	FindAll() (v map[int]dto.WareHouseDoc, err error)
+	FindAll() (w map[int]dto.WareHouseDoc, err error)
+
+	// ! 2)
+	GetWareHouseById(id int) (w dto.WareHouseDoc, err error)
 }

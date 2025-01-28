@@ -26,3 +26,9 @@ func (r *WareHouseRepository) GetAllWareHouses() (w map[int]models.WareHouse, er
 	}
 	return
 }
+
+// ! 2)
+func (r *WareHouseRepository) GetWareHouseById(id int) (wh models.WareHouse, exists bool) {
+	wh, exists = r.db[id]
+	return wh, exists
+}

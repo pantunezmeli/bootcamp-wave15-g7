@@ -52,7 +52,7 @@ type ServerChi struct {
 func (a *ServerChi) Run() (err error) {
 	// dependencies
 	// - loader
-	ld := loader.NewSellerJSONFile("../docs/db/seller_data.json")
+	ld := loader.NewSellerJSONFile("./docs/db/seller_data.json")
 
 
 	// - repository

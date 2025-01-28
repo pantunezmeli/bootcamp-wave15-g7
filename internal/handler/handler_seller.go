@@ -1,13 +1,17 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
+	repo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
 )
+
+// cambiar errores
 
 type SellerDefault struct {
 	sv seller.SellerService
@@ -26,6 +30,7 @@ func (h *SellerDefault) GetAll() http.HandlerFunc {
 			default:
 				response.Error(w, http.StatusInternalServerError, "please try again later")
 			}
+			return
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
@@ -44,12 +49,20 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 		idParsed, err := strconv.Atoi(id)
 		if err != nil{
 			response.Error(w, http.StatusBadRequest, "id should be a number")
+			return
 		}
 		res, err := h.sv.GetById(idParsed)
 		if err != nil {
 			switch {
-				
+			case errors.Is(err, repo.ErrSellerNotFound):
+				response.Error(w, http.StatusNotFound, "seller not found")
+			default:
+				response.Error(w, http.StatusInternalServerError, "please try again later")
 			}
+			return
 		}
+		response.JSON(w, http.StatusOK, map[string]any{
+			"data": res,
+		})
 	}
 }

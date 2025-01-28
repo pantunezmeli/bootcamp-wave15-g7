@@ -15,6 +15,20 @@ type ProductRepositoryMap struct {
 	loader product.IProductLoader
 }
 
+func (p ProductRepositoryMap) DeleteProduct(id int) error {
+	productSearch, errSearch := p.GetByID(id)
+	if errSearch != nil {
+		return errSearch
+	}
+
+	errDelete := p.loader.RemoveProduct(productSearch.ID)
+	if errDelete != nil {
+		return ErrProductRepository{msg: "Error deleting product"}
+	}
+
+	return nil
+}
+
 func (p ProductRepositoryMap) GetAll() (map[int]model.Product, error) {
 	products, err := p.loader.GetDb()
 	if err != nil {

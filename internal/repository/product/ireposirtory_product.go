@@ -19,4 +19,5 @@ var (
 type IProductRepository interface {
 	GetAll() (map[int]model.Product, error)
 	GetByID(id int) (model.Product, error)
+	DeleteProduct(id int) error
 }

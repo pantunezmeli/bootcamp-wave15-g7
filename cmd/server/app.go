@@ -8,7 +8,7 @@ import (
 	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/employee"
 	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
-	"golang.org/x/mod/sumdb/storage"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -52,10 +52,10 @@ type ServerChi struct {
 func (a *ServerChi) Run() (err error) {
 	// dependencies
 	// - loader
-	est := storage.NewVehicleJSONFile(a.loaderFilePath)
+	est := storage.NewEmployeeJSONFile(a.loaderFilePath)
 
 	// - repository
-	employeeRepository := erp.NewEmployeeMap(est)
+	employeeRepository := erp.NewEmployeeMap(*est)
 
 	// - service
 	employeeService := esv.NewDefaultService(employeeRepository)

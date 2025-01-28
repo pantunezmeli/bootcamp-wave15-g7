@@ -117,7 +117,11 @@ func NewTelephone(value string) (telephone Telephone, err error){
 	}
 	telephone = Telephone{value}
 	return
+}
 
+
+func (t Telephone) Value() string {
+	return t.value
 }
 
 func validateLength(value string, min, max int, errMin, errMax error) error {

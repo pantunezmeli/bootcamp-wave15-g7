@@ -19,3 +19,11 @@ type ProductRepositoryMap struct {
 func (p ProductRepositoryMap) GetAll() map[int]model.Product {
 	return p.db
 }
+
+func (p ProductRepositoryMap) GetByID(id int) (model.Product, error) {
+	product, ok := p.db[id]
+	if !ok {
+		return model.Product{}, ErrProductNotFound
+	}
+	return product, nil
+}

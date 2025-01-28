@@ -1,6 +1,7 @@
 package seller
 
 import (
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader"
 )
@@ -34,4 +35,56 @@ func  (s *SellerStorage) GetById(id int) (seller models.Seller, err error) {
 		err = ErrSellerNotFound
 	}
 	return
+}
+
+func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller, err error) {
+	sellersMap, err := s.loader.Load()
+	if err != nil {
+		return
+	}
+
+	if err = s.CheckCid(modelWithoutId.Cid.Value(), sellersMap); err != nil{
+		return
+	}
+	
+	newId := nextId(sellersMap)
+	
+	id, err := domain.NewId(newId)
+	if err != nil {
+		return
+	} 
+	modelWithoutId.ID = id
+	seller = modelWithoutId
+
+	sellersMap[newId] = seller
+
+	return
+
+
+
+}
+
+func (s *SellerStorage) CheckCid(cid int, sellersMap map[int]models.Seller) (err error){
+	for _, seller := range sellersMap{
+		if seller.Cid.Value() == cid {
+			err = ErrCidAlreadyExists
+			return
+		}
+	}
+	return
+}
+
+func nextId(sellersMap map[int]models.Seller) int {
+	existingIds := make(map[int]bool)
+	for id := range sellersMap {
+		existingIds[id] = true
+	}
+
+	nextId := 1
+	for {
+		if !existingIds[nextId] {
+			return nextId
+		}
+		nextId++
+	}
 }

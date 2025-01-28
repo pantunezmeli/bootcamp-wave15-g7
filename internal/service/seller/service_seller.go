@@ -1,7 +1,6 @@
 package seller
 
 import (
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
@@ -20,7 +19,7 @@ func (s *SellerDefault) GetAll() (sellers []dto.SellerDoc, err error) {
 		return
 	}
 	for _, sellerModel := range sellersModel{
-		sellerDto := parseModelToDto(sellerModel)
+		sellerDto := dto.ParseModelToDto(sellerModel)
 		sellers = append(sellers, sellerDto)
 	}
 	return
@@ -32,7 +31,26 @@ func (s *SellerDefault) GetById(id int) (seller dto.SellerDoc, err error){
 		return
 	}
 
-	seller = parseModelToDto(sellerModel)
+	seller = dto.ParseModelToDto(sellerModel)
+	return
+
+
+}
+
+
+func (s *SellerDefault) Save(reqBody dto.SellerDoc) (seller dto.SellerDoc, err error){
+	model, err := dto.ParseDtoToModel(reqBody)
+	if err != nil{
+		return
+	}
+
+	resModel, err := s.rp.Save(model)
+	if err != nil {
+		return 
+	}
+
+	seller = dto.ParseModelToDto(resModel)
+
 	return
 
 
@@ -41,13 +59,3 @@ func (s *SellerDefault) GetById(id int) (seller dto.SellerDoc, err error){
 
 
 
-func parseModelToDto(sellerModel models.Seller) (sellerDto dto.SellerDoc){
-	sellerDto = dto.SellerDoc{
-			ID: sellerModel.ID.Value(),
-			Cid: sellerModel.Cid.Value(),
-			CompanyName: sellerModel.CompanyName.Value(),
-			Address: sellerModel.Address.Value(),
-			Telephone: sellerModel.Telephone.Value(),
-		}
-	return
-}

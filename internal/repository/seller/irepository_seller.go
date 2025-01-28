@@ -8,10 +8,12 @@ import (
 
 var (
 	ErrSellerNotFound = errors.New("seller not found")
+	ErrCidAlreadyExists = errors.New("cid already exists")
 )
 
 
 type SellerRepository interface {
 	GetAll() (sellers []models.Seller, err error)
-	GetById(id int) (seller models.Seller, err error)
+	GetById(int) (seller models.Seller, err error)
+	Save(models.Seller) (seller models.Seller, err error)
 }

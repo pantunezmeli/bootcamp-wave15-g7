@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/bootcamp-go/web/request"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	repo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
 // cambiar errores
@@ -64,5 +66,18 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": res,
 		})
+	}
+}
+
+
+func (h *SellerDefault) Create() http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		var reqBody dto.SellerDoc
+		if err := request.JSON(r, &reqBody); err != nil{
+			response.Error(w, http.StatusBadRequest, "invalid body")
+			return
+		}
+
+		res, err := h.sv.Save()
 	}
 }

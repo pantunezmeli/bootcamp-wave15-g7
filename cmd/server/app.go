@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -48,15 +49,11 @@ type ServerChi struct {
 func (a *ServerChi) Run() (err error) {
 	// dependencies
 	// - loader
-	// ld := loader.NewVehicleJSONFile(a.loaderFilePath)
-	// db, err := ld.Load()
-	// if err != nil {
-	// 	return
-	// }
+	ld := loader.NewSellerJSONFile("../docs/db/seller_data.json")
 
 
 	// - repository
-
+	
 
 
 	// - service

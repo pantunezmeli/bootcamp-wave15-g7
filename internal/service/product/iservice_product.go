@@ -5,6 +5,6 @@ import (
 )
 
 type IProductService interface {
-	GetAll() []dto.ProductDTO
+	GetAll() ([]dto.ProductDTO, error)
 	GetByID(id int) (dto.ProductDTO, error)
 }

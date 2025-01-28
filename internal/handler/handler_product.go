@@ -21,8 +21,8 @@ type ProductHandle struct {
 
 func (h *ProductHandle) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		response.JSON(w, http.StatusOK, dto.GenericResponse{Data: h.sv.GetAll()})
+		products, _ := h.sv.GetAll()
+		response.JSON(w, http.StatusOK, dto.GenericResponse{Data: products})
 	}
 }
 

@@ -47,3 +47,25 @@ func ParserProductToDTO(p model.Product) ProductDTO {
 		SellerID:                       p.SellerID,
 	}
 }
+
+func ParseDTOProduct(product ProductDTO) model.Product {
+	return model.Product{
+		ID:            product.ID,
+		Description:   product.Description,
+		ProductCode:   product.ProductCode,
+		ProductTypeID: product.ProductTypeID,
+		SellerID:      product.SellerID,
+		FreezingInfo: model.FreezingInfo{
+			ExpirationRate:                 product.ExpirationRate,
+			FreezingRate:                   product.FreezingRate,
+			RecommendedFreezingTemperature: product.RecommendedFreezingTemperature,
+		},
+		Dimensions: model.Dimensions{
+			Height:    product.Height,
+			Length:    product.Length,
+			NetWeight: product.NetWeight,
+			Width:     product.Width,
+		},
+	}
+
+}

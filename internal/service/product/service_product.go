@@ -13,8 +13,12 @@ type ProductService struct {
 	rp product.IProductRepository
 }
 
-func (p ProductService) GetAll() []dto.ProductDTO {
-	return dto.ParserListProductToDTO(p.rp.GetAll())
+func (p ProductService) GetAll() ([]dto.ProductDTO, error) {
+	products, errSearch := p.rp.GetAll()
+	if errSearch != nil {
+		return make([]dto.ProductDTO, 0), errSearch
+	}
+	return dto.ParserListProductToDTO(products), nil
 }
 
 func (p ProductService) GetByID(id int) (dto.ProductDTO, error) {

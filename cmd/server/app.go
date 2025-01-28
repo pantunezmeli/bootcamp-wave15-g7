@@ -59,13 +59,8 @@ func (a *ServerChi) Run() (err error) {
 	// 	return
 	// }
 
-	ld := product_ld.NewProductJSONFile("/Users/matromero/GIT-Bootcamp/bootcamp-wave15-g7/docs/db/product_data.json")
-	dbProduct, err := ld.Load()
-	if err != nil {
-		return
-	}
-
-	rpProduct := product_rp.NewProductRepositoryMap(dbProduct)
+	ldProduct := product_ld.NewProductJSONFile("/Users/matromero/GIT-Bootcamp/bootcamp-wave15-g7/docs/db/product_data.json")
+	rpProduct := product_rp.NewProductRepositoryMap(ldProduct)
 	svProduct := product_sv.NewProductService(rpProduct)
 	hdProduct := product_hd.NewProductHandler(svProduct)
 

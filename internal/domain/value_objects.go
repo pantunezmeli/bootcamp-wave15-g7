@@ -14,7 +14,7 @@ var (
 	AddressMax                = 255
 	TelephoneMin              = 2
 	TelephoneMax              = 30
-	validTelephoneRegex       = `^[0-9+\-()]+$`
+	validTelephoneRegex       = `^[0-9+\-()\s]+$`
         
 
 	ErrInvalidId              = errors.New("id should be a positive number")

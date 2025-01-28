@@ -6,6 +6,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader"
+	SellerRepo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
+	SellerService"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -53,13 +56,16 @@ func (a *ServerChi) Run() (err error) {
 
 
 	// - repository
-	
+	sellerRepository := SellerRepo.NewSellerStorage(*ld)
+
 
 
 	// - service
+	sellerService := SellerService.NewSellerDefault(sellerRepository)
 
 
 	// - handler
+	sellerHandler := handler.NewSellerDefault(sellerService)
 
 
 	// router
@@ -70,7 +76,7 @@ func (a *ServerChi) Run() (err error) {
 	// - endpoints
 	rt.Route("/api/v1", func(r chi.Router) {
 		r.Route("/sellers", func(r chi.Router) {
-			r.Get("/", )
+			r.Get("/", sellerHandler.GetAll())
 		})
 	
 		r.Route("/warehouses", func(r chi.Router) {

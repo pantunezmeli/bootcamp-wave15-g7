@@ -2,6 +2,7 @@ package loader
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	d "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
@@ -25,6 +26,7 @@ type SellerJSONFile struct {
 func (l *SellerJSONFile) Load() (sellerMap map[int]models.Seller, err error) {
 	file, err := os.Open(l.path)
 	if err != nil {
+		fmt.Println(err.Error())
 		return
 	}
 	defer file.Close()
@@ -32,6 +34,7 @@ func (l *SellerJSONFile) Load() (sellerMap map[int]models.Seller, err error) {
 	var sellersJSON []dto.SellerDoc
 	err = json.NewDecoder(file).Decode(&sellersJSON)
 	if err != nil {
+		fmt.Println(err.Error())
 		return
 	}
 

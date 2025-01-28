@@ -24,3 +24,14 @@ func (s *SellerStorage) GetAll() (sellers []models.Seller, err error) {
 	return
 }
 
+func  (s *SellerStorage) GetById(id int) (seller models.Seller, err error) {
+	sellersMap, err := s.loader.Load()
+	if err != nil{
+		return
+	}
+	seller, ok := sellersMap[id]
+	if !ok {
+		err = ErrSellerNotFound
+	}
+	return
+}

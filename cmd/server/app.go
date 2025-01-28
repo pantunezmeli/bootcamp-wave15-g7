@@ -1,6 +1,10 @@
 package server
 
 import (
+	product4 "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/product"
+	product2 "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
+	product3 "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -47,6 +51,7 @@ type ServerChi struct {
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// dependencies
+
 	// - loader
 	// ld := loader.NewVehicleJSONFile(a.loaderFilePath)
 	// db, err := ld.Load()
@@ -54,16 +59,20 @@ func (a *ServerChi) Run() (err error) {
 	// 	return
 	// }
 
+	ld := product2.NewProductJSONFile("/Users/matromero/GIT-Bootcamp/bootcamp-wave15-g7/docs/db/product_data.json")
+	dbProduct, err := ld.Load()
+	if err != nil {
+		return
+	}
 
 	// - repository
-
-
+	rpProduct := product.NewProductRepositoryMap(dbProduct)
 
 	// - service
-
+	svProduct := product3.NewProductService(rpProduct)
 
 	// - handler
-
+	hdProduct := product4.NewProductHandler(svProduct)
 
 	// router
 	rt := chi.NewRouter()
@@ -74,23 +83,23 @@ func (a *ServerChi) Run() (err error) {
 	rt.Route("/api/v1", func(r chi.Router) {
 		r.Route("/sellers", func(r chi.Router) {
 		})
-	
+
 		r.Route("/warehouses", func(r chi.Router) {
 		})
-	
+
 		r.Route("/sections", func(r chi.Router) {
 		})
-	
+
 		r.Route("/products", func(r chi.Router) {
+			r.Get("/", hdProduct.GetAll())
 		})
-	
+
 		r.Route("/employees", func(r chi.Router) {
 		})
-	
+
 		r.Route("/buyers", func(r chi.Router) {
 		})
 	})
-	
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)

@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/employee"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -54,16 +55,12 @@ func (a *ServerChi) Run() (err error) {
 	// 	return
 	// }
 
-
 	// - repository
-
-
 
 	// - service
 
-
 	// - handler
-
+	employeeHandler := employee.NewDefaultHandler()
 
 	// router
 	rt := chi.NewRouter()
@@ -74,23 +71,27 @@ func (a *ServerChi) Run() (err error) {
 	rt.Route("/api/v1", func(r chi.Router) {
 		r.Route("/sellers", func(r chi.Router) {
 		})
-	
+
 		r.Route("/warehouses", func(r chi.Router) {
 		})
-	
+
 		r.Route("/sections", func(r chi.Router) {
 		})
-	
+
 		r.Route("/products", func(r chi.Router) {
 		})
-	
+
 		r.Route("/employees", func(r chi.Router) {
+			rt.Get("/", employeeHandler.GetAll())
+			rt.Get("/{id}", employeeHandler.GetById())
+			rt.Post("/", employeeHandler.Add())
+			rt.Patch("/{id}", employeeHandler.Update())
+			rt.Delete("/{id}", employeeHandler.DeleteById())
 		})
-	
+
 		r.Route("/buyers", func(r chi.Router) {
 		})
 	})
-	
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)

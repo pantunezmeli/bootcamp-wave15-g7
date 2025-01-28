@@ -5,7 +5,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/employee"
+	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/employee"
+	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
+	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -56,11 +58,13 @@ func (a *ServerChi) Run() (err error) {
 	// }
 
 	// - repository
+	employeeRepository := erp.NewEmployeeMap()
 
 	// - service
+	employeeService := esv.NewDefaultService(employeeRepository)
 
 	// - handler
-	employeeHandler := employee.NewDefaultHandler()
+	employeeHandler := ehd.NewDefaultHandler(employeeService)
 
 	// router
 	rt := chi.NewRouter()

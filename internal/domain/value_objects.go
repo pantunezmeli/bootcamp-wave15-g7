@@ -17,6 +17,7 @@ var (
 	validTelephoneRegex       = `^[0-9+\-()\s]+$`
         
 
+	
 	ErrInvalidId              = errors.New("id should be a positive number")
 	ErrInvalidCid             = errors.New("cid should be a positive number")
 	ErrCompanyNameTooShort    = errors.New("company name must be at least 2 characters long")

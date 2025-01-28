@@ -28,5 +28,8 @@ func (p ProductService) GetByID(id int) (dto.ProductDTO, error) {
 	}
 
 	return dto.ParserProductToDTO(productSearch), nil
+}
 
+func (p ProductService) DeleteProduct(id int) error {
+	return p.rp.DeleteProduct(id)
 }

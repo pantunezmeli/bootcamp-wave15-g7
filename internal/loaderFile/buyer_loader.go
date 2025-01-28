@@ -5,7 +5,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
 )
 
 type IBuyerLoader interface {
@@ -47,4 +47,35 @@ func (l *BuyerJSONFile) Load() (map[int]model.Buyer, error) {
 	}
 
 	return list, nil
+}
+
+func (l *BuyerJSONFile) Save(buyer model.Buyer) error {
+	// Leer el archivo JSON existente
+	var buyers []model.Buyer
+
+	file, err := os.Open(l.path)
+	if err == nil {
+		defer file.Close()
+		decoder := json.NewDecoder(file)
+		_ = decoder.Decode(&buyers)
+	} else if !os.IsNotExist(err) {
+		return errors.New("error reading")
+	}
+
+	// Agregar el nuevo buyer a la lista
+	buyers = append(buyers, buyer)
+
+	file, err = os.Create(l.path)
+	if err != nil {
+		return errors.New("error writing")
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(buyers); err != nil {
+		return errors.New("error encoding")
+	}
+
+	return nil
 }

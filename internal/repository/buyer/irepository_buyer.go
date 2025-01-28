@@ -1,6 +1,6 @@
-package buyerrepository
+package buyer
 
-import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/model"
+import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
 
 type IRepositoryBuyer interface {
 	GetAll() (map[int]model.Buyer, error)

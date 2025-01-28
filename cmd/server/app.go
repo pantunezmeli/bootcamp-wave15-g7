@@ -5,10 +5,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	buyerhandler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/buyer_handler"
+
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	loaderfile "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loaderFile"
-	buyerrepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer_repository"
-	buyerservice "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer_service"
+	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
+	buyerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -60,11 +61,11 @@ func (a *ServerChi) Run() (err error) {
 
 	// - repository
 	//rp := repository.NewBuyerRepository(db)
-	rp := buyerrepository.NewBuyerRepository(db)
+	rp := buyerRepository.NewBuyerRepository(db)
 	// - service
-	sv := buyerservice.NewBuyerService(rp)
+	sv := buyerService.NewBuyerService(rp)
 	// - handler
-	hd := buyerhandler.NewBuyerHandler(sv)
+	hd := handler.NewBuyerHandler(sv)
 	// router
 	rt := chi.NewRouter()
 	// - middlewares
@@ -90,6 +91,8 @@ func (a *ServerChi) Run() (err error) {
 		rt.Route("/buyers", func(rt chi.Router) {
 			rt.Get("/", hd.GetAll())
 			rt.Get("/{id}", hd.GetBuyerById())
+			rt.Post("/", hd.CreateBuyer())
+
 		})
 	})
 

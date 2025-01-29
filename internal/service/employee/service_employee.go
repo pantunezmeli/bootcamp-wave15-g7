@@ -1,8 +1,8 @@
 package employee
 
 import (
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
 func NewDefaultService(repository employee.EmployeeRepository) *DefaultService {
@@ -13,8 +13,12 @@ type DefaultService struct {
 	rp employee.EmployeeRepository
 }
 
-func (s *DefaultService) FindAll() (employees map[int]model.Employee, err error) {
-	employees, err = s.rp.FindAll()
+func (s *DefaultService) FindAll() (employeesData map[int]dto.EmployeeDoc, err error) {
+	employeesFound, err := s.rp.FindAll()
+	employeesData = make(map[int]dto.EmployeeDoc)
+	for key, value := range employeesFound {
+		employeesData[key] = dto.EmployeeModelToDto(value)
+	}
 	return
 }
 

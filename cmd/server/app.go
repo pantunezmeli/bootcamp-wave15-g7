@@ -5,6 +5,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader"
+	rep "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
+	sec "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -48,23 +52,17 @@ type ServerChi struct {
 func (a *ServerChi) Run() (err error) {
 	// dependencies
 	// - loader
-	// ld := loader.NewVehicleJSONFile(a.loaderFilePath)
-	// db, err := ld.Load()
-	// if err != nil {
-	// 	return
-	// }
-
-
+	ld := loader.NewSectionJSONFile(a.loaderFilePath)
+	db, err := ld.Load()
+	if err != nil {
+		return
+	}
 	// - repository
-
-
-
+	rp := rep.NewSectionMap(db)
 	// - service
-
-
+	sv := sec.NewSectionDefault(rp)
 	// - handler
-
-
+	hd := handler.NewSectionDefault(sv)
 	// router
 	rt := chi.NewRouter()
 	// - middlewares
@@ -74,23 +72,27 @@ func (a *ServerChi) Run() (err error) {
 	rt.Route("/api/v1", func(r chi.Router) {
 		r.Route("/sellers", func(r chi.Router) {
 		})
-	
+
 		r.Route("/warehouses", func(r chi.Router) {
 		})
-	
+
 		r.Route("/sections", func(r chi.Router) {
+			r.Get("/", hd.ListSections())
+			r.Get("/{id}", hd.GetSection())
+			r.Post("/", hd.CreateSection())
+			r.Patch("/{id}", hd.PatchSection())
+			r.Delete("/{id}", hd.DeleteSection())
 		})
-	
+
 		r.Route("/products", func(r chi.Router) {
 		})
-	
+
 		r.Route("/employees", func(r chi.Router) {
 		})
-	
+
 		r.Route("/buyers", func(r chi.Router) {
 		})
 	})
-	
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)

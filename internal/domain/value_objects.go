@@ -37,6 +37,17 @@ func NewName(value string) (name Name, err error) {
 	return Name{value: value}, nil
 }
 
+// Seteo sin validación
+func NewOptionalId(value int) Id {
+	return Id{value: value}
+}
+func NewOptionalCardNumber(value string) CardNumber {
+	return CardNumber{value: value}
+}
+func NewOptionalName(value string) Name {
+	return Name{value: value}
+}
+
 // Obtener el valor
 func (id Id) GetId() int {
 	return id.value

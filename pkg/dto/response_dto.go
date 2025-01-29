@@ -44,6 +44,17 @@ func EmployeeDtoToModel(dto EmployeeDoc) (employee model.Employee, err error) {
 	return
 }
 
+func EmployeeDtoToModeWithoutValidation(dto EmployeeDoc) (employee model.Employee, err error) {
+	employee = model.Employee{
+		Id:          domain.NewOptionalId(dto.Id),
+		CardNumber:  domain.NewOptionalCardNumber(dto.CardNumber),
+		FirstName:   domain.NewOptionalName(dto.FirstName),
+		LastName:    domain.NewOptionalName(dto.LastName),
+		WarehouseId: domain.NewOptionalId(dto.WarehouseId),
+	}
+	return
+}
+
 func EmployeeModelToDto(employee model.Employee) (dto EmployeeDoc) {
 	dto = EmployeeDoc{
 		Id:          employee.Id.GetId(),

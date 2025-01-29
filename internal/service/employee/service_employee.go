@@ -71,7 +71,10 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 		return
 	}
 
-	employee, err := dto.EmployeeDtoToModel(employeeData)
+	employee, err := dto.EmployeeDtoToModeWithoutValidation(employeeData)
+	if err != nil {
+		return
+	}
 	updatedEmployee, err := s.rp.Edit(id, employee)
 	if err != nil {
 		return

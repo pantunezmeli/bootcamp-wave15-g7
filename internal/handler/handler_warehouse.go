@@ -78,7 +78,7 @@ func (h *WareHouseHandler) GetWareHouseById() http.HandlerFunc {
 }
 
 // ! 3)
-func (h *WareHouseHandler) AddNewWarehouse() http.HandlerFunc {
+func (h *WareHouseHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var req dto.WareHouseDoc
@@ -140,7 +140,7 @@ func (h *WareHouseHandler) AddNewWarehouse() http.HandlerFunc {
 }
 
 // ! 4)
-func (h *WareHouseHandler) EditWareHouse() http.HandlerFunc {
+func (h *WareHouseHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Params
 		idStr := chi.URLParam(r, "id")
@@ -199,7 +199,7 @@ func (h *WareHouseHandler) EditWareHouse() http.HandlerFunc {
 		// Right response
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
-			"data":    wh,
+			"data":    []dto.WareHouseDoc{wh},
 		})
 
 	}

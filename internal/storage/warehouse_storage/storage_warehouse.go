@@ -1,4 +1,4 @@
-package warehouse
+package warehouse_storage
 
 import (
 	"encoding/json"
@@ -20,9 +20,9 @@ func NewWareHouseJSONFile(path string) *WareHouseJSONFile {
 	}
 }
 
-func (l *WareHouseJSONFile) Load() (w map[int]models.WareHouse, err error) {
+func (s *WareHouseJSONFile) Load() (w map[int]models.WareHouse, err error) {
 
-	file, err := os.Open(l.path)
+	file, err := os.Open(s.path)
 	if err != nil {
 		return
 	}
@@ -78,4 +78,34 @@ func (l *WareHouseJSONFile) Load() (w map[int]models.WareHouse, err error) {
 	}
 
 	return
+}
+
+func (s *WareHouseJSONFile) Save(wh map[int]models.WareHouse) error {
+
+	// Convert map to list
+	wareHouselist := make([]dto.WareHouseDoc, 0, len(wh))
+	for _, wareHouse := range wh {
+		wareHouselist = append(wareHouselist, dto.WareHouseDoc{
+			Id:                 wareHouse.Id.GetId(),
+			WareHouseCode:      wareHouse.WareHouseCode.GetWareHouseCode(),
+			Address:            wareHouse.Address.GetAddress(),
+			Telephone:          wareHouse.Telephone.GetTelephone(),
+			MinimunCapacity:    wareHouse.MinimunCapacity.GetMinimunCapacity(),
+			MinimunTemperature: wareHouse.MinimunTemperature.GetMinimunTemperature(),
+		})
+	}
+
+	// Convert list to JSON
+	data, err := json.MarshalIndent(wareHouselist, "", " ")
+	if err != nil {
+		return err
+	}
+
+	// Write JSON on file
+	err = os.WriteFile(s.path, data, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

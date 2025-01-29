@@ -89,6 +89,22 @@ func (h *WareHouseHandler) AddNewWarehouse() http.HandlerFunc {
 			return
 		}
 
+		// Validar si faltan campos obligatorios
+		if req.WareHouseCode == "" || req.Address == "" || req.Telephone == "" ||
+			req.MinimunCapacity <= 0 || req.MinimunTemperature < -100 {
+			response.JSON(w, http.StatusUnprocessableEntity, map[string]any{
+				"message": "missing or invalid required fields",
+				"errors": map[string]string{
+					"warehouse_code":      "must not be empty",
+					"address":             "must not be empty",
+					"telephone":           "must not be empty",
+					"minimun_capacity":    "must be greater than 0",
+					"minimun_temperature": "must be at least -100",
+				},
+			})
+			return
+		}
+
 		// Call Service
 		err = h.sv.AddWareHouse(req)
 		if err != nil {

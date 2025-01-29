@@ -11,14 +11,15 @@ import (
 
 type BuyerRepository struct {
 	buyers map[int]model.Buyer
+	loader loaderfile.IBuyerLoader
 }
 
-func NewBuyerRepository(buyers map[int]model.Buyer) *BuyerRepository {
+func NewBuyerRepository(buyers map[int]model.Buyer, loader loaderfile.IBuyerLoader) *BuyerRepository {
 	list := make(map[int]model.Buyer)
 	if buyers != nil {
 		list = buyers
 	}
-	return &BuyerRepository{buyers: list}
+	return &BuyerRepository{buyers: list, loader: loader}
 }
 
 func (buyer *BuyerRepository) GetAll() (map[int]model.Buyer, error) {
@@ -66,6 +67,32 @@ func (buyer *BuyerRepository) Create(entity model.Buyer) (model.Buyer, error) {
 	return entity, nil
 }
 
+func (buyer *BuyerRepository) Update(id int, entity model.Buyer) (model.Buyer, error) {
+
+	element, ok := buyer.buyers[id]
+	if !ok {
+		return model.Buyer{}, errorbase.ErrConflict
+	}
+	if cardNumberId, err := domain.NewCardNumberId(id); err == nil {
+		element.Card_Number_Id = cardNumberId.GetCardNumberId()
+	}
+
+	if firstName, err := domain.NewFirstName(entity.First_Name); err == nil {
+		element.First_Name = firstName.GetFirstName()
+	}
+
+	if lastName, err := domain.NewLastName(entity.Last_Name); err == nil {
+		element.Last_Name = lastName.GetLastName()
+	}
+	// if err := mergo.Merge(&element, entity, mergo.WithOverride); err != nil {
+	// 	return model.Buyer{}, err
+	// }
+
+	buyer.loader.Save(element)
+	buyer.buyers[id] = element
+	return element, nil
+}
+
 func getLastId(buyer map[int]model.Buyer) int {
 	maxId := 0
 	for id := range buyer {
@@ -97,32 +124,6 @@ func (*BuyerRepository) ValidateModel(entity model.Buyer) (map[string]any, error
 		"FirstName":  firstName,
 		"LastName":   lastName,
 	}, nil
-}
-
-func (buyer *BuyerRepository) Update(id int, entity model.Buyer) (model.Buyer, error) {
-
-	element, ok := buyer.buyers[id]
-	if !ok {
-		return model.Buyer{}, errorbase.ErrConflict
-	}
-	if cardNumberId, err := domain.NewCardNumberId(id); err == nil {
-		element.Card_Number_Id = cardNumberId.GetCardNumberId()
-	}
-
-	if firstName, err := domain.NewFirstName(entity.First_Name); err == nil {
-		element.First_Name = firstName.GetFirstName()
-	}
-
-	if lastName, err := domain.NewLastName(entity.Last_Name); err == nil {
-		element.Last_Name = lastName.GetLastName()
-	}
-	// if err := mergo.Merge(&element, entity, mergo.); err != nil {
-	// 	return model.Buyer{}, err
-	// }
-	loader := loaderfile.NewBuyerJSONFile("../docs/db/buyer_data.json")
-	loader.Save(element)
-	buyer.buyers[id] = element
-	return element, nil
 }
 
 //func (buyer *BuyerRepository) Delete(id int) error {

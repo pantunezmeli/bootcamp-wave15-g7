@@ -60,8 +60,7 @@ func (a *ServerChi) Run() (err error) {
 	}
 
 	// - repository
-	//rp := repository.NewBuyerRepository(db)
-	rp := buyerRepository.NewBuyerRepository(db)
+	rp := buyerRepository.NewBuyerRepository(db, ld)
 	// - service
 	sv := buyerService.NewBuyerService(rp)
 	// - handler

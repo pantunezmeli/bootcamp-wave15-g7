@@ -1,8 +1,8 @@
 package employee
 
 import (
-	"github.com/leofierens/bootcamp-wave15-g7/internal/storage"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 )
 
 func NewEmployeeMap(storage storage.EmployeeJSONFile) *EmployeeMap {
@@ -14,7 +14,18 @@ type EmployeeMap struct {
 }
 
 func (r *EmployeeMap) FindAll() (employees map[int]model.Employee, err error) {
-	return nil, nil
+	file, err := r.st.Load()
+	if err != nil {
+		return
+	}
+	employees = make(map[int]model.Employee)
+
+	// copy db
+	for key, value := range file {
+		employees[key] = value
+	}
+
+	return
 }
 
 func (r *EmployeeMap) FindById() (err error) {

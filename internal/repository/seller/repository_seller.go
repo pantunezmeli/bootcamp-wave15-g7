@@ -37,26 +37,29 @@ func  (s *SellerStorage) GetById(id int) (seller models.Seller, err error) {
 	return
 }
 
-func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller, err error) {
+func (s *SellerStorage) Save(modelToSave models.Seller) (seller models.Seller, err error) {
 	sellersMap, err := s.loader.Load()
 	if err != nil {
 		return
 	}
 
-	if err = s.CheckCid(*modelWithoutId.Cid.Value(), sellersMap); err != nil{
+	if err = s.CheckCid(*modelToSave.Cid.Value(), sellersMap); err != nil{
 		return
 	}
 
-	newId := nextId(sellersMap)
-	
-	id, err := domain.NewId(newId)
-	if err != nil {
-		return
-	} 
-	modelWithoutId.ID = id
-	seller = modelWithoutId
+	if *modelToSave.ID.Value() == 0 {
+		newId := nextId(sellersMap)
+		
+		id, err := domain.NewId(newId)
+		if err != nil {
+			return models.Seller{}, err
+		} 
+		modelToSave.ID = id
+	}
 
-	sellersMap[newId] = seller
+	seller = modelToSave
+
+	sellersMap[*modelToSave.ID.Value()] = seller
 
 	err = s.loader.Save(sellersMap)
 
@@ -87,7 +90,7 @@ func (s *SellerStorage) Delete(id int) (err error){
 
 func (s *SellerStorage) CheckCid(cid int, sellersMap map[int]models.Seller) (err error){
 	for _, seller := range sellersMap{
-		if seller.Cid.Value() == &cid {
+		if *seller.Cid.Value() == cid {
 			err = ErrCidAlreadyExists
 			return
 		}

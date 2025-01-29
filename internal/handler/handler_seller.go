@@ -131,25 +131,42 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 func (h *SellerDefault) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//CODIGO REPETIDO
-		// id := chi.URLParam(r, "id")
-		// if id == "" {
-		// 	response.Error(w, http.StatusBadRequest, "invalid id")
-		// 	return
-		// }
-		// idParsed, err := strconv.Atoi(id)
-		// if err != nil{
-		// 	response.Error(w, http.StatusBadRequest, "id should be a number")
-		// 	return
-		// }
+		id := chi.URLParam(r, "id")
+		if id == "" {
+			response.Error(w, http.StatusBadRequest, "invalid id")
+			return
+		}
+		idParsed, err := strconv.Atoi(id)
+		if err != nil{
+			response.Error(w, http.StatusBadRequest, "id should be a number")
+			return
+		}
 
-		// var reqBody dto.SellerDoc
-		// if err := request.JSON(r, &reqBody); err != nil{
-		// 	response.Error(w, http.StatusBadRequest, "invalid body")
-		// 	return
-		// }
-		// reqBody.ID = idParsed
+		var reqBody dto.SellerDoc
+		if err := request.JSON(r, &reqBody); err != nil{
+			response.Error(w, http.StatusBadRequest, "invalid body")
+			return
+		}
+		reqBody.ID = &idParsed
 
-		// res, err := h.sv.Update(reqBody)
+		res, err := h.sv.Update(reqBody)
+		if err != nil {
+			//handlear los errores que faltan
+			switch{
+			case errors.Is(err, repo.ErrCidAlreadyExists):
+				response.Error(w, http.StatusConflict, "cid already exists")
+			case errors.Is(err, repo.ErrSellerNotFound):
+				response.Error(w, http.StatusNotFound, "seller not found")
+			default:
+				response.Error(w, http.StatusInternalServerError, "please try again later")
+			}
+			return
+		}
+
+		response.JSON(w, http.StatusOK, map[string]any{
+			"data": res,
+		})
+
 
 
 	}

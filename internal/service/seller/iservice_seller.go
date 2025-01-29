@@ -16,4 +16,5 @@ type SellerService interface {
 	GetById(int) (seller dto.SellerDoc, err error)
 	Save(dto.SellerDoc) (seller dto.SellerDoc, err error)
 	Delete(id int) (err error)
+	Update(reqBody dto.SellerDoc) (seller dto.SellerDoc, err error)
 }

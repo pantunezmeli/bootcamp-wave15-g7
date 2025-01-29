@@ -37,36 +37,28 @@ func  (s *SellerStorage) GetById(id int) (seller models.Seller, err error) {
 	return
 }
 
-func (s *SellerStorage) Save(modelToSave models.Seller) (seller models.Seller, err error) {
+func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller, err error) {
 	sellersMap, err := s.loader.Load()
 	if err != nil {
 		return
 	}
-
-	if err = s.CheckCid(modelToSave, sellersMap); err != nil{
+	if err = s.CheckCid(*modelWithoutId.Cid.Value(), sellersMap); err != nil{
 		return
 	}
-
-	if *modelToSave.ID.Value() == 0 {
-		newId := nextId(sellersMap)
-		
-		id, err := domain.NewId(newId)
-		if err != nil {
-			return models.Seller{}, err
-		} 
-		modelToSave.ID = id
-	}
-
-	seller = modelToSave
-
-	sellersMap[*modelToSave.ID.Value()] = seller
+	
+	newId := nextId(sellersMap)
+	
+	id, err := domain.NewId(newId)
+	if err != nil {
+		return
+	} 
+	modelWithoutId.ID = id
+	seller = modelWithoutId
+	sellersMap[newId] = seller
 
 	err = s.loader.Save(sellersMap)
-
 	return
-
 }
-
 
 func (s *SellerStorage) Delete(id int) (err error){
 	sellersMap, err := s.loader.Load()
@@ -88,18 +80,31 @@ func (s *SellerStorage) Delete(id int) (err error){
 
 }
 
-func (s *SellerStorage) CheckCid(sellerToCheck models.Seller, sellersMap map[int]models.Seller) (err error){
-	if *sellerToCheck.ID.Value() == 0 {
-		return
-	}
+func (s *SellerStorage) CheckCid(cid int, sellersMap map[int]models.Seller) (err error){
 	for _, seller := range sellersMap{
-		if *seller.Cid.Value() == *sellerToCheck.Cid.Value() && *sellerToCheck.ID.Value() != *seller.ID.Value()  {
+		if *seller.Cid.Value() == cid {
 			err = ErrCidAlreadyExists
 			return
 		}
 	}
 	return
 }
+
+func(s *SellerStorage) Update(sellerModel models.Seller) (sellerUpdated models.Seller, err error){
+	sellersMap, err := s.loader.Load()
+	if err != nil {
+		return
+	}
+	if err = s.CheckCid(*sellerModel.Cid.Value(), sellersMap); err != nil{
+		return
+	}
+	
+	sellerUpdated = sellerModel
+	sellersMap[*sellerModel.ID.Value()] = sellerUpdated
+	err = s.loader.Save(sellersMap)
+	return
+}
+
 
 func nextId(sellersMap map[int]models.Seller) int {
 	existingIds := make(map[int]bool)

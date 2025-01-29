@@ -106,7 +106,7 @@ func (s *SellerDefault) Update(reqBody dto.SellerDoc) (seller dto.SellerDoc, err
 		sellerModel.Telephone = telephone
 	}
 
-	sellerModel, err = s.rp.Save(sellerModel)
+	sellerModel, err = s.rp.Update(sellerModel)
 
 	if err != nil{
 		return

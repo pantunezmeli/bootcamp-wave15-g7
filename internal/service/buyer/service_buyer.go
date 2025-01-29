@@ -3,7 +3,7 @@ package buyer
 import (
 	"errors"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
@@ -43,7 +43,7 @@ func (repo *BuyerService) GetBuyer(id int) (dto.BuyerResponse, error) {
 	return buyerResponse, nil
 }
 
-func (repo *BuyerService) CreateBuyer(entity model.Buyer) (dto.BuyerResponse, error) {
+func (repo *BuyerService) CreateBuyer(entity models.Buyer) (dto.BuyerResponse, error) {
 	buyer, err := repo.repository.Create(entity)
 	if err != nil {
 		return dto.BuyerResponse{}, errors.New(err.Error())
@@ -68,4 +68,17 @@ func (repo *BuyerService) UpdateBuyer(id int, entity dto.BuyerResponse) (dto.Buy
 
 	buyerResponse := dto.GenerateBuyerResponse(buyer)
 	return buyerResponse, nil
+}
+
+func (repo *BuyerService) DeleteBuyer(id int) error {
+	if id <= 0 {
+		return errorbase.ErrInvalidId
+	}
+
+	err := repo.repository.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

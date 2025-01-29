@@ -14,6 +14,7 @@ import (
 )
 
 // cambiar errores
+// Preguntar si response es un array 
 
 type SellerDefault struct {
 	sv seller.SellerService
@@ -80,6 +81,7 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 
 		res, err := h.sv.Save(reqBody)
 		if err != nil {
+			//handlear los errores que faltan
 			switch{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
 				response.Error(w, http.StatusConflict, "cid already exists")
@@ -92,6 +94,35 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": res,
 		})
+
+	}
+}
+
+func (h *SellerDefault) Delete() http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		//CODIGO REPETIDO
+		id := chi.URLParam(r, "id")
+		if id == "" {
+			response.Error(w, http.StatusBadRequest, "invalid id")
+			return
+		}
+		idParsed, err := strconv.Atoi(id)
+		if err != nil{
+			response.Error(w, http.StatusBadRequest, "id should be a number")
+			return
+		}
+
+		res, err := h.sv.Delete(idParsed)
+		if err != nil {
+			switch {
+			case errors.Is(err, repo.ErrSellerNotFound):
+				response.Error(w, http.StatusNotFound, "seller not found")
+			default:
+				response.Error(w, http.StatusInternalServerError, "please try again later")
+			}
+			return
+		}
+		response.
 
 	}
 }

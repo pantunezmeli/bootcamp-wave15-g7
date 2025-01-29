@@ -79,6 +79,7 @@ func (a *ServerChi) Run() (err error) {
 			r.Get("/", sellerHandler.GetAll())
 			r.Get("/{id}", sellerHandler.GetById())
 			r.Post("/", sellerHandler.Create())
+			r.Delete("/{id}", sellerHandler.Delete())
 		})
 	
 		r.Route("/warehouses", func(r chi.Router) {

@@ -62,6 +62,25 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 
 	return
 
+}
+
+
+func (s *SellerStorage) Delete(id int) (err error){
+	sellersMap, err := s.loader.Load()
+	if err != nil {
+		return
+	}
+	_, ok := sellersMap[id]
+	if !ok {
+		err = ErrSellerNotFound
+		return
+	}
+
+	delete(sellersMap, id)
+	
+	err = s.loader.Save(sellersMap)
+	return
+
 
 
 }

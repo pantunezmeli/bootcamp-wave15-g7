@@ -112,7 +112,7 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 			return
 		}
 
-		res, err := h.sv.Delete(idParsed)
+		err = h.sv.Delete(idParsed)
 		if err != nil {
 			switch {
 			case errors.Is(err, repo.ErrSellerNotFound):
@@ -122,7 +122,7 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 			}
 			return
 		}
-		response.
+		response.Text(w, http.StatusNoContent, "seller deleted")
 
 	}
 }

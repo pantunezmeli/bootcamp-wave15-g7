@@ -16,4 +16,5 @@ type SellerRepository interface {
 	GetAll() (sellers []models.Seller, err error)
 	GetById(int) (seller models.Seller, err error)
 	Save(models.Seller) (seller models.Seller, err error)
+	Delete(id int) (err error)
 }

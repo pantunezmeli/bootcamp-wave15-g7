@@ -57,5 +57,11 @@ func (s *SellerDefault) Save(reqBody dto.SellerDoc) (seller dto.SellerDoc, err e
 }
 
 
+func (s *SellerDefault) Delete(id int) (err error) {
+	err = s.rp.Delete(id)
+	return
+}
+
+
 
 

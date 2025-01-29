@@ -7,4 +7,5 @@ type SellerService interface {
 	GetAll() (sellers []dto.SellerDoc, err error)
 	GetById(int) (seller dto.SellerDoc, err error)
 	Save(dto.SellerDoc) (seller dto.SellerDoc, err error)
+	Delete(id int) (err error)
 }

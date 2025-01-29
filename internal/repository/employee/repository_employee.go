@@ -24,7 +24,6 @@ func (r *EmployeeMap) FindAll() (employees map[int]model.Employee, err error) {
 	}
 	employees = make(map[int]model.Employee)
 
-	// copy db
 	for key, value := range file {
 		employees[key] = value
 	}

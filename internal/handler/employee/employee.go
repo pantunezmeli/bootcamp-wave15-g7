@@ -24,7 +24,6 @@ func (h *DefaultHandler) GetAll() http.HandlerFunc {
 		// - nothing
 
 		// process
-		// - get all vehicles
 		employees, err := h.sv.FindAll()
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, nil)
@@ -48,7 +47,6 @@ func (h *DefaultHandler) GetById() http.HandlerFunc {
 		}
 
 		// process
-		// - get all vehicles
 		employee, err := h.sv.FindById(id)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {

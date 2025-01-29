@@ -19,6 +19,9 @@ type DefaultService struct {
 
 func (s *DefaultService) FindAll() (employeesData map[int]dto.EmployeeDoc, err error) {
 	employeesFound, err := s.rp.FindAll()
+	if err != nil {
+		return
+	}
 	employeesData = make(map[int]dto.EmployeeDoc)
 	for key, value := range employeesFound {
 		employeesData[key] = dto.EmployeeModelToDto(value)

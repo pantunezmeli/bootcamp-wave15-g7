@@ -3,7 +3,10 @@ package handler
 import (
 	"net/http"
 
+	"strconv"
+
 	"github.com/bootcamp-go/web/response"
+	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
 )
@@ -47,13 +50,30 @@ func (h *SectionDefault) ListSections() http.HandlerFunc {
 
 func (h *SectionDefault) GetSection() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// request
-		// ...
+		// Obtener la ID de la URL
+		idStr := chi.URLParam(r, "id")
+
+		// Obtener la ID de la URL
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+			return
+		}
 
 		// process
-		// - get Section by ID
-		// - convert Section to SectionDoc
-		// - response
+		// - get the Section by ID
+		section, err := h.sv.GetSection(id)
+		if err != nil {
+			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
+			return
+		}
+
+		// response
+		data := ConvertSectionToSectionDoc(section)
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
 	}
 }
 

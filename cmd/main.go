@@ -12,9 +12,11 @@ func main() {
 
 	// app
 	// - config
+	fmt.Println("Proyecto corriendo...")
 	cfg := &server.ConfigServerChi{
 		ServerAddress:  ":8080",
 		LoaderFilePath: "../docs/db/buyer_data.json",
+		//LoaderFilePath: "../docs/db/warehouse_data.json",
 	}
 	app := server.NewServerChi(cfg)
 	// - run

@@ -60,6 +60,7 @@ func (s *EmployeeJSONFile) Save(employee model.Employee) (err error) {
 
 	// Escribir el JSON generado en el archivo
 	err = os.WriteFile(s.path, data, 0644)
+	s.lastId++
 	return
 }
 
@@ -93,9 +94,9 @@ func (s *EmployeeJSONFile) GetLastId() (id int, err error) {
 			return
 		}
 		id = employees[len(employees)].Id.GetId()
-		return
-	} else {
-		id = s.lastId
+		s.lastId = id
 		return
 	}
+	id = s.lastId
+	return
 }

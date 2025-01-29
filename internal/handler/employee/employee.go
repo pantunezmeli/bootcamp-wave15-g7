@@ -1,18 +1,21 @@
 package employee
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/bootcamp-go/web/response"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
+	"github.com/go-chi/chi/v5"
+	sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 )
 
-func NewDefaultHandler(service employee.EmployeeService) *DefaultHandler {
+func NewDefaultHandler(service sv.EmployeeService) *DefaultHandler {
 	return &DefaultHandler{sv: service}
 }
 
 type DefaultHandler struct {
-	sv employee.EmployeeService
+	sv sv.EmployeeService
 }
 
 func (h *DefaultHandler) GetAll() http.HandlerFunc {
@@ -37,7 +40,31 @@ func (h *DefaultHandler) GetAll() http.HandlerFunc {
 }
 
 func (h *DefaultHandler) GetById() http.HandlerFunc {
-	return nil
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+		}
+
+		// process
+		// - get all vehicles
+		employee, err := h.sv.FindById(id)
+		if err != nil {
+			if errors.Is(err, sv.ErrEmployeeNotFound) {
+				response.JSON(w, http.StatusNotFound, nil)
+				return
+			}
+			response.JSON(w, http.StatusInternalServerError, nil)
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    employee,
+		})
+	}
 }
 
 func (h *DefaultHandler) Add() http.HandlerFunc {

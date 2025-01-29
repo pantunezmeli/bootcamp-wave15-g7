@@ -1,11 +1,13 @@
 package model
 
+import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
+
 type Product struct {
-	ID            int
+	ID            domain.Id
 	ProductCode   string
 	Description   string
-	ProductTypeID int
-	SellerID      int
+	ProductTypeID domain.Id
+	SellerID      domain.Id
 	Dimensions
 	FreezingInfo
 }

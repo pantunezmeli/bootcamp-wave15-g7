@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
@@ -65,6 +66,7 @@ func (h *ProductHandle) DeleteProduct() http.HandlerFunc {
 
 				if errors.Is(errDelete, pr.ErrProductNotFound) {
 					response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: errDelete.Error()})
+					return
 				}
 
 				response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: errDelete.Error()})
@@ -77,4 +79,36 @@ func (h *ProductHandle) DeleteProduct() http.HandlerFunc {
 
 		response.JSON(w, http.StatusOK, nil)
 	}
+}
+
+func (h ProductHandle) CreateProduct() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var newProduct dto.ProductDTO
+
+		if errDecode := json.NewDecoder(r.Body).Decode(&newProduct); errDecode != nil {
+			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid Body"})
+			return
+		}
+
+		newProduct, errCreate := h.sv.CreateProduct(newProduct)
+		if errCreate != nil {
+
+			if errors.As(errCreate, &product.ErrValidProduct{}) {
+				response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: errCreate.Error()})
+				return
+			}
+
+			if errors.As(errCreate, &product.ErrProduct{}) {
+				response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: errCreate.Error()})
+				return
+			}
+
+			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			return
+		}
+
+		response.JSON(w, http.StatusCreated, dto.GenericResponse{Data: newProduct})
+	}
+
 }

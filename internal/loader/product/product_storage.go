@@ -36,7 +36,9 @@ func (l *ProductJSONFile) GetDb() (map[int]model.Product, error) {
 
 	list := make(map[int]model.Product)
 	for _, v := range ProductJson {
-		list[v.ID] = dto.ParseDTOProduct(v)
+		var newProduct model.Product
+		dto.ValidAndParserDTO(v, &newProduct)
+		list[v.ID] = newProduct
 	}
 
 	return list, nil
@@ -48,7 +50,7 @@ func (l *ProductJSONFile) AddProduct(newProduct model.Product) error {
 		return err
 	}
 
-	products[newProduct.ID] = newProduct
+	products[newProduct.ID.Value()] = newProduct
 
 	return l.saveToSlice(products)
 }

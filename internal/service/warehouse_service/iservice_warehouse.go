@@ -16,4 +16,7 @@ type IWareHouseService interface {
 
 	// ! 4)
 	EditWareHouse(id int, req dto.WareHouseDoc) (wh dto.WareHouseDoc, err error)
+
+	// ! 5)
+	DeleteWarehouse(id int) error
 }

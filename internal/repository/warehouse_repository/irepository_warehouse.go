@@ -16,4 +16,7 @@ type IWareHouseRepository interface {
 
 	//! 4)
 	UpdateWarehouse(wh models.WareHouse) (err error)
+
+	//! 5)
+	DeleteWarehouse(id int) (err error)
 }

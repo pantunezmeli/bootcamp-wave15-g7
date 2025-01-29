@@ -204,3 +204,40 @@ func (h *WareHouseHandler) EditWareHouse() http.HandlerFunc {
 
 	}
 }
+
+// ! 5)
+func (h *WareHouseHandler) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Params
+		idStr := chi.URLParam(r, "id")
+
+		// Param validation
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": "invalid id parameter",
+			})
+			return
+		}
+
+		// Call Service
+		err = h.sv.DeleteWarehouse(id)
+		if err != nil {
+			if errors.Is(err, service.ErrWareHouseNotFound) {
+				response.JSON(w, http.StatusNotFound, map[string]any{
+					"message": "warehouse not found",
+				})
+				return
+			}
+			response.JSON(w, http.StatusInternalServerError, map[string]any{
+				"message": "something went wrong",
+			})
+			return
+		}
+
+		// Right response
+		response.JSON(w, http.StatusNoContent, map[string]any{
+			"message": "warehouse eliminated successfully",
+		})
+	}
+}

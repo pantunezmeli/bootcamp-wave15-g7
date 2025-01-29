@@ -53,3 +53,9 @@ func (r *WareHouseRepository) UpdateWarehouse(wh models.WareHouse) (err error) {
 	r.db[wh.Id.GetId()] = wh
 	return nil
 }
+
+// ! 5)
+func (r *WareHouseRepository) DeleteWarehouse(id int) (err error) {
+	delete(r.db, id)
+	return nil
+}

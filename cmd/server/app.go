@@ -79,6 +79,7 @@ func (a *ServerChi) Run() (err error) {
 		rt.Get("/{id}", wh_h.GetWareHouseById())
 		rt.Post("/", wh_h.AddNewWarehouse())
 		rt.Patch("/{id}", wh_h.EditWareHouse())
+		rt.Delete("/{id}", wh_h.Delete())
 	})
 
 	rt.Route("/sections", func(rt chi.Router) {

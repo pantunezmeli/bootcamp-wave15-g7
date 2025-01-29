@@ -147,3 +147,19 @@ func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (wh dto.W
 	}
 	return
 }
+
+// ! 5)
+func (s *WarehouseService) DeleteWarehouse(id int) error {
+	// Get previous instance
+	_, exists := s.rp.GetWareHouseById(id)
+	if !exists {
+		return ErrWareHouseNotFound
+	}
+
+	// Call repository
+	err := s.rp.DeleteWarehouse(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

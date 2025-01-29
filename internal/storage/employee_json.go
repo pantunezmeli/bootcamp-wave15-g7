@@ -1,10 +1,9 @@
-package loader
+package storage
 
 import (
 	"encoding/json"
 	"os"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
@@ -19,7 +18,7 @@ type EmployeeJSONFile struct {
 	path string
 }
 
-func (l *EmployeeJSONFile) Load() (e map[int]model.Employee, err error) {
+func (l *EmployeeJSONFile) Load() (employees map[int]model.Employee, err error) {
 	file, err := os.Open(l.path)
 	if err != nil {
 		return
@@ -32,50 +31,18 @@ func (l *EmployeeJSONFile) Load() (e map[int]model.Employee, err error) {
 		return
 	}
 
-	e = make(map[int]model.Employee)
+	employees = make(map[int]model.Employee)
 	for _, em := range EmployeesJSON {
-		newId, errE := domain.NewId(em.Id)
-		if errE != nil {
-			err = errE
-		}
-		newCardNumber, errE := domain.NewCardNumber(em.CardNumber)
-		if errE != nil {
-			err = errE
-		}
-		newFirstName, errE := domain.NewName(em.FirstName)
-		if errE != nil {
-			err = errE
-		}
-		newLastName, errE := domain.NewName(em.LastName)
-		if errE != nil {
-			err = errE
-		}
-		newWarehouseId, errE := domain.NewId(em.WarehouseId)
-		if errE != nil {
-			err = errE
-		}
-		e[em.Id] = model.Employee{
-			Id:          newId,
-			CardNumber:  newCardNumber,
-			FirstName:   newFirstName,
-			LastName:    newLastName,
-			WarehouseId: newWarehouseId,
-		}
+		employees[em.Id], err = dto.EmployeeDtoToModel(em)
 	}
 
 	return
 }
 
-func (l *EmployeeJSONFile) Save(e map[int]model.Employee) error {
-	EmployeeList := make([]dto.EmployeeDoc, 0, len(e))
-	for _, employee := range e {
-		EmployeeList = append(EmployeeList, dto.EmployeeDoc{
-			Id:          employee.Id.GetId(),
-			CardNumber:  employee.CardNumber.GetCardNumber(),
-			FirstName:   employee.FirstName.GetName(),
-			LastName:    employee.LastName.GetName(),
-			WarehouseId: employee.WarehouseId.GetId(),
-		})
+func (l *EmployeeJSONFile) Save(employees map[int]model.Employee) error {
+	EmployeeList := make([]dto.EmployeeDoc, 0, len(employees))
+	for _, e := range employees {
+		EmployeeList = append(EmployeeList, dto.EmployeeModelToDto(e))
 	}
 
 	// Convertir la lista en JSON

@@ -63,3 +63,44 @@ func (w WareHouseDoc) ConvertToDTO(req models.WareHouse) (wh WareHouseDoc, err e
 		MinimunTemperature: domain.MinimunTemperature.GetMinimunTemperature(req.MinimunTemperature), // Convertir value object MinimunTemperature a int
 	}, nil
 }
+
+func (w WareHouseDoc) ConvertToModelPatch(req WareHouseDoc, existingWarehouse models.WareHouse) (models.WareHouse, error) {
+	if req.WareHouseCode != "" {
+		newCode, err := domain.NewWareHouseCode(req.WareHouseCode)
+		if err != nil {
+			return models.WareHouse{}, fmt.Errorf("invalid warehouse code '%s': %w", req.WareHouseCode, err)
+		}
+		existingWarehouse.WareHouseCode = newCode
+	}
+
+	if req.Address != "" {
+		newAddress, err := domain.NewAddress(req.Address)
+		if err != nil {
+			return models.WareHouse{}, fmt.Errorf("invalid warehouse address '%s': %w", req.Address, err)
+		}
+		existingWarehouse.Address = newAddress
+	}
+	if req.Telephone != "" {
+		newTelephone, err := domain.NewTelephone(req.Telephone)
+		if err != nil {
+			return models.WareHouse{}, fmt.Errorf("invalid warehouse telephone '%s': %w", req.Telephone, err)
+		}
+		existingWarehouse.Telephone = newTelephone
+	}
+	if req.MinimunCapacity > 0 {
+		newMinCapacity, err := domain.NewMinimunCapacity(req.MinimunCapacity)
+		if err != nil {
+			return models.WareHouse{}, fmt.Errorf("invalid warehouse minimun capacity '%d': %w", req.MinimunCapacity, err)
+		}
+		existingWarehouse.MinimunCapacity = newMinCapacity
+	}
+
+	if req.MinimunTemperature > -100 {
+		newMinTemp, err := domain.NewMinimunTemperature(req.MinimunTemperature)
+		if err != nil {
+			return models.WareHouse{}, fmt.Errorf("invalid warehouse minimun temperature '%d': %w", req.MinimunTemperature, err)
+		}
+		existingWarehouse.MinimunTemperature = newMinTemp
+	}
+	return existingWarehouse, nil
+}

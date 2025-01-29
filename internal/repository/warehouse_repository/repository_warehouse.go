@@ -47,3 +47,9 @@ func (r *WareHouseRepository) CreateNewWareHouse(wh models.WareHouse) (err error
 	r.db[wh.Id.GetId()] = wh
 	return nil
 }
+
+// ! 4)
+func (r *WareHouseRepository) UpdateWarehouse(wh models.WareHouse) (err error) {
+	r.db[wh.Id.GetId()] = wh
+	return nil
+}

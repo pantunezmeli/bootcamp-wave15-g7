@@ -111,3 +111,39 @@ func (s *WarehouseService) MapWareHouseToDTO(w map[int]models.WareHouse) (r map[
 	}
 	return
 }
+
+// ! 4)
+func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (wh dto.WareHouseDoc, err error) {
+	// Get previous instance
+	existingWarehouse, exists := s.rp.GetWareHouseById(id)
+	if !exists {
+		return dto.WareHouseDoc{}, ErrWareHouseNotFound
+	}
+
+	// Validation and covert to model
+	warehouse, err := req.ConvertToModelPatch(req, existingWarehouse)
+	if err != nil {
+		return dto.WareHouseDoc{}, fmt.Errorf("failed to convert warehouse: %w", err)
+	}
+
+	warehouse.Id = existingWarehouse.Id
+
+	// Verify warehouse_code
+	whCodeExisting, exists := s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
+	if exists && whCodeExisting.Id.GetId() != id {
+		return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
+	}
+
+	// Call Repository
+	err = s.rp.UpdateWarehouse(warehouse)
+	if err != nil {
+		return dto.WareHouseDoc{}, err
+	}
+
+	// Convert to DTO
+	wh, err = wh.ConvertToDTO(warehouse)
+	if err != nil {
+		return dto.WareHouseDoc{}, err
+	}
+	return
+}

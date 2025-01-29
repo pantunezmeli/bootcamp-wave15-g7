@@ -13,4 +13,7 @@ type IWareHouseService interface {
 
 	// ! 3)
 	AddWareHouse(req dto.WareHouseDoc) (err error)
+
+	// ! 4)
+	EditWareHouse(id int, req dto.WareHouseDoc) (wh dto.WareHouseDoc, err error)
 }

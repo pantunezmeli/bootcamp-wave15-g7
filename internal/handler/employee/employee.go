@@ -129,5 +129,27 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 }
 
 func (h *DefaultHandler) DeleteById() http.HandlerFunc {
-	return nil
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+		}
+
+		// process
+		err = h.sv.DeleteById(id)
+		if err != nil {
+			if errors.Is(err, sv.ErrEmployeeNotFound) {
+				response.JSON(w, http.StatusUnprocessableEntity, nil)
+				return
+			}
+			response.JSON(w, http.StatusInternalServerError, nil)
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusNoContent, map[string]any{
+			"message": "success",
+		})
+	}
 }

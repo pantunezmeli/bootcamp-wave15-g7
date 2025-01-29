@@ -99,6 +99,19 @@ func (r *EmployeeMap) Edit(id int, employee model.Employee) (updatedEmployee mod
 	return
 }
 
-func (r *EmployeeMap) DeleteById() (err error) {
-	return nil
+func (r *EmployeeMap) DeleteById(id int) (err error) {
+	file, err := r.st.Load()
+	if err != nil {
+		return
+	}
+
+	for _, value := range file {
+		if value.Id.GetId() == id {
+			err = r.st.Erase(value)
+			return
+		}
+	}
+
+	err = ErrIdNotFound
+	return
 }

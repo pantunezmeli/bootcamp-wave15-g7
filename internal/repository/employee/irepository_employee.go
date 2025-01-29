@@ -8,5 +8,5 @@ type EmployeeRepository interface {
 	FindById(id int) (employee model.Employee, err error)
 	New(employee model.Employee) (newEmployee model.Employee, err error)
 	Edit(id int, employee model.Employee) (updatedEmployee model.Employee, err error)
-	DeleteById() (err error)
+	DeleteById(id int) (err error)
 }

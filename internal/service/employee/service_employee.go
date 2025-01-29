@@ -84,6 +84,18 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 	return
 }
 
-func (s *DefaultService) DeleteById() (err error) {
-	return nil
+func (s *DefaultService) DeleteById(id int) (err error) {
+	_, errId := s.rp.FindById(id)
+	if errId != nil {
+		if errors.Is(errId, employee.ErrIdNotFound) {
+			err = ErrEmployeeNotFound
+		}
+		return
+	}
+
+	err = s.rp.DeleteById(id)
+	if errors.Is(err, employee.ErrIdNotFound) {
+		err = ErrEmployeeNotFound
+	}
+	return
 }

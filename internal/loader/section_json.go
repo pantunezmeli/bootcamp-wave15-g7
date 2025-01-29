@@ -2,6 +2,7 @@ package loader
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
@@ -41,16 +42,56 @@ func (l *SectionJSONFile) Load() (v map[int]models.Section, err error) {
 	for _, vh := range sectionsJSON {
 		v[vh.Id] = models.Section{
 			Id:                  vh.Id,
-			Section_number:      vh.Section_number,
-			Current_temperature: vh.Current_temperature,
-			Minimum_temperature: vh.Minimum_temperature,
-			Current_capacity:    vh.Current_capacity,
-			Minimum_capacity:    vh.Minimum_capacity,
-			Maximim_capacity:    vh.Maximim_capacity,
-			Warehouse_id:        vh.Warehouse_id,
-			Product_type_id:     vh.Product_type_id,
+			Section_Number:      vh.Section_Number,
+			Current_Temperature: vh.Current_Temperature,
+			Minimum_Temperature: vh.Minimum_Temperature,
+			Current_Capacity:    vh.Current_Capacity,
+			Minimum_Capacity:    vh.Minimum_Capacity,
+			Maximum_Capacity:    vh.Maximum_Capacity,
+			Warehouse_Id:        vh.Warehouse_Id,
+			Product_Type_Id:     vh.Product_Type_Id,
 		}
 	}
 
 	return
+}
+
+func (l *SectionJSONFile) Save(section models.Section) error {
+	var sections []models.Section
+
+	file, err := os.Open(l.path)
+	if err == nil {
+		defer file.Close()
+		decoder := json.NewDecoder(file)
+		_ = decoder.Decode(&sections)
+	} else if !os.IsNotExist(err) {
+		return errors.New("error reading")
+	}
+
+	updated := false
+	for i := range sections {
+		if sections[i].Id == section.Id {
+			sections[i] = section
+			updated = true
+			break
+		}
+	}
+
+	if !updated {
+		sections = append(sections, section)
+	}
+
+	file, err = os.Create(l.path)
+	if err != nil {
+		return errors.New("error writing")
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(sections); err != nil {
+		return errors.New("error encoding")
+	}
+
+	return nil
 }

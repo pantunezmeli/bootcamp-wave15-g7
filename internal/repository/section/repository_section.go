@@ -10,10 +10,10 @@ type SectionRepository interface {
 	FindAll() (v map[int]models.Section, err error)
 	// FindByID is a method that returns a section by its ID
 	FindByID(id int) (v models.Section, err error)
-	// Patch is a method that updates a section by its ID
-	Patch(id int, v models.Section) (err error)
-	// Delete is a method that deletes a section by its ID
-	Delete(id int) (err error)
 	// Create is a method that creates a new section
 	Create(v models.Section) (err error)
+	// Patch is a method that updates a section by its ID
+	//Update(id int, v models.Section) (err error)
+	// Delete is a method that deletes a section by its ID
+	Delete(id int) (err error)
 }

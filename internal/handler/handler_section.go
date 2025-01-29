@@ -52,10 +52,7 @@ func (h *SectionDefault) ListSections() http.HandlerFunc {
 func (h *SectionDefault) GetSection() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Obtener la ID de la URL
-		idStr := chi.URLParam(r, "id")
-
-		// Obtener la ID de la URL
-		id, err := strconv.Atoi(idStr)
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
 			return
@@ -103,17 +100,36 @@ func (h *SectionDefault) CreateSection() http.HandlerFunc {
 	}
 }
 
-func (h *SectionDefault) PatchSection() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// request
-		// ...
+// func (h *SectionDefault) PatchSection() http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		// Obtener la ID de la URL
+// 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+// 		if err != nil {
+// 			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+// 			return
+// 		}
+// 		// Decodificar el cuerpo de la solicitud
+// 		var sectionDoc models.SectionDoc
+// 		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
+// 			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+// 			return
+// 		}
 
-		// process
-		// - convert SectionDoc to Section
-		// - update Section
-		// - response
-	}
-}
+// 		// Convertir SectionDoc a Section
+// 		section := ConvertSectionDocToSection(sectionDoc)
+
+// 		// Actualizar la sección
+// 		if err := h.sv.PatchSection(id, section); err != nil {
+// 			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
+// 			return
+// 		}
+
+// 		// Responder con éxito
+// 		response.JSON(w, http.StatusOK, map[string]any{
+// 			"message": "section updated successfully",
+// 		})
+// 	}
+// }
 
 func (h *SectionDefault) DeleteSection() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -130,14 +146,14 @@ func (h *SectionDefault) DeleteSection() http.HandlerFunc {
 func ConvertSectionDocToSection(vd models.SectionDoc) models.Section {
 	return models.Section{
 		Id:                  vd.Id,
-		Section_number:      vd.Section_number,
-		Current_temperature: vd.Current_temperature,
-		Minimum_temperature: vd.Minimum_temperature,
-		Current_capacity:    vd.Current_capacity,
-		Minimum_capacity:    vd.Minimum_capacity,
-		Maximim_capacity:    vd.Maximim_capacity,
-		Warehouse_id:        vd.Warehouse_id,
-		Product_type_id:     vd.Product_type_id,
+		Section_Number:      vd.Section_Number,
+		Current_Temperature: vd.Current_Temperature,
+		Minimum_Temperature: vd.Minimum_Temperature,
+		Current_Capacity:    vd.Current_Capacity,
+		Minimum_Capacity:    vd.Minimum_Capacity,
+		Maximum_Capacity:    vd.Maximum_Capacity,
+		Warehouse_Id:        vd.Warehouse_Id,
+		Product_Type_Id:     vd.Product_Type_Id,
 	}
 }
 
@@ -145,13 +161,13 @@ func ConvertSectionDocToSection(vd models.SectionDoc) models.Section {
 func ConvertSectionToSectionDoc(v models.Section) models.SectionDoc {
 	return models.SectionDoc{
 		Id:                  v.Id,
-		Section_number:      v.Section_number,
-		Current_temperature: v.Current_temperature,
-		Minimum_temperature: v.Minimum_temperature,
-		Current_capacity:    v.Current_capacity,
-		Minimum_capacity:    v.Minimum_capacity,
-		Maximim_capacity:    v.Maximim_capacity,
-		Warehouse_id:        v.Warehouse_id,
-		Product_type_id:     v.Product_type_id,
+		Section_Number:      v.Section_Number,
+		Current_Temperature: v.Current_Temperature,
+		Minimum_Temperature: v.Minimum_Temperature,
+		Current_Capacity:    v.Current_Capacity,
+		Minimum_Capacity:    v.Minimum_Capacity,
+		Maximum_Capacity:    v.Maximum_Capacity,
+		Warehouse_Id:        v.Warehouse_Id,
+		Product_Type_Id:     v.Product_Type_Id,
 	}
 }

@@ -11,7 +11,7 @@ type SectionServiceV2 interface {
 	// CreateSection is a method that creates a new Section
 	CreateSection(v models.Section) (err error)
 	// PatchSection is a method that updates a Section by its ID
-	PatchSection(id int, v models.Section) (err error)
+	//PatchSection(id int, v models.Section) (err error)
 	// DeleteSection is a method that deletes a Section by its ID
 	DeleteSection(id int) (err error)
 }

@@ -6,4 +6,5 @@ import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 type SectionLoader interface {
 	// Load is a method that loads the Sections
 	Load() (v map[int]models.Section, err error)
+	Save(section models.Section) error
 }

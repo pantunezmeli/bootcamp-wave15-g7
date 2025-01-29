@@ -32,9 +32,9 @@ func (s *SectionDefault) CreateSection(v models.Section) (err error) {
 }
 
 // PatchSection is a method that updates a Section by its ID
-func (s *SectionDefault) PatchSection(id int, v models.Section) (err error) {
-	return s.rp.Patch(id, v)
-}
+// func (s *SectionDefault) PatchSection(id int, v models.Section) (err error) {
+// 	return s.rp.Update(id, v)
+// }
 
 // DeleteSection is a method that deletes a Section by its ID
 func (s *SectionDefault) DeleteSection(id int) (err error) {

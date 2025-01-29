@@ -80,7 +80,7 @@ func (a *ServerChi) Run() (err error) {
 			r.Get("/", hd.ListSections())
 			r.Get("/{id}", hd.GetSection())
 			r.Post("/", hd.CreateSection())
-			r.Patch("/{id}", hd.PatchSection())
+			//r.Patch("/{id}", hd.PatchSection())
 			r.Delete("/{id}", hd.DeleteSection())
 		})
 

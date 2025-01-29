@@ -44,7 +44,10 @@ func (buyer *BuyerRepository) GetById(id int) (model.Buyer, error) {
 func (buyer *BuyerRepository) Create(entity model.Buyer) (model.Buyer, error) {
 
 	_, ok := buyer.buyers[entity.Id]
-	if ok {
+
+	exist := searchCardId(buyer, entity.Card_Number_Id)
+
+	if ok || exist {
 		return model.Buyer{}, errorbase.ErrConflict
 	}
 
@@ -65,6 +68,16 @@ func (buyer *BuyerRepository) Create(entity model.Buyer) (model.Buyer, error) {
 	loader.Save(entity)
 
 	return entity, nil
+}
+
+func searchCardId(buyer *BuyerRepository, id int) bool {
+	var found bool = false
+	var i int = 0
+	for i <= len(buyer.buyers) && !found {
+		found = buyer.buyers[i].Card_Number_Id == id
+		i++
+	}
+	return found
 }
 
 func (buyer *BuyerRepository) Update(id int, entity model.Buyer) (model.Buyer, error) {

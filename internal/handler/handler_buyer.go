@@ -85,7 +85,7 @@ func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
 		}
 
 		if err != nil {
-			jsonResponse(writer, http.StatusBadRequest, "the fields are empty or incorrect", nil)
+			jsonResponse(writer, http.StatusUnprocessableEntity, "the fields are empty or incorrect", nil)
 			return
 		}
 

@@ -63,8 +63,24 @@ func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.
 	return
 }
 
-func (s *DefaultService) Update() (err error) {
-	return nil
+func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error) {
+	_, errId := s.rp.FindById(id)
+	if errId != nil {
+		if errors.Is(errId, employee.ErrIdNotFound) {
+			err = ErrEmployeeNotFound
+			return
+		}
+		return
+	}
+
+	employee, err := dto.EmployeeDtoToModel(employeeData)
+	updatedEmployee, err := s.rp.Edit(id, employee)
+	if err != nil {
+		return
+	}
+
+	newEmployeeData = dto.EmployeeModelToDto(updatedEmployee)
+	return
 }
 
 func (s *DefaultService) DeleteById() (err error) {

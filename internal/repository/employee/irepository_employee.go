@@ -7,6 +7,6 @@ type EmployeeRepository interface {
 	FindAll() (employees map[int]model.Employee, err error)
 	FindById(id int) (employee model.Employee, err error)
 	New(employee model.Employee) (newEmployee model.Employee, err error)
-	Update() (err error)
+	Edit(id int, employee model.Employee) (updatedEmployee model.Employee, err error)
 	DeleteById() (err error)
 }

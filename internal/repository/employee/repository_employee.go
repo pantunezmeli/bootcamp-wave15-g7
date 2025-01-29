@@ -63,8 +63,40 @@ func (r *EmployeeMap) New(employee model.Employee) (newEmployee model.Employee, 
 	return
 }
 
-func (r *EmployeeMap) Update() (err error) {
-	return nil
+func (r *EmployeeMap) Edit(id int, employee model.Employee) (updatedEmployee model.Employee, err error) {
+	file, err := r.st.Load()
+	if err != nil {
+		return
+	}
+
+	for _, value := range file {
+		if value.Id.GetId() == id {
+			updatedEmployee = value
+			err = r.st.Erase(value)
+			if err != nil {
+				return
+			}
+
+			if employee.CardNumber.GetCardNumber() != "" {
+				updatedEmployee.CardNumber = employee.CardNumber
+			}
+			if employee.FirstName.GetName() != "" {
+				updatedEmployee.FirstName = employee.FirstName
+			}
+			if employee.LastName.GetName() != "" {
+				updatedEmployee.LastName = employee.LastName
+			}
+			if employee.WarehouseId.GetId() != 0 {
+				updatedEmployee.WarehouseId = employee.WarehouseId
+			}
+
+			err = r.st.Save(updatedEmployee)
+			return
+		}
+	}
+
+	err = ErrIdNotFound
+	return
 }
 
 func (r *EmployeeMap) DeleteById() (err error) {

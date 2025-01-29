@@ -9,6 +9,6 @@ type EmployeeService interface {
 	FindAll() (employeesData map[int]dto.EmployeeDoc, err error)
 	FindById(id int) (employeeData dto.EmployeeDoc, err error)
 	New(employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error)
-	Update() (err error)
+	Edit(id int, employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error)
 	DeleteById() (err error)
 }

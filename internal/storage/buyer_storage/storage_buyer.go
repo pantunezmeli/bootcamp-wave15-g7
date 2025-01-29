@@ -1,17 +1,12 @@
-package loaderfile
+package buyerstorage
 
 import (
 	"encoding/json"
 	"errors"
 	"os"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 )
-
-type IBuyerLoader interface {
-	Load() (v map[int]model.Buyer, err error)
-	Save(buyer model.Buyer) error
-}
 
 type BuyerJSONFile struct {
 	path string
@@ -21,7 +16,7 @@ func NewBuyerJSONFile(path string) *BuyerJSONFile {
 	return &BuyerJSONFile{path: path}
 }
 
-func (l *BuyerJSONFile) Load() (map[int]model.Buyer, error) {
+func (l *BuyerJSONFile) Load() (map[int]models.Buyer, error) {
 	file, err := os.Open(l.path)
 	if err != nil {
 		return nil, errors.New("")
@@ -29,17 +24,17 @@ func (l *BuyerJSONFile) Load() (map[int]model.Buyer, error) {
 
 	defer file.Close()
 
-	var buyerJson []model.Buyer
+	var buyerJson []models.Buyer
 	err = json.NewDecoder(file).Decode(&buyerJson)
 	if err != nil {
 		return nil, errors.New("")
 	}
 
-	list := make(map[int]model.Buyer)
+	list := make(map[int]models.Buyer)
 	for _, value := range buyerJson {
-		list[value.Id] = model.Buyer{
+		list[value.Id] = models.Buyer{
 			Id: value.Id,
-			PersonAtributes: model.PersonAtributes{
+			PersonAtributes: models.PersonAtributes{
 				Card_Number_Id: value.Card_Number_Id,
 				First_Name:     value.First_Name,
 				Last_Name:      value.Last_Name,
@@ -50,8 +45,8 @@ func (l *BuyerJSONFile) Load() (map[int]model.Buyer, error) {
 	return list, nil
 }
 
-func (l *BuyerJSONFile) Save(buyer model.Buyer) error {
-	var buyers []model.Buyer
+func (l *BuyerJSONFile) Save(buyer models.Buyer) error {
+	var buyers []models.Buyer
 
 	file, err := os.Open(l.path)
 	if err == nil {
@@ -84,6 +79,48 @@ func (l *BuyerJSONFile) Save(buyer model.Buyer) error {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(buyers); err != nil {
+		return errors.New("error encoding")
+	}
+
+	return nil
+}
+
+func (l *BuyerJSONFile) Delete(buyerID int) error {
+	var buyers []models.Buyer
+
+	file, err := os.Open(l.path)
+	if err == nil {
+		defer file.Close()
+		decoder := json.NewDecoder(file)
+		_ = decoder.Decode(&buyers)
+	} else if !os.IsNotExist(err) {
+		return errors.New("error reading")
+	}
+
+	var updatedBuyers []models.Buyer
+	found := false
+
+	for _, buyer := range buyers {
+		if buyer.Id != buyerID {
+			updatedBuyers = append(updatedBuyers, buyer)
+		} else {
+			found = true
+		}
+	}
+
+	if !found {
+		return errors.New("buyer not found")
+	}
+
+	file, err = os.Create(l.path)
+	if err != nil {
+		return errors.New("error writing")
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(updatedBuyers); err != nil {
 		return errors.New("error encoding")
 	}
 

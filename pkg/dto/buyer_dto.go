@@ -3,7 +3,7 @@ package dto
 import (
 	"sort"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 )
 
 type BuyerResponse struct {
@@ -13,7 +13,7 @@ type BuyerResponse struct {
 	Last_Name      string `json:"last_name"`
 }
 
-func GenerateResponseList(buyers map[int]model.Buyer) []BuyerResponse {
+func GenerateResponseList(buyers map[int]models.Buyer) []BuyerResponse {
 	var list []BuyerResponse
 	for _, value := range buyers {
 		list = append(list, BuyerResponse{
@@ -29,7 +29,7 @@ func GenerateResponseList(buyers map[int]model.Buyer) []BuyerResponse {
 	return list
 }
 
-func GenerateBuyerResponse(buyer model.Buyer) BuyerResponse {
+func GenerateBuyerResponse(buyer models.Buyer) BuyerResponse {
 	buyerResponse := BuyerResponse{
 		Id:             buyer.Id,
 		Card_Number_Id: buyer.Card_Number_Id,
@@ -39,10 +39,10 @@ func GenerateBuyerResponse(buyer model.Buyer) BuyerResponse {
 	return buyerResponse
 }
 
-func GenerateBuyerRequeste(buyer BuyerResponse) model.Buyer {
-	buyerResponse := model.Buyer{
+func GenerateBuyerRequeste(buyer BuyerResponse) models.Buyer {
+	buyerResponse := models.Buyer{
 		Id: buyer.Id,
-		PersonAtributes: model.PersonAtributes{
+		PersonAtributes: models.PersonAtributes{
 			Card_Number_Id: buyer.Card_Number_Id,
 			First_Name:     buyer.First_Name,
 			Last_Name:      buyer.Last_Name,

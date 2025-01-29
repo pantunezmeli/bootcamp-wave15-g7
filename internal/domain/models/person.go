@@ -1,4 +1,4 @@
-package model
+package models
 
 type PersonAtributes struct {
 	Card_Number_Id int

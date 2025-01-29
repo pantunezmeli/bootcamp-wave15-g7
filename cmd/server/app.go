@@ -70,33 +70,31 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
-	rt.Route("/sellers", func(rt chi.Router) {
-
+	rt.Route("/api/v1", func(r chi.Router) {
+		r.Route("/sellers", func(r chi.Router) {
+		})
+	
+		r.Route("/warehouses", func(rt chi.Router) {
+      rt.Get("/", wh_h.Get())
+		  rt.Get("/{id}", wh_h.GetById())
+		  rt.Post("/", wh_h.Create())
+		  rt.Patch("/{id}", wh_h.Update())
+		  rt.Delete("/{id}", wh_h.Delete())
+		})
+	
+		r.Route("/sections", func(r chi.Router) {
+		})
+	
+		r.Route("/products", func(r chi.Router) {
+		})
+	
+		r.Route("/employees", func(r chi.Router) {
+		})
+	
+		r.Route("/buyers", func(r chi.Router) {
+		})
 	})
-
-	rt.Route("/warehouses", func(rt chi.Router) {
-		rt.Get("/", wh_h.Get())
-		rt.Get("/{id}", wh_h.GetById())
-		rt.Post("/", wh_h.Create())
-		rt.Patch("/{id}", wh_h.Update())
-		rt.Delete("/{id}", wh_h.Delete())
-	})
-
-	rt.Route("/sections", func(rt chi.Router) {
-
-	})
-
-	rt.Route("/products", func(rt chi.Router) {
-
-	})
-
-	rt.Route("/employees", func(rt chi.Router) {
-
-	})
-
-	rt.Route("/buyers", func(rt chi.Router) {
-
-	})
+	
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, rt)

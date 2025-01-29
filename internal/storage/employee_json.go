@@ -60,10 +60,7 @@ func (s *EmployeeJSONFile) Save(employee model.Employee) (err error) {
 
 	// Escribir el JSON generado en el archivo
 	err = os.WriteFile(s.path, data, 0644)
-	if err != nil {
-		return
-	}
-	return nil
+	return
 }
 
 func (s *EmployeeJSONFile) Erase(employee model.Employee) (err error) {
@@ -86,10 +83,7 @@ func (s *EmployeeJSONFile) Erase(employee model.Employee) (err error) {
 
 	// Escribir el JSON generado en el archivo
 	err = os.WriteFile(s.path, data, 0644)
-	if err != nil {
-		return
-	}
-	return nil
+	return
 }
 
 func (s *EmployeeJSONFile) GetLastId() (id int, err error) {

@@ -2,7 +2,6 @@ package employee
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
@@ -36,7 +35,6 @@ func (s *DefaultService) FindById(id int) (employeeData dto.EmployeeDoc, err err
 	if errId != nil {
 		if errors.Is(errId, employee.ErrIdNotFound) {
 			err = ErrEmployeeNotFound
-			return
 		}
 		return
 	}
@@ -49,16 +47,17 @@ func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.
 		err = ErrEmptyField
 		return
 	}
+
 	employee, err := dto.EmployeeDtoToModel(employeeData)
-	fmt.Println("employee data: ", employeeData)
 	if err != nil {
 		return
 	}
-	fmt.Println("employee: ", employee)
+
 	newEmployee, err := s.rp.New(employee)
 	if err != nil {
 		return
 	}
+
 	newEmployeeData = dto.EmployeeModelToDto(newEmployee)
 	return
 }
@@ -68,7 +67,6 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 	if errId != nil {
 		if errors.Is(errId, employee.ErrIdNotFound) {
 			err = ErrEmployeeNotFound
-			return
 		}
 		return
 	}

@@ -52,3 +52,20 @@ func (repo *BuyerService) CreateBuyer(entity model.Buyer) (dto.BuyerResponse, er
 	buyerResponse := dto.GenerateBuyerResponse(buyer)
 	return buyerResponse, nil
 }
+
+func (repo *BuyerService) UpdateBuyer(id int, entity dto.BuyerResponse) (dto.BuyerResponse, error) {
+
+	if id <= 0 {
+		return dto.BuyerResponse{}, errorbase.ErrInvalidId
+	}
+
+	buyerReq := dto.GenerateBuyerRequeste(entity)
+
+	buyer, err := repo.repository.Update(id, buyerReq)
+	if err != nil {
+		return dto.BuyerResponse{}, err
+	}
+
+	buyerResponse := dto.GenerateBuyerResponse(buyer)
+	return buyerResponse, nil
+}

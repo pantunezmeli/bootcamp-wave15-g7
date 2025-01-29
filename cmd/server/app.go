@@ -92,6 +92,7 @@ func (a *ServerChi) Run() (err error) {
 			rt.Get("/", hd.GetAll())
 			rt.Get("/{id}", hd.GetBuyerById())
 			rt.Post("/", hd.CreateBuyer())
+			rt.Patch("/{id}", hd.UpdateBuyer())
 
 		})
 	})

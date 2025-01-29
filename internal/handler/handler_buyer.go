@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
@@ -30,7 +31,7 @@ func (handler *BuyerHandler) GetAll() http.HandlerFunc {
 		}
 
 		if err != nil {
-			jsonResponse(writer, http.StatusBadRequest, "internal server error", nil)
+			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
 			return
 		}
 		jsonResponse(writer, http.StatusOK, "success", buyers)
@@ -49,12 +50,14 @@ func (handler *BuyerHandler) GetBuyerById() http.HandlerFunc {
 		}
 		buyer, err := handler.service.GetBuyer(id)
 		if errors.Is(err, errorbase.ErrInvalidId) {
-			jsonResponse(writer, http.StatusBadRequest, "the id parameter is incorrect", nil)
+			jsonResponse(writer, http.StatusBadRequest, "invalid Id parameters", nil)
 			return
-		} else if errors.Is(err, errorbase.ErrNotFound) {
+		}
+		if errors.Is(err, errorbase.ErrNotFound) {
 			jsonResponse(writer, http.StatusNotFound, "buyer not found", nil)
 			return
-		} else if err != nil {
+		}
+		if err != nil {
 			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
 			return
 		}
@@ -70,7 +73,7 @@ func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
 		isEmpty := newBuyer == model.Buyer{}
 
 		if err2 != nil || isEmpty {
-			jsonResponse(writer, http.StatusBadRequest, "internal server error", nil)
+			jsonResponse(writer, http.StatusBadRequest, "invalid JSON format", nil)
 			return
 		}
 
@@ -89,6 +92,45 @@ func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
 		jsonResponse(writer, http.StatusCreated, "buyer created", buyer)
 	}
 
+}
+
+func (handler *BuyerHandler) UpdateBuyer() http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+
+		idParam := chi.URLParam(request, "id")
+		id, err3 := strconv.Atoi(idParam)
+
+		if err3 != nil {
+			jsonResponse(writer, http.StatusBadRequest, "invalid Id parameters", nil)
+			return
+		}
+
+		var entity dto.BuyerResponse
+		err2 := json.NewDecoder(request.Body).Decode(&entity)
+		if err2 != nil {
+			jsonResponse(writer, http.StatusBadRequest, "invalid JSON format", nil)
+			return
+		}
+
+		buyer, err := handler.service.UpdateBuyer(id, entity)
+
+		if errors.Is(err, errorbase.ErrConflict) {
+			jsonResponse(writer, http.StatusNotFound, "buyer not found", nil)
+			return
+		}
+
+		if errors.Is(err, errorbase.ErrInvalidId) {
+			jsonResponse(writer, http.StatusBadRequest, "invalid Id parameters", nil)
+			return
+		}
+
+		if err != nil {
+			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
+			return
+		}
+
+		jsonResponse(writer, http.StatusOK, "success", buyer)
+	}
 }
 
 func jsonResponse(writer http.ResponseWriter, statusCode int, message string, data any) {

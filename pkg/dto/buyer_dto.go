@@ -38,3 +38,15 @@ func GenerateBuyerResponse(buyer model.Buyer) BuyerResponse {
 	}
 	return buyerResponse
 }
+
+func GenerateBuyerRequeste(buyer BuyerResponse) model.Buyer {
+	buyerResponse := model.Buyer{
+		Id: buyer.Id,
+		PersonAtributes: model.PersonAtributes{
+			Card_Number_Id: buyer.Card_Number_Id,
+			First_Name:     buyer.First_Name,
+			Last_Name:      buyer.Last_Name,
+		},
+	}
+	return buyerResponse
+}

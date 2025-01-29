@@ -99,6 +99,30 @@ func (*BuyerRepository) ValidateModel(entity model.Buyer) (map[string]any, error
 	}, nil
 }
 
-//func (buyer *BuyerRepository) Update(id int, entity model.Buyer) error {
+func (buyer *BuyerRepository) Update(id int, entity model.Buyer) (model.Buyer, error) {
+
+	element, ok := buyer.buyers[id]
+	if !ok {
+		return model.Buyer{}, errorbase.ErrConflict
+	}
+	if cardNumberId, err := domain.NewCardNumberId(id); err == nil {
+		element.Card_Number_Id = cardNumberId.GetCardNumberId()
+	}
+
+	if firstName, err := domain.NewFirstName(entity.First_Name); err == nil {
+		element.First_Name = firstName.GetFirstName()
+	}
+
+	if lastName, err := domain.NewLastName(entity.Last_Name); err == nil {
+		element.Last_Name = lastName.GetLastName()
+	}
+	// if err := mergo.Merge(&element, entity, mergo.); err != nil {
+	// 	return model.Buyer{}, err
+	// }
+	loader := loaderfile.NewBuyerJSONFile("../docs/db/buyer_data.json")
+	loader.Save(element)
+	buyer.buyers[id] = element
+	return element, nil
+}
 
 //func (buyer *BuyerRepository) Delete(id int) error {

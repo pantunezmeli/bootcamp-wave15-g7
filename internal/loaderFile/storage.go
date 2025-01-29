@@ -50,9 +50,9 @@ func (l *BuyerJSONFile) Load() (map[int]model.Buyer, error) {
 }
 
 func (l *BuyerJSONFile) Save(buyer model.Buyer) error {
-	// Leer el archivo JSON existente
 	var buyers []model.Buyer
 
+	// Leer el archivo JSON existente
 	file, err := os.Open(l.path)
 	if err == nil {
 		defer file.Close()
@@ -62,9 +62,23 @@ func (l *BuyerJSONFile) Save(buyer model.Buyer) error {
 		return errors.New("error reading")
 	}
 
-	// Agregar el nuevo buyer a la lista
-	buyers = append(buyers, buyer)
+	// Buscar si el buyer ya existe en la lista
+	updated := false
+	for i := range buyers {
+		if buyers[i].Id == buyer.Id {
+			// Si existe, actualizarlo
+			buyers[i] = buyer
+			updated = true
+			break
+		}
+	}
 
+	// Si no existe, agregarlo
+	if !updated {
+		buyers = append(buyers, buyer)
+	}
+
+	// Escribir los datos actualizados en el archivo JSON
 	file, err = os.Create(l.path)
 	if err != nil {
 		return errors.New("error writing")

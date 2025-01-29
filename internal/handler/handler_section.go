@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"strconv"
@@ -79,13 +80,26 @@ func (h *SectionDefault) GetSection() http.HandlerFunc {
 
 func (h *SectionDefault) CreateSection() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// request
-		// ...
+		var v models.SectionDoc
+		if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+			return
+		}
 
-		// process
-		// - convert SectionDoc to Section
-		// - create Section
-		// - response
+		section := ConvertSectionDocToSection(v)
+
+		if err := h.sv.CreateSection(section); err != nil {
+			if err.Error() == "section already exists" {
+				response.JSON(w, http.StatusConflict, nil)
+			} else {
+				response.JSON(w, http.StatusInternalServerError, nil)
+			}
+			return
+		}
+
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": "section created successfully",
+		})
 	}
 }
 

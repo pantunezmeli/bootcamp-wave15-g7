@@ -39,12 +39,7 @@ func (h *ProductHandle) GetById() http.HandlerFunc {
 
 		productSearch, errSearch := h.sv.GetByID(idPath)
 		if errSearch != nil {
-			if errors.Is(errSearch, pr.ErrProductNotFound) {
-				response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: errSearch.Error()})
-				return
-			}
-
-			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			validErrorResponse(w, errSearch)
 			return
 		}
 
@@ -153,4 +148,23 @@ func (h ProductHandle) UpdateProduct() http.HandlerFunc {
 
 		response.JSON(w, http.StatusOK, dto.GenericResponse{Data: productUpdate})
 	}
+}
+
+func validErrorResponse(w http.ResponseWriter, err error) {
+	if errors.As(err, &product.ErrNotFoundProduct{}) {
+		response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: err.Error()})
+		return
+	}
+
+	if errors.As(err, &product.ErrValidProduct{}) {
+		response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: err.Error()})
+		return
+	}
+
+	if errors.As(err, &product.ErrProduct{}) {
+		response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: err.Error()})
+		return
+	}
+
+	response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
 }

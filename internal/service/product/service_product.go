@@ -49,13 +49,19 @@ func (p ProductService) GetAll() ([]product2.ProductDTO, error) {
 	return product2.ParserMapProductToListDTO(products), nil
 }
 
-func (p ProductService) GetByID(id int) (product2.ProductDTO, error) {
+func (p ProductService) GetByID(id int) (productDTO product2.ProductDTO, err error) {
 	productSearch, errSearch := p.rp.GetByID(id)
 	if errSearch != nil {
-		return product2.ProductDTO{}, errSearch
+		if errors.Is(errSearch, product.ErrProductNotFound) {
+			err = ErrNotFoundProduct{message: "Product not found"}
+			return
+		}
+		err = ErrProduct{message: "Error searching product"}
+		return
 	}
 
-	return product2.ParserProductToDTO(productSearch), nil
+	productDTO = product2.ParserProductToDTO(productSearch)
+	return
 }
 
 func (p ProductService) CreateProduct(product product2.ProductDTO) (productDto product2.ProductDTO, err error) {

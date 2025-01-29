@@ -11,6 +11,10 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+const (
+	PATH_PRODUCT_JSON_FILE = "docs/db/product_data.json"
+)
+
 // ConfigServerChi is a struct that represents the configuration for ServerChi
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
@@ -59,7 +63,7 @@ func (a *ServerChi) Run() (err error) {
 	// 	return
 	// }
 
-	ldProduct := product_ld.NewProductJSONFile("/Users/matromero/GIT-Bootcamp/bootcamp-wave15-g7/docs/db/product_data.json")
+	ldProduct := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
 	rpProduct := product_rp.NewProductRepositoryMap(ldProduct)
 	svProduct := product_sv.NewProductService(rpProduct)
 	hdProduct := product_hd.NewProductHandler(svProduct)

@@ -39,6 +39,10 @@ func (s *SellerDefault) GetById(id int) (seller dto.SellerDoc, err error){
 
 
 func (s *SellerDefault) Save(reqBody dto.SellerDoc) (seller dto.SellerDoc, err error){
+	if err = s.ValidateAllParameters(reqBody); err != nil {
+		return
+	}
+
 	model, err := dto.ParseDtoToModel(reqBody)
 	if err != nil{
 		return
@@ -63,5 +67,15 @@ func (s *SellerDefault) Delete(id int) (err error) {
 }
 
 
+// func (s *SellerDefault) Update(reqBody dto.SellerDoc) (seller dto.SellerDoc, err error){
+
+// }
 
 
+func (s *SellerDefault) ValidateAllParameters(reqBody dto.SellerDoc) (err error){
+	if reqBody.Address == nil || reqBody.Cid == nil || reqBody.Telephone == nil ||reqBody.CompanyName == nil {
+		err = ErrMissingParameters
+		return
+	}
+	return
+}

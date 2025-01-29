@@ -17,7 +17,7 @@ var (
 	validTelephoneRegex       = `^[0-9+\-()\s]+$`
         
 
-	
+
 	ErrInvalidId              = errors.New("id should be a positive number")
 	ErrInvalidCid             = errors.New("cid should be a positive number")
 	ErrCompanyNameTooShort    = errors.New("company name must be at least 2 characters long")
@@ -44,8 +44,8 @@ func NewId(value int) (id Id, err error) {
 	return
 }
 
-func (id Id) Value() int {
-	return id.value
+func (id Id) Value() *int {
+	return &id.value
 }
 
 type Cid struct {
@@ -61,8 +61,8 @@ func NewCid(value int) (cid Cid, err error){
 	return
 }
 
-func (c Cid) Value() int {
-	return c.value
+func (c Cid) Value() *int {
+	return &c.value
 }
 
 
@@ -82,8 +82,8 @@ func NewCompanyName(value string) (companyName CompanyName, err error){
 	return
 }
 
-func (c CompanyName) Value() string{
-	return c.value
+func (c CompanyName) Value() *string{
+	return &c.value
 }
 
 type Address struct {
@@ -99,8 +99,8 @@ func NewAddress(value string) (address Address, err error){
 	
 }
 
-func (a Address) Value() string {
-	return a.value
+func (a Address) Value() *string {
+	return &a.value
 }
 
 
@@ -121,8 +121,8 @@ func NewTelephone(value string) (telephone Telephone, err error){
 }
 
 
-func (t Telephone) Value() string {
-	return t.value
+func (t Telephone) Value() *string {
+	return &t.value
 }
 
 func validateLength(value string, min, max int, errMin, errMax error) error {

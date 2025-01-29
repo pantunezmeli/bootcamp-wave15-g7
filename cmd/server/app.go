@@ -80,6 +80,7 @@ func (a *ServerChi) Run() (err error) {
 			r.Get("/{id}", sellerHandler.GetById())
 			r.Post("/", sellerHandler.Create())
 			r.Delete("/{id}", sellerHandler.Delete())
+			r.Patch("/{id}", sellerHandler.Update())
 		})
 	
 		r.Route("/warehouses", func(r chi.Router) {

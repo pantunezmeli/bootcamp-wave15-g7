@@ -43,7 +43,7 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 		return
 	}
 
-	if err = s.CheckCid(modelWithoutId.Cid.Value(), sellersMap); err != nil{
+	if err = s.CheckCid(*modelWithoutId.Cid.Value(), sellersMap); err != nil{
 		return
 	}
 
@@ -77,7 +77,7 @@ func (s *SellerStorage) Delete(id int) (err error){
 	}
 
 	delete(sellersMap, id)
-	
+
 	err = s.loader.Save(sellersMap)
 	return
 
@@ -87,7 +87,7 @@ func (s *SellerStorage) Delete(id int) (err error){
 
 func (s *SellerStorage) CheckCid(cid int, sellersMap map[int]models.Seller) (err error){
 	for _, seller := range sellersMap{
-		if seller.Cid.Value() == cid {
+		if seller.Cid.Value() == &cid {
 			err = ErrCidAlreadyExists
 			return
 		}

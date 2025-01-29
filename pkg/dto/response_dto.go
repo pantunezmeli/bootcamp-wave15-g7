@@ -6,13 +6,13 @@ import (
 )
 
 type SellerDoc struct {
-	ID  int `json:"id"`
-	Cid int `json:"cid"`
-	CompanyName string `json:"company_name"`
-	Address string `json:"address"`
-	Telephone string `json:"telephone"`
-	
+	ID  *int `json:"id"`
+	Cid *int `json:"cid"`
+	CompanyName *string `json:"company_name"`
+	Address *string `json:"address"`
+	Telephone *string `json:"telephone"`
 }
+
 
 func ParseModelToDto(sellerModel models.Seller) (sellerDto SellerDoc){
 	sellerDto = SellerDoc{
@@ -26,19 +26,19 @@ func ParseModelToDto(sellerModel models.Seller) (sellerDto SellerDoc){
 }
 
 func ParseDtoToModel(sellerDto SellerDoc) (sellerModel models.Seller, err error){
-	cid, err := domain.NewCid(sellerDto.Cid)
+	cid, err := domain.NewCid(*sellerDto.Cid)
 	if err != nil{
 		return
 	}
-	companyName, err := domain.NewCompanyName(sellerDto.CompanyName)
+	companyName, err := domain.NewCompanyName(*sellerDto.CompanyName)
 	if err != nil {
 		return
 	}
-	address, err := domain.NewAddress(sellerDto.Address)
+	address, err := domain.NewAddress(*sellerDto.Address)
 	if err != nil{
 		return
 	}
-	telephone, err := domain.NewTelephone(sellerDto.Telephone)
+	telephone, err := domain.NewTelephone(*sellerDto.Telephone)
 	if err != nil {
 		return
 	}
@@ -53,3 +53,4 @@ func ParseDtoToModel(sellerDto SellerDoc) (sellerModel models.Seller, err error)
 	}
 	return
 }
+

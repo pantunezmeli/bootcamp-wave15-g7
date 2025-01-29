@@ -1,7 +1,15 @@
 package seller
 
-import "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+import (
+	"errors"
 
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+)
+
+
+var (
+	ErrMissingParameters = errors.New("missing parameters")
+)
 
 type SellerService interface {
 	GetAll() (sellers []dto.SellerDoc, err error)

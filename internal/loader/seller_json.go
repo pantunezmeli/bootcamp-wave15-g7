@@ -40,27 +40,27 @@ func (l *SellerJSONFile) Load() (sellerMap map[int]models.Seller, err error) {
 
 	sellerMap = make(map[int]models.Seller)
 	for _, s := range sellersJSON {
-		Id, err := d.NewId(s.ID)
+		Id, err := d.NewId(*s.ID)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Cid, err := d.NewCid(s.Cid)
+		Cid, err := d.NewCid(*s.Cid)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		CompanyName, err := d.NewCompanyName(s.CompanyName)
+		CompanyName, err := d.NewCompanyName(*s.CompanyName)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Address, err := d.NewAddress(s.Address)
+		Address, err := d.NewAddress(*s.Address)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Telephone, err := d.NewTelephone(s.Telephone)
+		Telephone, err := d.NewTelephone(*s.Telephone)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		sellerMap[s.ID] = models.Seller{
+		sellerMap[*s.ID] = models.Seller{
 			ID: Id,
 			SellerAttributes: models.SellerAttributes{
 				Cid: Cid,

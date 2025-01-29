@@ -2,15 +2,15 @@ package product
 
 import (
 	"encoding/json"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product"
 	"os"
 )
 
 type IProductLoader interface {
-	GetDb() (map[int]model.Product, error)
+	GetDb() (map[int]models.Product, error)
 	RemoveProduct(productID int) error
-	AddProduct(newProduct model.Product) error
+	SaveProduct(newProduct models.Product) error
 }
 
 type ProductJSONFile struct {
@@ -21,30 +21,30 @@ func NewProductJSONFile(path string) *ProductJSONFile {
 	return &ProductJSONFile{path: path}
 }
 
-func (l *ProductJSONFile) GetDb() (map[int]model.Product, error) {
+func (l *ProductJSONFile) GetDb() (map[int]models.Product, error) {
 	file, err := os.Open(l.path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	var ProductJson []dto.ProductDTO
+	var ProductJson []product.ProductDTO
 	err = json.NewDecoder(file).Decode(&ProductJson)
 	if err != nil {
 		return nil, err
 	}
 
-	list := make(map[int]model.Product)
+	list := make(map[int]models.Product)
 	for _, v := range ProductJson {
-		var newProduct model.Product
-		dto.ValidAndParserDTO(v, &newProduct)
+		var newProduct models.Product
+		product.ValidAndParserDTO(v, &newProduct)
 		list[v.ID] = newProduct
 	}
 
 	return list, nil
 }
 
-func (l *ProductJSONFile) AddProduct(newProduct model.Product) error {
+func (l *ProductJSONFile) SaveProduct(newProduct models.Product) error {
 	products, err := l.GetDb()
 	if err != nil {
 		return err
@@ -66,16 +66,16 @@ func (l *ProductJSONFile) RemoveProduct(productID int) error {
 	return l.saveToSlice(products)
 }
 
-func (l *ProductJSONFile) saveToSlice(products map[int]model.Product) error {
-	var productSlice []dto.ProductDTO
+func (l *ProductJSONFile) saveToSlice(products map[int]models.Product) error {
+	var productSlice []product.ProductDTO
 	for _, v := range products {
-		productSlice = append(productSlice, dto.ParserProductToDTO(v))
+		productSlice = append(productSlice, product.ParserProductToDTO(v))
 	}
 
 	return l.save(productSlice)
 }
 
-func (l *ProductJSONFile) save(products []dto.ProductDTO) error {
+func (l *ProductJSONFile) save(products []product.ProductDTO) error {
 	file, err := os.Create(l.path)
 	if err != nil {
 		return err

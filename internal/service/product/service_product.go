@@ -1,9 +1,10 @@
 package product
 
 import (
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"errors"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	product2 "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product"
 )
 
 func NewProductService(rp product.IProductRepository) *ProductService {
@@ -14,27 +15,53 @@ type ProductService struct {
 	rp product.IProductRepository
 }
 
-func (p ProductService) GetAll() ([]dto.ProductDTO, error) {
-	products, errSearch := p.rp.GetAll()
-	if errSearch != nil {
-		return make([]dto.ProductDTO, 0), errSearch
-	}
-	return dto.ParserListProductToDTO(products), nil
-}
-
-func (p ProductService) GetByID(id int) (dto.ProductDTO, error) {
+func (p ProductService) UpdateProduct(id int, patch product2.UpdateProductRequest) (productUpdate product2.ProductDTO, err error) {
 	productSearch, errSearch := p.rp.GetByID(id)
 	if errSearch != nil {
-		return dto.ProductDTO{}, errSearch
+		if errors.Is(errSearch, product.ErrProductNotFound) {
+			err = ErrNotFoundProduct{message: "Product not found"}
+			return
+		}
+		err = ErrProduct{message: "Error searching product"}
+		return
 	}
 
-	return dto.ParserProductToDTO(productSearch), nil
+	errPatch := product2.PatchProduct(patch, &productSearch)
+	if errPatch != nil {
+		err = ErrValidProduct{message: errPatch.Error()}
+		return
+	}
+
+	errSave := p.rp.UpdateProduct(productSearch)
+	if errSave != nil {
+		err = ErrProduct{message: "Error save product"}
+		return
+	}
+
+	return product2.ParserProductToDTO(productSearch), nil
 }
 
-func (p ProductService) CreateProduct(product dto.ProductDTO) (productDto dto.ProductDTO, err error) {
+func (p ProductService) GetAll() ([]product2.ProductDTO, error) {
+	products, errSearch := p.rp.GetAll()
+	if errSearch != nil {
+		return make([]product2.ProductDTO, 0), errSearch
+	}
+	return product2.ParserMapProductToListDTO(products), nil
+}
 
-	var newProduct model.Product
-	errValid := dto.ValidAndParserDTO(product, &newProduct)
+func (p ProductService) GetByID(id int) (product2.ProductDTO, error) {
+	productSearch, errSearch := p.rp.GetByID(id)
+	if errSearch != nil {
+		return product2.ProductDTO{}, errSearch
+	}
+
+	return product2.ParserProductToDTO(productSearch), nil
+}
+
+func (p ProductService) CreateProduct(product product2.ProductDTO) (productDto product2.ProductDTO, err error) {
+
+	var newProduct models.Product
+	errValid := product2.ValidAndParserDTO(product, &newProduct)
 	if errValid != nil {
 		err = ErrValidProduct{message: errValid.Error()}
 		return
@@ -52,7 +79,7 @@ func (p ProductService) CreateProduct(product dto.ProductDTO) (productDto dto.Pr
 		return
 	}
 
-	productDto = dto.ParserProductToDTO(newProduct)
+	productDto = product2.ParserProductToDTO(newProduct)
 	return
 }
 

@@ -1,14 +1,15 @@
 package product
 
 import (
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product"
 )
 
 type IProductService interface {
-	GetAll() ([]dto.ProductDTO, error)
-	GetByID(id int) (dto.ProductDTO, error)
+	GetAll() ([]product.ProductDTO, error)
+	GetByID(id int) (product.ProductDTO, error)
 	DeleteProduct(id int) error
-	CreateProduct(product dto.ProductDTO) (dto.ProductDTO, error)
+	CreateProduct(product product.ProductDTO) (product.ProductDTO, error)
+	UpdateProduct(id int, product product.UpdateProductRequest) (product.ProductDTO, error)
 }
 
 // ErrService is an interface

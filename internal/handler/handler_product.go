@@ -8,6 +8,7 @@ import (
 	pr "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	product2 "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product"
 	"net/http"
 	"strconv"
 )
@@ -84,7 +85,7 @@ func (h *ProductHandle) DeleteProduct() http.HandlerFunc {
 func (h ProductHandle) CreateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		var newProduct dto.ProductDTO
+		var newProduct product2.ProductDTO
 
 		if errDecode := json.NewDecoder(r.Body).Decode(&newProduct); errDecode != nil {
 			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid Body"})
@@ -111,4 +112,45 @@ func (h ProductHandle) CreateProduct() http.HandlerFunc {
 		response.JSON(w, http.StatusCreated, dto.GenericResponse{Data: newProduct})
 	}
 
+}
+
+func (h ProductHandle) UpdateProduct() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		idPath, errPath := strconv.Atoi(chi.URLParam(r, "id"))
+		if errPath != nil {
+			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid ID"})
+			return
+		}
+
+		var productRequest product2.UpdateProductRequest
+		if errDecode := json.NewDecoder(r.Body).Decode(&productRequest); errDecode != nil {
+			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid Body"})
+			return
+		}
+
+		productUpdate, errPatch := h.sv.UpdateProduct(idPath, productRequest)
+		if errPatch != nil {
+
+			if errors.As(errPatch, &product.ErrNotFoundProduct{}) {
+				response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: errPatch.Error()})
+				return
+			}
+
+			if errors.As(errPatch, &product.ErrValidProduct{}) {
+				response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: errPatch.Error()})
+				return
+			}
+
+			if errors.As(errPatch, &product.ErrProduct{}) {
+				response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: errPatch.Error()})
+				return
+			}
+
+			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			return
+		}
+
+		response.JSON(w, http.StatusOK, dto.GenericResponse{Data: productUpdate})
+	}
 }

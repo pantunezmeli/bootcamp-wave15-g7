@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	v "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
 )
 
@@ -16,7 +16,7 @@ type ProductRepositoryMap struct {
 	loader product.IProductLoader
 }
 
-func (p ProductRepositoryMap) GetAll() (map[int]model.Product, error) {
+func (p ProductRepositoryMap) GetAll() (map[int]models.Product, error) {
 	products, err := p.loader.GetDb()
 	if err != nil {
 		fmt.Println(err)
@@ -24,15 +24,15 @@ func (p ProductRepositoryMap) GetAll() (map[int]model.Product, error) {
 	return products, err
 }
 
-func (p ProductRepositoryMap) GetByID(id int) (model.Product, error) {
+func (p ProductRepositoryMap) GetByID(id int) (models.Product, error) {
 	products, err := p.GetAll()
 	if err != nil {
-		return model.Product{}, errors.New("Error getting all products")
+		return models.Product{}, errors.New("Error getting all products")
 	}
 
 	productSearch, ok := products[id]
 	if !ok {
-		return model.Product{}, ErrProductNotFound
+		return models.Product{}, ErrProductNotFound
 	}
 
 	return productSearch, nil
@@ -52,8 +52,8 @@ func (p ProductRepositoryMap) DeleteProduct(id int) error {
 	return nil
 }
 
-func (p ProductRepositoryMap) CreateProduct(product model.Product) error {
-	return p.loader.AddProduct(product)
+func (p ProductRepositoryMap) CreateProduct(product models.Product) error {
+	return p.loader.SaveProduct(product)
 }
 
 func (p ProductRepositoryMap) ProductCodeExist(productCode string) bool {
@@ -77,4 +77,8 @@ func (p ProductRepositoryMap) GetLastID() v.Id {
 	}
 	id, _ := v.NewId(lastId + 1)
 	return id
+}
+
+func (p ProductRepositoryMap) UpdateProduct(product models.Product) error {
+	return p.loader.SaveProduct(product)
 }

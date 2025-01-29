@@ -2,7 +2,7 @@ package product
 
 import (
 	v "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 )
 
 type ErrProductRepository struct {
@@ -18,10 +18,11 @@ var (
 )
 
 type IProductRepository interface {
-	GetAll() (map[int]model.Product, error)
-	GetByID(id int) (model.Product, error)
-	CreateProduct(product model.Product) error
+	GetAll() (map[int]models.Product, error)
+	GetByID(id int) (models.Product, error)
+	CreateProduct(product models.Product) error
 	DeleteProduct(id int) error
 	ProductCodeExist(productCode string) bool
 	GetLastID() v.Id
+	UpdateProduct(product models.Product) error
 }

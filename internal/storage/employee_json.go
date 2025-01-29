@@ -20,8 +20,8 @@ type EmployeeJSONFile struct {
 	lastId int
 }
 
-func (l *EmployeeJSONFile) Load() (employees map[int]model.Employee, err error) {
-	file, err := os.Open(l.path)
+func (s *EmployeeJSONFile) Load() (employees map[int]model.Employee, err error) {
+	file, err := os.Open(s.path)
 	if err != nil {
 		return
 	}
@@ -41,8 +41,8 @@ func (l *EmployeeJSONFile) Load() (employees map[int]model.Employee, err error) 
 	return
 }
 
-func (l *EmployeeJSONFile) Save(employee model.Employee) (err error) {
-	employees, err := l.Load()
+func (s *EmployeeJSONFile) Save(employee model.Employee) (err error) {
+	employees, err := s.Load()
 	if err != nil {
 		return
 	}
@@ -59,23 +59,23 @@ func (l *EmployeeJSONFile) Save(employee model.Employee) (err error) {
 	}
 
 	// Escribir el JSON generado en el archivo
-	err = os.WriteFile(l.path, data, 0644)
+	err = os.WriteFile(s.path, data, 0644)
 	if err != nil {
 		return
 	}
 	return nil
 }
 
-func (l *EmployeeJSONFile) GetLastId() (id int, err error) {
-	if l.lastId == -1 {
-		employees, errLoad := l.Load()
+func (s *EmployeeJSONFile) GetLastId() (id int, err error) {
+	if s.lastId == -1 {
+		employees, errLoad := s.Load()
 		if errLoad != nil {
 			return
 		}
 		id = employees[len(employees)].Id.GetId()
 		return
 	} else {
-		id = l.lastId
+		id = s.lastId
 		return
 	}
 }

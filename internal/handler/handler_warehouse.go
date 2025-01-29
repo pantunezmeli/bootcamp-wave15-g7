@@ -22,23 +22,31 @@ func NewWareHouseHandler(sv service.IWareHouseService) *WareHouseHandler {
 }
 
 // ! 1)
-func (h *WareHouseHandler) GetAll() http.HandlerFunc {
+func (h *WareHouseHandler) Get() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Call Service
 		wh, err := h.sv.FindAll()
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, nil)
 			return
 		}
 
+		// Convert map to list of maps
+		var whList []dto.WareHouseDoc
+		for _, warehouse := range wh {
+			whList = append(whList, warehouse)
+		}
+
+		// Right Response
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
-			"data":    wh,
+			"data":    whList,
 		})
 	}
 }
 
 // ! 2)
-func (h *WareHouseHandler) GetWareHouseById() http.HandlerFunc {
+func (h *WareHouseHandler) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Params
 		idStr := chi.URLParam(r, "id")
@@ -55,7 +63,7 @@ func (h *WareHouseHandler) GetWareHouseById() http.HandlerFunc {
 		// Call service
 		wh, err := h.sv.GetWareHouseById(id)
 
-		// Any error
+		// Errors types
 		if err != nil {
 			if errors.Is(err, service.ErrWareHouseNotFound) {
 				response.JSON(w, http.StatusNotFound, map[string]any{
@@ -109,7 +117,9 @@ func (h *WareHouseHandler) Create() http.HandlerFunc {
 		}
 
 		// Call Service
-		err = h.sv.AddWareHouse(req)
+		wh, err := h.sv.AddWareHouse(req)
+
+		// Errors types
 		if err != nil {
 			if errors.Is(err, service.ErrWareHouseCodeAlreadyExists) {
 				response.JSON(w, http.StatusConflict, map[string]any{
@@ -132,8 +142,10 @@ func (h *WareHouseHandler) Create() http.HandlerFunc {
 			return
 		}
 
+		// Right Response
 		response.JSON(w, http.StatusCreated, map[string]any{
 			"message": "success",
+			"data":    wh,
 		})
 
 	}
@@ -167,6 +179,8 @@ func (h *WareHouseHandler) Update() http.HandlerFunc {
 
 		// Call service
 		wh, err := h.sv.EditWareHouse(id, req)
+
+		// Errors types
 		if err != nil {
 			if errors.Is(err, service.ErrWareHouseNotFound) {
 				response.JSON(w, http.StatusNotFound, map[string]any{
@@ -199,7 +213,7 @@ func (h *WareHouseHandler) Update() http.HandlerFunc {
 		// Right response
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
-			"data":    []dto.WareHouseDoc{wh},
+			"data":    wh,
 		})
 
 	}
@@ -222,6 +236,8 @@ func (h *WareHouseHandler) Delete() http.HandlerFunc {
 
 		// Call Service
 		err = h.sv.DeleteWarehouse(id)
+
+		// Errors types
 		if err != nil {
 			if errors.Is(err, service.ErrWareHouseNotFound) {
 				response.JSON(w, http.StatusNotFound, map[string]any{

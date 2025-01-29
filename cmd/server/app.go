@@ -75,8 +75,8 @@ func (a *ServerChi) Run() (err error) {
 	})
 
 	rt.Route("/warehouses", func(rt chi.Router) {
-		rt.Get("/", wh_h.GetAll())
-		rt.Get("/{id}", wh_h.GetWareHouseById())
+		rt.Get("/", wh_h.Get())
+		rt.Get("/{id}", wh_h.GetById())
 		rt.Post("/", wh_h.Create())
 		rt.Patch("/{id}", wh_h.Update())
 		rt.Delete("/{id}", wh_h.Delete())

@@ -51,24 +51,24 @@ func (s *WarehouseService) GetWareHouseById(id int) (w dto.WareHouseDoc, err err
 }
 
 // ! 3)
-func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (err error) {
+func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (wh dto.WareHouseDoc, err error) {
 
 	// Validation and convert to model
 	warehouse, err := req.ConvertToModel(req)
 	if err != nil {
-		return fmt.Errorf("failed to convert warehouse: %w", err)
+		return dto.WareHouseDoc{}, fmt.Errorf("failed to convert warehouse: %w", err)
 	}
 
 	// Validation of warehouse code
 	_, exists := s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
 	if exists {
-		return ErrWareHouseCodeAlreadyExists
+		return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
 	}
 
 	// Generation of new Id
 	warehouses, err := s.rp.GetAllWareHouses()
 	if err != nil {
-		return err
+		return dto.WareHouseDoc{}, err
 	}
 
 	var newId = 0
@@ -82,7 +82,7 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (err error) {
 	// Asignation of Id
 	newIdObj, err := domain.NewId(newId)
 	if err != nil {
-		return ErrInvalidIdGenerated
+		return dto.WareHouseDoc{}, ErrInvalidIdGenerated
 	}
 
 	warehouse.Id = newIdObj
@@ -90,11 +90,16 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (err error) {
 	// Call the repository
 	err = s.rp.CreateNewWareHouse(warehouse)
 	if err != nil {
-		return err
+		return dto.WareHouseDoc{}, err
 	}
 
-	return nil
+	// Convert model to DTO
+	wh, err = wh.ConvertToDTO(warehouse)
+	if err != nil {
+		return dto.WareHouseDoc{}, err
+	}
 
+	return
 }
 
 func (s *WarehouseService) MapWareHouseToDTO(w map[int]models.WareHouse) (r map[int]dto.WareHouseDoc) {

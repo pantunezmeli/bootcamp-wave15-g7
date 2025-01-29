@@ -133,12 +133,25 @@ func (h *SectionDefault) CreateSection() http.HandlerFunc {
 
 func (h *SectionDefault) DeleteSection() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// request
-		// ...
+		// Obtener la ID de la URL
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+			return
+		}
 
 		// process
-		// - delete Section
-		// - response
+		// - get the Section by ID
+		err = h.sv.DeleteSection(id)
+		if err != nil {
+			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "section deleted succesfully",
+		})
 	}
 }
 

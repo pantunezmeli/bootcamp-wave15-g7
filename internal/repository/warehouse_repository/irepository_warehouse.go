@@ -9,4 +9,8 @@ type IWareHouseRepository interface {
 
 	//! 2)
 	GetWareHouseById(id int) (wh models.WareHouse, exists bool)
+
+	//! 3)
+	GetWareHouseByCode(code string) (wh models.WareHouse, exists bool)
+	CreateNewWareHouse(wh models.WareHouse) (err error)
 }

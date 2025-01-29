@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	service "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse_service"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
 type WareHouseHandler struct {
@@ -26,8 +28,6 @@ func (h *WareHouseHandler) GetAll() http.HandlerFunc {
 			response.JSON(w, http.StatusInternalServerError, nil)
 			return
 		}
-
-		print("Este es el wh: \n", wh)
 
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
@@ -72,5 +72,50 @@ func (h *WareHouseHandler) GetWareHouseById() http.HandlerFunc {
 			"message": "success",
 			"data":    wh,
 		})
+	}
+}
+
+func (h *WareHouseHandler) AddNewWarehouse() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var req dto.WareHouseDoc
+
+		// Decode request
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]any{
+				"message": "invalid request payload",
+			})
+			return
+		}
+
+		// Call Service
+		err = h.sv.AddWareHouse(req)
+		if err != nil {
+			if errors.Is(err, service.ErrWareHouseCodeAlreadyExists) {
+				response.JSON(w, http.StatusConflict, map[string]any{
+					"message": "warehouse with warehouse_code already exists",
+				})
+				return
+			}
+
+			var invalidFieldErr error
+			if errors.As(err, &invalidFieldErr) {
+				response.JSON(w, http.StatusBadRequest, map[string]any{
+					"message": "some values are not valid",
+				})
+				return
+			}
+
+			response.JSON(w, http.StatusInternalServerError, map[string]any{
+				"message": "something went wrong",
+			})
+			return
+		}
+
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": "success",
+		})
+
 	}
 }

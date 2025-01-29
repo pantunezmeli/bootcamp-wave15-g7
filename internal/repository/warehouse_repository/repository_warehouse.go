@@ -2,16 +2,16 @@ package warehouse
 
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	loader "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/warehouse_loader"
+	loader "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 )
 
 type WareHouseRepository struct {
 	db     map[int]models.WareHouse
-	loader loader.IWareHouseLoader
+	loader loader.IWareHouseStorage
 }
 
 // Crea una nueva 'base de datos'
-func NewWareHouseRepository(db map[int]models.WareHouse, loader loader.IWareHouseLoader) *WareHouseRepository {
+func NewWareHouseRepository(db map[int]models.WareHouse, loader loader.IWareHouseStorage) *WareHouseRepository {
 	return &WareHouseRepository{
 		db:     db,
 		loader: loader,
@@ -31,4 +31,19 @@ func (r *WareHouseRepository) GetAllWareHouses() (w map[int]models.WareHouse, er
 func (r *WareHouseRepository) GetWareHouseById(id int) (wh models.WareHouse, exists bool) {
 	wh, exists = r.db[id]
 	return wh, exists
+}
+
+// ! 3)
+func (r *WareHouseRepository) GetWareHouseByCode(code string) (wh models.WareHouse, exists bool) {
+	for _, wh := range r.db {
+		if wh.WareHouseCode.GetWareHouseCode() == code {
+			return wh, true
+		}
+	}
+	return wh, false
+}
+
+func (r *WareHouseRepository) CreateNewWareHouse(wh models.WareHouse) (err error) {
+	r.db[wh.Id.GetId()] = wh
+	return nil
 }

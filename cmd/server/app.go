@@ -6,9 +6,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	warehouse_h "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
-	loader "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/warehouse_loader"
 	warehouse_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse_repository"
 	warehouse_sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse_service"
+	loader "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -77,6 +77,7 @@ func (a *ServerChi) Run() (err error) {
 	rt.Route("/warehouses", func(rt chi.Router) {
 		rt.Get("/", wh_h.GetAll())
 		rt.Get("/{id}", wh_h.GetWareHouseById())
+		rt.Post("/", wh_h.AddNewWarehouse())
 	})
 
 	rt.Route("/sections", func(rt chi.Router) {

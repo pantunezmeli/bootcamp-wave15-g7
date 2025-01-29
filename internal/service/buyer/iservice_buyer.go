@@ -8,7 +8,7 @@ import (
 type IServiceBuyer interface {
 	GetBuyers() ([]dto.BuyerResponse, error)
 	GetBuyer(id int) (dto.BuyerResponse, error)
-	CreateBuyer(entity model.Buyer) error
+	CreateBuyer(entity model.Buyer) (dto.BuyerResponse, error)
 	//UpdateBuyer(id int, entity model.Buyer) error
 	//DeleteBuyer(id int) error
 }

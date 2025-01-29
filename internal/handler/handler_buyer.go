@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
+	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 type BuyerHandler struct {
@@ -21,21 +23,17 @@ func NewBuyerHandler(sv buyer.IServiceBuyer) *BuyerHandler {
 
 func (handler *BuyerHandler) GetAll() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-
 		buyers, err := handler.service.GetBuyers()
-		if err != nil {
-			response.JSON(writer, http.StatusOK, map[string]any{
-				"message": http.StatusInternalServerError,
-				"data":    nil,
-			})
+		if errors.Is(err, errorbase.ErrEmptyList) {
+			jsonResponse(writer, http.StatusNotFound, "the buyer list is empty", nil)
+			return
 		}
 
-		//list := handler.generateResponseList(buyers)
-
-		response.JSON(writer, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    buyers,
-		})
+		if err != nil {
+			jsonResponse(writer, http.StatusBadRequest, "internal server error", nil)
+			return
+		}
+		jsonResponse(writer, http.StatusOK, "success", buyers)
 	}
 }
 
@@ -46,24 +44,21 @@ func (handler *BuyerHandler) GetBuyerById() http.HandlerFunc {
 		id, err2 := strconv.Atoi(idParam)
 
 		if err2 != nil {
-			response.JSON(writer, http.StatusOK, map[string]any{
-				"message": http.StatusInternalServerError,
-			})
+			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
+			return
 		}
-
 		buyer, err := handler.service.GetBuyer(id)
-		if err != nil {
-			response.JSON(writer, http.StatusOK, map[string]any{
-				"message": http.StatusNotFound,
-				"data":    nil,
-			})
+		if errors.Is(err, errorbase.ErrInvalidId) {
+			jsonResponse(writer, http.StatusBadRequest, "the id parameter is incorrect", nil)
+			return
+		} else if errors.Is(err, errorbase.ErrNotFound) {
+			jsonResponse(writer, http.StatusNotFound, "buyer not found", nil)
+			return
+		} else if err != nil {
+			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
+			return
 		}
-
-		//buyerResponse := handler.generateBuyerResponse(buyer)
-		response.JSON(writer, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    buyer,
-		})
+		jsonResponse(writer, http.StatusOK, "success", buyer)
 	}
 }
 
@@ -75,26 +70,30 @@ func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
 		isEmpty := newBuyer == model.Buyer{}
 
 		if err2 != nil || isEmpty {
-			response.JSON(writer, http.StatusBadRequest, map[string]any{
-				"message": http.StatusBadRequest,
-			})
+			jsonResponse(writer, http.StatusBadRequest, "internal server error", nil)
 			return
 		}
 
-		err := handler.service.CreateBuyer(newBuyer)
+		buyer, err := handler.service.CreateBuyer(newBuyer)
+
+		if errors.Is(err, errorbase.ErrConflict) {
+			jsonResponse(writer, http.StatusConflict, "the buyer already exist", nil)
+			return
+		}
 
 		if err != nil {
-			response.JSON(writer, http.StatusConflict, map[string]any{
-				"message": err.Error(),
-				"data":    nil,
-			})
+			jsonResponse(writer, http.StatusBadRequest, "the fields are empty or incorrect", nil)
 			return
 		}
 
-		response.JSON(writer, http.StatusCreated, map[string]any{
-			"message": http.StatusCreated,
-			"data":    "success",
-		})
+		jsonResponse(writer, http.StatusCreated, "buyer created", buyer)
 	}
 
+}
+
+func jsonResponse(writer http.ResponseWriter, statusCode int, message string, data any) {
+	response.JSON(writer, statusCode, map[string]any{
+		"message": message,
+		"data":    data,
+	})
 }

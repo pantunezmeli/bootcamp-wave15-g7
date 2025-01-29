@@ -3,8 +3,10 @@ package buyer
 import (
 	"errors"
 
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
 	loaderfile "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loaderFile"
+	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 type BuyerRepository struct {
@@ -33,17 +35,27 @@ func (buyer *BuyerRepository) GetById(id int) (model.Buyer, error) {
 
 	byer_founded, ok := buyer.buyers[id]
 	if !ok {
-		return model.Buyer{}, errors.New("not found")
+		return model.Buyer{}, errorbase.ErrNotFound
 	}
 	return byer_founded, nil
 }
 
-func (buyer *BuyerRepository) Create(entity model.Buyer) error {
+func (buyer *BuyerRepository) Create(entity model.Buyer) (model.Buyer, error) {
 
 	_, ok := buyer.buyers[entity.Id]
 	if ok {
-		return errors.New("element exist")
+		return model.Buyer{}, errorbase.ErrConflict
 	}
+
+	attributes, err := buyer.ValidateModel(entity)
+
+	if err != nil {
+		return model.Buyer{}, err
+	}
+
+	entity.Card_Number_Id = attributes["CardNumber"].(domain.CardNumberId).GetCardNumberId()
+	entity.First_Name = attributes["FirstName"].(domain.FirstName).GetFirstName()
+	entity.Last_Name = attributes["LastName"].(domain.LastName).GetLastName()
 
 	entity.Id = getLastId(buyer.buyers)
 	buyer.buyers[entity.Id] = entity
@@ -51,7 +63,7 @@ func (buyer *BuyerRepository) Create(entity model.Buyer) error {
 	loader := loaderfile.NewBuyerJSONFile("../docs/db/buyer_data.json")
 	loader.Save(entity)
 
-	return nil
+	return entity, nil
 }
 
 func getLastId(buyer map[int]model.Buyer) int {
@@ -62,6 +74,29 @@ func getLastId(buyer map[int]model.Buyer) int {
 		}
 	}
 	return maxId + 1
+}
+
+func (*BuyerRepository) ValidateModel(entity model.Buyer) (map[string]any, error) {
+	cardNumber, err := domain.NewCardNumberId(entity.Card_Number_Id)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	firstName, err := domain.NewFirstName(entity.First_Name)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	lastName, err := domain.NewLastName(entity.Last_Name)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	return map[string]any{
+		"CardNumber": cardNumber,
+		"FirstName":  firstName,
+		"LastName":   lastName,
+	}, nil
 }
 
 //func (buyer *BuyerRepository) Update(id int, entity model.Buyer) error {

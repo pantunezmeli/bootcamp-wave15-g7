@@ -77,18 +77,7 @@ func (h ProductHandle) CreateProduct() http.HandlerFunc {
 
 		newProduct, errCreate := h.sv.CreateProduct(newProduct)
 		if errCreate != nil {
-
-			if errors.As(errCreate, &product.ErrValidProduct{}) {
-				response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: errCreate.Error()})
-				return
-			}
-
-			if errors.As(errCreate, &product.ErrProduct{}) {
-				response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: errCreate.Error()})
-				return
-			}
-
-			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			validErrorResponse(w, errCreate)
 			return
 		}
 
@@ -114,23 +103,7 @@ func (h ProductHandle) UpdateProduct() http.HandlerFunc {
 
 		productUpdate, errPatch := h.sv.UpdateProduct(idPath, productRequest)
 		if errPatch != nil {
-
-			if errors.As(errPatch, &product.ErrNotFoundProduct{}) {
-				response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: errPatch.Error()})
-				return
-			}
-
-			if errors.As(errPatch, &product.ErrValidProduct{}) {
-				response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: errPatch.Error()})
-				return
-			}
-
-			if errors.As(errPatch, &product.ErrProduct{}) {
-				response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: errPatch.Error()})
-				return
-			}
-
-			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			validErrorResponse(w, errPath)
 			return
 		}
 

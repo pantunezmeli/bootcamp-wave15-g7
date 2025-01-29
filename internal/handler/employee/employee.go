@@ -113,7 +113,7 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		updatedEmployee, err := h.sv.Edit(id, employeeData)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				response.JSON(w, http.StatusUnprocessableEntity, nil)
+				response.JSON(w, http.StatusNotFound, nil)
 				return
 			}
 			response.JSON(w, http.StatusInternalServerError, nil)
@@ -121,7 +121,7 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		}
 
 		// response
-		response.JSON(w, http.StatusCreated, map[string]any{
+		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
 			"data":    updatedEmployee,
 		})
@@ -140,7 +140,7 @@ func (h *DefaultHandler) DeleteById() http.HandlerFunc {
 		err = h.sv.DeleteById(id)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				response.JSON(w, http.StatusUnprocessableEntity, nil)
+				response.JSON(w, http.StatusNotFound, nil)
 				return
 			}
 			response.JSON(w, http.StatusInternalServerError, nil)

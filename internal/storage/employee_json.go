@@ -10,12 +10,14 @@ import (
 
 func NewEmployeeJSONFile(path string) *EmployeeJSONFile {
 	return &EmployeeJSONFile{
-		path: path,
+		path:   path,
+		lastId: -1,
 	}
 }
 
 type EmployeeJSONFile struct {
-	path string
+	path   string
+	lastId int
 }
 
 func (l *EmployeeJSONFile) Load() (employees map[int]model.Employee, err error) {
@@ -39,14 +41,19 @@ func (l *EmployeeJSONFile) Load() (employees map[int]model.Employee, err error) 
 	return
 }
 
-func (l *EmployeeJSONFile) Save(employees map[int]model.Employee) error {
-	EmployeeList := make([]dto.EmployeeDoc, 0, len(employees))
-	for _, e := range employees {
-		EmployeeList = append(EmployeeList, dto.EmployeeModelToDto(e))
+func (l *EmployeeJSONFile) Save(employee model.Employee) (err error) {
+	employees, err := l.Load()
+	if err != nil {
+		return
 	}
+	employeeList := make([]dto.EmployeeDoc, 0, len(employees))
+	for _, e := range employees {
+		employeeList = append(employeeList, dto.EmployeeModelToDto(e))
+	}
+	employeeList = append(employeeList, dto.EmployeeModelToDto(employee))
 
 	// Convertir la lista en JSON
-	data, err := json.MarshalIndent(EmployeeList, "", "  ")
+	data, err := json.MarshalIndent(employeeList, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -54,7 +61,21 @@ func (l *EmployeeJSONFile) Save(employees map[int]model.Employee) error {
 	// Escribir el JSON generado en el archivo
 	err = os.WriteFile(l.path, data, 0644)
 	if err != nil {
-		return err
+		return
 	}
 	return nil
+}
+
+func (l *EmployeeJSONFile) GetLastId() (id int, err error) {
+	if l.lastId == -1 {
+		employees, errLoad := l.Load()
+		if errLoad != nil {
+			return
+		}
+		id = employees[len(employees)].Id.GetId()
+		return
+	} else {
+		id = l.lastId
+		return
+	}
 }

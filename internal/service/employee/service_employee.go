@@ -2,12 +2,14 @@ package employee
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
 var ErrEmployeeNotFound = errors.New("employee not found")
+var ErrEmptyField = errors.New("employee data lacks a required field")
 
 func NewDefaultService(repository employee.EmployeeRepository) *DefaultService {
 	return &DefaultService{rp: repository}
@@ -42,8 +44,23 @@ func (s *DefaultService) FindById(id int) (employeeData dto.EmployeeDoc, err err
 	return
 }
 
-func (s *DefaultService) New() (err error) {
-	return nil
+func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error) {
+	if employeeData.CardNumber == "" || employeeData.FirstName == "" || employeeData.LastName == "" || employeeData.WarehouseId == 0 {
+		err = ErrEmptyField
+		return
+	}
+	employee, err := dto.EmployeeDtoToModel(employeeData)
+	fmt.Println("employee data: ", employeeData)
+	if err != nil {
+		return
+	}
+	fmt.Println("employee: ", employee)
+	newEmployee, err := s.rp.New(employee)
+	if err != nil {
+		return
+	}
+	newEmployeeData = dto.EmployeeModelToDto(newEmployee)
+	return
 }
 
 func (s *DefaultService) Update() (err error) {

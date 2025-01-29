@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/bootcamp-go/web/request"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
 func NewDefaultHandler(service sv.EmployeeService) *DefaultHandler {
@@ -66,7 +68,31 @@ func (h *DefaultHandler) GetById() http.HandlerFunc {
 }
 
 func (h *DefaultHandler) Add() http.HandlerFunc {
-	return nil
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		var employeeData dto.EmployeeDoc
+		if err := request.JSON(r, &employeeData); err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+			return
+		}
+
+		// process
+		newEmployee, err := h.sv.New(employeeData)
+		if err != nil {
+			if errors.Is(err, sv.ErrEmptyField) {
+				response.JSON(w, http.StatusUnprocessableEntity, nil)
+				return
+			}
+			response.JSON(w, http.StatusInternalServerError, nil)
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": "success",
+			"data":    newEmployee,
+		})
+	}
 }
 
 func (h *DefaultHandler) Update() http.HandlerFunc {

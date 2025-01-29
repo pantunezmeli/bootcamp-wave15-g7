@@ -3,6 +3,7 @@ package employee
 import (
 	"errors"
 
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 )
@@ -48,8 +49,18 @@ func (r *EmployeeMap) FindById(id int) (employee model.Employee, err error) {
 	return
 }
 
-func (r *EmployeeMap) New() (err error) {
-	return nil
+func (r *EmployeeMap) New(employee model.Employee) (newEmployee model.Employee, err error) {
+	lastId, err := r.st.GetLastId()
+	if err != nil {
+		return
+	}
+	newEmployee = employee
+	newEmployee.Id, err = domain.NewId(lastId + 1)
+	if err != nil {
+		return
+	}
+	err = r.st.Save(newEmployee)
+	return
 }
 
 func (r *EmployeeMap) Update() (err error) {

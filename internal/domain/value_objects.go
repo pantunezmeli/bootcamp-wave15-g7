@@ -19,7 +19,7 @@ type Name struct {
 
 // Validación
 func NewId(value int) (id Id, err error) {
-	if value <= 0 {
+	if value < 0 {
 		return Id{}, ErrInvalidId
 	}
 	return Id{value: value}, nil

@@ -89,6 +89,15 @@ func (p ProductService) CreateProduct(product product2.ProductDTO) (productDto p
 	return
 }
 
-func (p ProductService) DeleteProduct(id int) error {
-	return p.rp.DeleteProduct(id)
+func (p ProductService) DeleteProduct(id int) (err error) {
+	errDelete := p.rp.DeleteProduct(id)
+	if errDelete != nil {
+		if errors.Is(errDelete, product.ErrProductNotFound) {
+			err = ErrNotFoundProduct{message: "Product not found"}
+			return
+		}
+		err = ErrProduct{message: "Error deleted product"}
+	}
+
+	return
 }

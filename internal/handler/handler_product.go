@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
-	pr "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 	product2 "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product"
@@ -58,22 +57,11 @@ func (h *ProductHandle) DeleteProduct() http.HandlerFunc {
 
 		errDelete := h.sv.DeleteProduct(idPath)
 		if errDelete != nil {
-			if errors.As(errDelete, &pr.ErrProductRepository{}) {
-
-				if errors.Is(errDelete, pr.ErrProductNotFound) {
-					response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: errDelete.Error()})
-					return
-				}
-
-				response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: errDelete.Error()})
-				return
-			}
-
-			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			validErrorResponse(w, errDelete)
 			return
 		}
 
-		response.JSON(w, http.StatusOK, nil)
+		response.JSON(w, http.StatusNoContent, nil)
 	}
 }
 
@@ -157,7 +145,7 @@ func validErrorResponse(w http.ResponseWriter, err error) {
 	}
 
 	if errors.As(err, &product.ErrValidProduct{}) {
-		response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: err.Error()})
+		response.JSON(w, http.StatusUnprocessableEntity, dto.GenericResponse{Message: err.Error()})
 		return
 	}
 

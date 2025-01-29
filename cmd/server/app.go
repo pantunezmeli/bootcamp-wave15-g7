@@ -5,6 +5,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	warehouse_h "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
+	warehouse_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse_repository"
+	warehouse_sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse_service"
+	loader "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -48,34 +52,34 @@ type ServerChi struct {
 func (a *ServerChi) Run() (err error) {
 	// dependencies
 	// - loader
-	// ld := loader.NewVehicleJSONFile(a.loaderFilePath)
-	// db, err := ld.Load()
-	// if err != nil {
-	// 	return
-	// }
+	ld := loader.NewWareHouseJSONFile(a.loaderFilePath)
+	db, err := ld.Load()
+	if err != nil {
+		return
+	}
 
-
-	// - repository
-
-
-
-	// - service
-
-
-	// - handler
-
+	wh_rp := warehouse_rp.NewWareHouseRepository(db, ld)
+	wh_sv := warehouse_sv.NewWareHouseService(wh_rp)
+	wh_h := warehouse_h.NewWareHouseHandler(wh_sv)
 
 	// router
 	rt := chi.NewRouter()
+
 	// - middlewares
 	rt.Use(middleware.Logger)
 	rt.Use(middleware.Recoverer)
+
 	// - endpoints
 	rt.Route("/api/v1", func(r chi.Router) {
 		r.Route("/sellers", func(r chi.Router) {
 		})
 	
-		r.Route("/warehouses", func(r chi.Router) {
+		r.Route("/warehouses", func(rt chi.Router) {
+      rt.Get("/", wh_h.Get())
+		  rt.Get("/{id}", wh_h.GetById())
+		  rt.Post("/", wh_h.Create())
+		  rt.Patch("/{id}", wh_h.Update())
+		  rt.Delete("/{id}", wh_h.Delete())
 		})
 	
 		r.Route("/sections", func(r chi.Router) {

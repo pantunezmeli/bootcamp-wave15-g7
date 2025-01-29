@@ -6,16 +6,16 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/cmd/server"
 )
 
-
 func main() {
 	// env
 	// ...
 
 	// app
 	// - config
+	fmt.Println("Proyecto corriendo...")
 	cfg := &server.ConfigServerChi{
 		ServerAddress:  ":8080",
-		LoaderFilePath: "",
+		LoaderFilePath: "../docs/db/warehouse_data.json",
 	}
 	app := server.NewServerChi(cfg)
 	// - run

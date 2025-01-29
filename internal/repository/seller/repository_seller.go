@@ -43,7 +43,7 @@ func (s *SellerStorage) Save(modelToSave models.Seller) (seller models.Seller, e
 		return
 	}
 
-	if err = s.CheckCid(*modelToSave.Cid.Value(), sellersMap); err != nil{
+	if err = s.CheckCid(modelToSave, sellersMap); err != nil{
 		return
 	}
 
@@ -88,9 +88,12 @@ func (s *SellerStorage) Delete(id int) (err error){
 
 }
 
-func (s *SellerStorage) CheckCid(cid int, sellersMap map[int]models.Seller) (err error){
+func (s *SellerStorage) CheckCid(sellerToCheck models.Seller, sellersMap map[int]models.Seller) (err error){
+	if *sellerToCheck.ID.Value() == 0 {
+		return
+	}
 	for _, seller := range sellersMap{
-		if *seller.Cid.Value() == cid {
+		if *seller.Cid.Value() == *sellerToCheck.Cid.Value() && *sellerToCheck.ID.Value() != *seller.ID.Value()  {
 			err = ErrCidAlreadyExists
 			return
 		}

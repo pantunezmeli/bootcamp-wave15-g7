@@ -83,11 +83,11 @@ func (a *ServerChi) Run() (err error) {
 		})
 
 		r.Route("/employees", func(r chi.Router) {
-			rt.Get("/", employeeHandler.GetAll())
-			rt.Get("/{id}", employeeHandler.GetById())
-			rt.Post("/", employeeHandler.Add())
-			rt.Patch("/{id}", employeeHandler.Update())
-			rt.Delete("/{id}", employeeHandler.DeleteById())
+			r.Get("/", employeeHandler.GetAll())
+			r.Get("/{id}", employeeHandler.GetById())
+			r.Post("/", employeeHandler.Add())
+			r.Patch("/{id}", employeeHandler.Update())
+			r.Delete("/{id}", employeeHandler.DeleteById())
 		})
 
 		r.Route("/buyers", func(r chi.Router) {

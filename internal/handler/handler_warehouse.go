@@ -24,6 +24,7 @@ func NewWareHouseHandler(sv service.IWareHouseService) *WareHouseHandler {
 // ! 1)
 func (h *WareHouseHandler) Get() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		// Call Service
 		wh, err := h.sv.FindAll()
 		if err != nil {

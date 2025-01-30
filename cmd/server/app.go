@@ -6,67 +6,68 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
-
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 	warehouse_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse_repository"
 	buyerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
 	warehouse_sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse_service"
-	loader "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
+	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
+	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
 type ConfigServerChi struct {
-	ServerAddress  string
-	LoaderFilePath string
+	ServerAddress           string
+	BuyerLoaderFilePath     string
+	WarehouseLoaderFilePath string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
 func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	// default values
 	defaultConfig := &ConfigServerChi{
-		ServerAddress: ":8080",
+		ServerAddress:           ":8080",
+		BuyerLoaderFilePath:     "../docs/db/buyer_data.json",
+		WarehouseLoaderFilePath: "../docs/db/warehouse_data.json",
 	}
 	if cfg != nil {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePath != "" {
-			defaultConfig.LoaderFilePath = cfg.LoaderFilePath
-
+		if cfg.BuyerLoaderFilePath != "" {
+			defaultConfig.BuyerLoaderFilePath = cfg.BuyerLoaderFilePath
+		}
+		if cfg.WarehouseLoaderFilePath != "" {
+			defaultConfig.WarehouseLoaderFilePath = cfg.WarehouseLoaderFilePath
 		}
 	}
 
 	return &ServerChi{
-		serverAddress:  defaultConfig.ServerAddress,
-		loaderFilePath: defaultConfig.LoaderFilePath,
+		serverAddress:     defaultConfig.ServerAddress,
+		buyerFilePath:     defaultConfig.BuyerLoaderFilePath,
+		warehouseFilePath: defaultConfig.WarehouseLoaderFilePath,
 	}
 }
 
 // ServerChi is a struct that implements the Application interface
 type ServerChi struct {
-	serverAddress  string
-	loaderFilePath string
+	serverAddress     string
+	buyerFilePath     string
+	warehouseFilePath string
 }
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
-	// dependencies
-	// - loader
-	buyerSt := buyerstorage.NewBuyerJSONFile(a.loaderFilePath)
-	warehouseSt := loader.NewWareHouseJSONFile(a.loaderFilePath)
-	dbwarehouse, _ := warehouseSt.Load()
-
-	// if err2 != nil {
-	// 	return
-	// }
+	//? DEPENDENCIES
+	// loader
+	buyerSt := buyerstorage.NewBuyerJSONFile(a.buyerFilePath)
+	warehouseSt := warehouseStorage.NewWareHouseJSONFile(a.warehouseFilePath)
 
 	by_rp := buyerRepository.NewBuyerRepository(buyerSt)
 	by_sv := buyerService.NewBuyerService(by_rp)
 	by_hd := handler.NewBuyerHandler(by_sv)
 
-	wh_rp := warehouse_rp.NewWareHouseRepository(dbwarehouse, warehouseSt)
+	wh_rp := warehouse_rp.NewWareHouseRepository(warehouseSt)
 	wh_sv := warehouse_sv.NewWareHouseService(wh_rp)
 	wh_h := handler.NewWareHouseHandler(wh_sv)
 

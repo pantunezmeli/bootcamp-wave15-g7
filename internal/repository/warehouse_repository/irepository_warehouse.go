@@ -8,13 +8,13 @@ type IWareHouseRepository interface {
 	GetAllWareHouses() (w map[int]models.WareHouse, err error)
 
 	//! 2)
-	GetWareHouseById(id int) (wh models.WareHouse, exists bool)
+	GetWareHouseById(id int) (wh models.WareHouse, err error)
 
 	//! 3)
-	GetWareHouseByCode(code string) (wh models.WareHouse, exists bool)
+	GetWareHouseByCode(code string) (wh models.WareHouse, err error)
 	CreateNewWareHouse(wh models.WareHouse) (err error)
 
-	//! 4)
+	// //! 4)
 	UpdateWarehouse(wh models.WareHouse) (err error)
 
 	//! 5)

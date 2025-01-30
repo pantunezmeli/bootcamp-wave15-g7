@@ -29,16 +29,19 @@ func NewWareHouseService(rp repository.IWareHouseRepository) *WarehouseService {
 func (s *WarehouseService) FindAll() (w map[int]dto.WareHouseDoc, err error) {
 
 	wareHouses, err := s.rp.GetAllWareHouses()
+
 	if err != nil {
 		return map[int]dto.WareHouseDoc{}, err
 	}
-	return s.MapWareHouseToDTO(wareHouses), nil
+	w = s.MapWareHouseToDTO(wareHouses)
+
+	return
 }
 
 // ! 2)
 func (s *WarehouseService) GetWareHouseById(id int) (w dto.WareHouseDoc, err error) {
-	wh, exists := s.rp.GetWareHouseById(id)
-	if !exists {
+	wh, err := s.rp.GetWareHouseById(id)
+	if err != nil {
 		return dto.WareHouseDoc{}, ErrWareHouseNotFound
 	}
 
@@ -51,7 +54,7 @@ func (s *WarehouseService) GetWareHouseById(id int) (w dto.WareHouseDoc, err err
 }
 
 // ! 3)
-func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (wh dto.WareHouseDoc, err error) {
+func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (dto.WareHouseDoc, error) {
 
 	// Validation and convert to model
 	warehouse, err := req.ConvertToModel(req)
@@ -60,9 +63,13 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (wh dto.WareHouseD
 	}
 
 	// Validation of warehouse code
-	_, exists := s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
-	if exists {
+	_, err = s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
+	if err == nil {
 		return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
+	}
+
+	if err != repository.ErrWareHouseCodeNotFound {
+		return dto.WareHouseDoc{}, err
 	}
 
 	// Generation of new Id
@@ -94,14 +101,15 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (wh dto.WareHouseD
 	}
 
 	// Convert model to DTO
-	wh, err = wh.ConvertToDTO(warehouse)
+	whDTO, err := dto.WareHouseDoc{}.ConvertToDTO(warehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, err
 	}
 
-	return
+	return whDTO, nil
 }
 
+// TODO mover al DTO
 func (s *WarehouseService) MapWareHouseToDTO(w map[int]models.WareHouse) (r map[int]dto.WareHouseDoc) {
 	r = make(map[int]dto.WareHouseDoc)
 	for id, wh := range w {
@@ -118,26 +126,28 @@ func (s *WarehouseService) MapWareHouseToDTO(w map[int]models.WareHouse) (r map[
 }
 
 // ! 4)
-func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (wh dto.WareHouseDoc, err error) {
+func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (whDTO dto.WareHouseDoc, err error) {
 	// Get previous instance
-	existingWarehouse, exists := s.rp.GetWareHouseById(id)
-	if !exists {
+	existingWarehouse, err := s.rp.GetWareHouseById(id)
+	if err != nil {
 		return dto.WareHouseDoc{}, ErrWareHouseNotFound
 	}
 
-	// Validation and covert to model
+	// Validation and convert to model
 	warehouse, err := req.ConvertToModelPatch(req, existingWarehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, fmt.Errorf("failed to convert warehouse: %w", err)
 	}
 
-	warehouse.Id = existingWarehouse.Id
-
 	// Verify warehouse_code
-	whCodeExisting, exists := s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
-	if exists && whCodeExisting.Id.GetId() != id {
-		return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
+	if warehouse.WareHouseCode.GetWareHouseCode() != existingWarehouse.WareHouseCode.GetWareHouseCode() {
+		_, err := s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
+		if err == nil {
+			return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
+		}
 	}
+
+	warehouse.Id = existingWarehouse.Id
 
 	// Call Repository
 	err = s.rp.UpdateWarehouse(warehouse)
@@ -146,7 +156,8 @@ func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (wh dto.W
 	}
 
 	// Convert to DTO
-	wh, err = wh.ConvertToDTO(warehouse)
+	// wh, err = wh.ConvertToDTO(warehouse)
+	whDTO, err = dto.WareHouseDoc{}.ConvertToDTO(warehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, err
 	}
@@ -155,16 +166,18 @@ func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (wh dto.W
 
 // ! 5)
 func (s *WarehouseService) DeleteWarehouse(id int) error {
+
 	// Get previous instance
-	_, exists := s.rp.GetWareHouseById(id)
-	if !exists {
+	_, err := s.rp.GetWareHouseById(id)
+	if err != nil {
 		return ErrWareHouseNotFound
 	}
 
 	// Call repository
-	err := s.rp.DeleteWarehouse(id)
+	err = s.rp.DeleteWarehouse(id)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

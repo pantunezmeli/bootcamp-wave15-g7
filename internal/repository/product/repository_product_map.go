@@ -44,7 +44,7 @@ func (p ProductRepositoryMap) DeleteProduct(id int) error {
 		return errSearch
 	}
 
-	errDelete := p.storage.RemoveProduct(productSearch.ID.Value())
+	errDelete := p.storage.RemoveProduct(productSearch.ID.GetId())
 	if errDelete != nil {
 		return ErrProductRepository{msg: "Error deleting product"}
 	}
@@ -71,8 +71,8 @@ func (p ProductRepositoryMap) GetLastID() v.Id {
 	products, _ := p.GetAll()
 	var lastId int
 	for _, productMap := range products {
-		if lastId < productMap.ID.Value() {
-			lastId = productMap.ID.Value()
+		if lastId < productMap.ID.GetId() {
+			lastId = productMap.ID.GetId()
 		}
 	}
 	id, _ := v.NewId(lastId + 1)

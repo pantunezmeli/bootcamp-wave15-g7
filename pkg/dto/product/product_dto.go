@@ -56,7 +56,7 @@ func ParserMapProductToListDTO(p map[int]models.Product) []ProductDTO {
 
 func ParserProductToDTO(p models.Product) ProductDTO {
 	return ProductDTO{
-		ID:                             p.ID.Value(),
+		ID:                             p.ID.GetId(),
 		Description:                    p.Description,
 		ExpirationRate:                 p.ExpirationRate,
 		FreezingRate:                   p.FreezingRate,
@@ -66,7 +66,7 @@ func ParserProductToDTO(p models.Product) ProductDTO {
 		ProductCode:                    p.ProductCode,
 		RecommendedFreezingTemperature: p.RecommendedFreezingTemperature,
 		Width:                          p.Width,
-		ProductTypeID:                  p.ProductTypeID.Value(),
-		SellerID:                       p.SellerID.Value(),
+		ProductTypeID:                  p.ProductTypeID.GetId(),
+		SellerID:                       p.SellerID.GetId(),
 	}
 }

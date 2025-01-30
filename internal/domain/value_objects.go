@@ -1,137 +1,116 @@
 package domain
 
-import (
-	"errors"
-	"regexp"
-	"strings"
-)
+import "errors"
 
-// los errores estan hardcodeados
 var (
-	CompanyNameMin      = 2
-	CompanyNameMax      = 100
-	AddressMin          = 2
-	AddressMax          = 255
-	TelephoneMin        = 2
-	TelephoneMax        = 30
-	validTelephoneRegex = `^[0-9+\-()\s]+$`
-
-	ErrInvalidId           = errors.New("id should be a positive number")
-	ErrInvalidCid          = errors.New("cid should be a positive number")
-	ErrCompanyNameTooShort = errors.New("company name must be at least 2 characters long")
-	ErrCompanyNameTooLong  = errors.New("company name must not exceed 100 characters")
-	ErrAddressTooShort     = errors.New("address must be at least 2 characters long")
-	ErrAddressTooLong      = errors.New("address must not exceed 255 characters")
-	ErrTelephoneTooShort   = errors.New("phone number must be at least 8 characters long")
-	ErrTelephoneTooLong    = errors.New("phone number must not exceed 30 characters")
-	ErrInvalidTelephone    = errors.New("telephone contains invalid characters")
+	ErrInvalidId              = errors.New("invalid id")
+	ErrInvalidWareHouseCode   = errors.New("invalid warehouse code")
+	ErrInvalidTelephone       = errors.New("invalid telephone")
+	ErrInvalidMinimunCapacity = errors.New("invalid minimun capacity")
+	ErrMinimunTemperature     = errors.New("invalid minimun temperature")
+	ErrInvalidAddress         = errors.New("invalid address")
 )
 
+// * ##################### Id ######################
+// Estructura
 type Id struct {
 	value int
 }
 
+// Validación
 func NewId(value int) (id Id, err error) {
 	if value <= 0 {
-		err = ErrInvalidId
-		return
+		return Id{}, ErrInvalidId
 	}
-	id = Id{value: value}
-	return
+	return Id{value: value}, nil
 }
 
-func (id Id) Value() int {
+// Obtener el valor
+func (id Id) GetId() int {
 	return id.value
 }
 
-type Cid struct {
-	value int
-}
+// * ##################### WareHouse_Code ######################
 
-func NewCid(value int) (cid Cid, err error) {
-	if value <= 0 {
-		err = ErrInvalidCid
-		return
-	}
-	cid = Cid{value: value}
-	return
-}
-
-func (c Cid) Value() int {
-	return c.value
-}
-
-type CompanyName struct {
+type WareHouseCode struct {
 	value string
 }
 
-func NewCompanyName(value string) (companyName CompanyName, err error) {
-	value = strings.TrimSpace(value)
-	if err = validateLength(value, CompanyNameMin, CompanyNameMax, ErrCompanyNameTooShort, ErrCompanyNameTooLong); err != nil {
-		return
+func NewWareHouseCode(value string) (code WareHouseCode, err error) {
+	if len(value) < 3 {
+		return WareHouseCode{}, ErrInvalidWareHouseCode
 	}
-
-	//validar caracteres?
-
-	companyName = CompanyName{value}
-	return
+	return WareHouseCode{value: value}, nil
 }
 
-func (c CompanyName) Value() string {
-	return c.value
+func (code WareHouseCode) GetWareHouseCode() string {
+	return code.value
 }
+
+// * ##################### Address ######################
 
 type Address struct {
 	value string
 }
 
 func NewAddress(value string) (address Address, err error) {
-	if err = validateLength(value, AddressMin, AddressMax, ErrAddressTooShort, ErrAddressTooLong); err != nil {
-		return
+	if len(value) < 5 {
+		return Address{}, ErrInvalidAddress
 	}
-	address = Address{value}
-	return
-
+	return Address{value: value}, nil
 }
 
-func (a Address) Value() string {
-	return a.value
+func (address Address) GetAddress() string {
+	return address.value
 }
+
+// * ##################### Telephone ######################
 
 type Telephone struct {
 	value string
 }
 
-func NewTelephone(value string) (telephone Telephone, err error) {
-	if err = validateLength(value, TelephoneMin, TelephoneMax, ErrTelephoneTooShort, ErrTelephoneTooLong); err != nil {
-		return
+func NewTelephone(value string) (phone Telephone, err error) {
+	if len(value) < 10 {
+		return Telephone{}, ErrInvalidTelephone
 	}
-
-	if err = validateTelephone(value); err != nil {
-		return
-	}
-	telephone = Telephone{value}
-	return
+	return Telephone{value: value}, nil
 }
 
-func (t Telephone) Value() string {
-	return t.value
+func (phone Telephone) GetTelephone() string {
+	return phone.value
 }
 
-func validateLength(value string, min, max int, errMin, errMax error) error {
-	if len(value) < min {
-		return errMin
-	}
-	if len(value) > max {
-		return errMax
-	}
-	return nil
+// * ##################### minimun_capacity ######################
+
+type MinimunCapacity struct {
+	value int
 }
 
-func validateTelephone(value string) error {
-	validTelephone := regexp.MustCompile(validTelephoneRegex)
-	if !validTelephone.MatchString(value) {
-		return ErrInvalidTelephone
+func NewMinimunCapacity(value int) (minCapacity MinimunCapacity, err error) {
+	if value <= 0 {
+		return MinimunCapacity{}, ErrInvalidMinimunCapacity
 	}
-	return nil
+	return MinimunCapacity{value: value}, nil
+}
+
+func (minCapacity MinimunCapacity) GetMinimunCapacity() int {
+	return minCapacity.value
+}
+
+// * ##################### minimun_temperature ######################
+
+type MinimunTemperature struct {
+	value int
+}
+
+func NewMinimunTemperature(value int) (minTemperature MinimunTemperature, err error) {
+	if value <= -100 {
+		return MinimunTemperature{}, ErrMinimunTemperature
+	}
+	return MinimunTemperature{value: value}, nil
+}
+
+func (minTemperature MinimunTemperature) GetMinimunTemperature() int {
+	return minTemperature.value
 }

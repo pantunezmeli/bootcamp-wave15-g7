@@ -50,7 +50,7 @@ func (l *ProductJSONFile) SaveProduct(newProduct models.Product) error {
 		return err
 	}
 
-	products[newProduct.ID.Value()] = newProduct
+	products[newProduct.ID.GetId()] = newProduct
 
 	return l.saveToSlice(products)
 }

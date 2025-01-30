@@ -2,7 +2,7 @@ package dto
 
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 )
 
 type EmployeeDoc struct {
@@ -13,7 +13,7 @@ type EmployeeDoc struct {
 	WarehouseId int    `json:"warehouse_id"`
 }
 
-func EmployeeDtoToModel(dto EmployeeDoc) (employee model.Employee, err error) {
+func EmployeeDtoTomodels(dto EmployeeDoc) (employee models.Employee, err error) {
 	newId, errValidation := domain.NewId(dto.Id)
 	if errValidation != nil {
 		return
@@ -34,7 +34,7 @@ func EmployeeDtoToModel(dto EmployeeDoc) (employee model.Employee, err error) {
 	if errValidation != nil {
 		return
 	}
-	employee = model.Employee{
+	employee = models.Employee{
 		Id:          newId,
 		CardNumber:  newCardNumber,
 		FirstName:   newFirstName,
@@ -44,8 +44,8 @@ func EmployeeDtoToModel(dto EmployeeDoc) (employee model.Employee, err error) {
 	return
 }
 
-func EmployeeDtoToModeWithoutValidation(dto EmployeeDoc) (employee model.Employee, err error) {
-	employee = model.Employee{
+func EmployeeDtoToModeWithoutValidation(dto EmployeeDoc) (employee models.Employee, err error) {
+	employee = models.Employee{
 		Id:          domain.NewOptionalId(dto.Id),
 		CardNumber:  domain.NewOptionalCardNumber(dto.CardNumber),
 		FirstName:   domain.NewOptionalName(dto.FirstName),
@@ -55,7 +55,7 @@ func EmployeeDtoToModeWithoutValidation(dto EmployeeDoc) (employee model.Employe
 	return
 }
 
-func EmployeeModelToDto(employee model.Employee) (dto EmployeeDoc) {
+func EmployeemodelsToDto(employee models.Employee) (dto EmployeeDoc) {
 	dto = EmployeeDoc{
 		Id:          employee.Id.GetId(),
 		CardNumber:  employee.CardNumber.GetCardNumber(),

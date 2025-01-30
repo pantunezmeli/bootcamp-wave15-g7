@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
@@ -20,7 +20,7 @@ type EmployeeJSONFile struct {
 	lastId int
 }
 
-func (s *EmployeeJSONFile) Load() (employees map[int]model.Employee, err error) {
+func (s *EmployeeJSONFile) Load() (employees map[int]models.Employee, err error) {
 	file, err := os.Open(s.path)
 	if err != nil {
 		return
@@ -33,24 +33,24 @@ func (s *EmployeeJSONFile) Load() (employees map[int]model.Employee, err error) 
 		return
 	}
 
-	employees = make(map[int]model.Employee)
+	employees = make(map[int]models.Employee)
 	for _, em := range EmployeesJSON {
-		employees[em.Id], err = dto.EmployeeDtoToModel(em)
+		employees[em.Id], err = dto.EmployeeDtoTomodels(em)
 	}
 
 	return
 }
 
-func (s *EmployeeJSONFile) Save(employee model.Employee) (err error) {
+func (s *EmployeeJSONFile) Save(employee models.Employee) (err error) {
 	employees, err := s.Load()
 	if err != nil {
 		return
 	}
 	employeeList := make([]dto.EmployeeDoc, 0, len(employees))
 	for _, e := range employees {
-		employeeList = append(employeeList, dto.EmployeeModelToDto(e))
+		employeeList = append(employeeList, dto.EmployeemodelsToDto(e))
 	}
-	employeeList = append(employeeList, dto.EmployeeModelToDto(employee))
+	employeeList = append(employeeList, dto.EmployeemodelsToDto(employee))
 
 	// Convertir la lista en JSON
 	data, err := json.MarshalIndent(employeeList, "", "  ")
@@ -64,7 +64,7 @@ func (s *EmployeeJSONFile) Save(employee model.Employee) (err error) {
 	return
 }
 
-func (s *EmployeeJSONFile) Erase(employee model.Employee) (err error) {
+func (s *EmployeeJSONFile) Erase(employee models.Employee) (err error) {
 	employees, err := s.Load()
 	if err != nil {
 		return
@@ -72,7 +72,7 @@ func (s *EmployeeJSONFile) Erase(employee model.Employee) (err error) {
 	employeeList := make([]dto.EmployeeDoc, 0, len(employees))
 	for _, e := range employees {
 		if e.Id.GetId() != employee.Id.GetId() {
-			employeeList = append(employeeList, dto.EmployeeModelToDto(e))
+			employeeList = append(employeeList, dto.EmployeemodelsToDto(e))
 		}
 	}
 

@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/model"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 )
 
@@ -18,12 +18,12 @@ type EmployeeMap struct {
 	st storage.EmployeeJSONFile
 }
 
-func (r *EmployeeMap) FindAll() (employees map[int]model.Employee, err error) {
+func (r *EmployeeMap) FindAll() (employees map[int]models.Employee, err error) {
 	file, err := r.st.Load()
 	if err != nil {
 		return
 	}
-	employees = make(map[int]model.Employee)
+	employees = make(map[int]models.Employee)
 
 	for key, value := range file {
 		employees[key] = value
@@ -32,7 +32,7 @@ func (r *EmployeeMap) FindAll() (employees map[int]model.Employee, err error) {
 	return
 }
 
-func (r *EmployeeMap) FindById(id int) (employee model.Employee, err error) {
+func (r *EmployeeMap) FindById(id int) (employee models.Employee, err error) {
 	file, err := r.st.Load()
 	if err != nil {
 		return
@@ -49,7 +49,7 @@ func (r *EmployeeMap) FindById(id int) (employee model.Employee, err error) {
 	return
 }
 
-func (r *EmployeeMap) New(employee model.Employee) (newEmployee model.Employee, err error) {
+func (r *EmployeeMap) New(employee models.Employee) (newEmployee models.Employee, err error) {
 	lastId, err := r.st.GetLastId()
 	if err != nil {
 		return
@@ -63,7 +63,7 @@ func (r *EmployeeMap) New(employee model.Employee) (newEmployee model.Employee, 
 	return
 }
 
-func (r *EmployeeMap) Edit(id int, employee model.Employee) (updatedEmployee model.Employee, err error) {
+func (r *EmployeeMap) Edit(id int, employee models.Employee) (updatedEmployee models.Employee, err error) {
 	file, err := r.st.Load()
 	if err != nil {
 		return

@@ -1,4 +1,4 @@
-package model
+package models
 
 import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 

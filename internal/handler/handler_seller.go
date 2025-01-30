@@ -97,7 +97,7 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 			return
 		}
 
-		response.JSON(w, http.StatusOK, map[string]any{
+		response.JSON(w, http.StatusCreated, map[string]any{
 			"data": res,
 		})
 

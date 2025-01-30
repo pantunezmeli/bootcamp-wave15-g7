@@ -37,7 +37,7 @@ func (h *SellerDefault) GetAll() http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request){
 		res, err := h.sv.GetAll()
 		if err != nil {
-			response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
@@ -57,9 +57,9 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 		if err != nil {
 			switch {
 			case errors.Is(err, repo.ErrSellerNotFound):
-				response.Error(w, http.StatusNotFound, ErrSellerNotFound.Error())
+				dto.JSONError(w, http.StatusNotFound, ErrSellerNotFound.Error())
 			default:
-				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
 			return
 		}
@@ -76,7 +76,7 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
 		var reqBody dto.SellerDoc
 		if err := request.JSON(r, &reqBody); err != nil{
-			response.Error(w, http.StatusBadRequest, ErrInvalidBody.Error())
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
 
@@ -86,13 +86,13 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 			var invalidParamErr *seller.ErrInvalidParameter
 			switch{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
-				response.Error(w, http.StatusConflict, ErrCidExists.Error())
+				dto.JSONError(w, http.StatusConflict, ErrCidExists.Error())
 			case errors.As(err, &missingParamErr):
-				response.Error(w, http.StatusUnprocessableEntity, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
+				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
 			case errors.As(err, &invalidParamErr):
-				response.Error(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
+				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
 			default:
-				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
 			return
 		}
@@ -115,9 +115,9 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 		if err != nil {
 			switch {
 			case errors.Is(err, repo.ErrSellerNotFound):
-				response.Error(w, http.StatusNotFound, ErrSellerNotFound.Error())
+				dto.JSONError(w, http.StatusNotFound, ErrSellerNotFound.Error())
 			default:
-				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
 			return
 		}
@@ -137,7 +137,7 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 
 		var reqBody dto.SellerDoc
 		if err := request.JSON(r, &reqBody); err != nil{
-			response.Error(w, http.StatusBadRequest, ErrInvalidBody.Error())
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
 		reqBody.ID = &idParsed
@@ -147,13 +147,13 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 			var invalidParamErr *seller.ErrInvalidParameter
 			switch{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
-				response.Error(w, http.StatusConflict, ErrCidExists.Error())
+				dto.JSONError(w, http.StatusConflict, ErrCidExists.Error())
 			case errors.Is(err, repo.ErrSellerNotFound):
-				response.Error(w, http.StatusNotFound, ErrSellerNotFound.Error())
+				dto.JSONError(w, http.StatusNotFound, ErrSellerNotFound.Error())
 			case errors.As(err, &invalidParamErr):
-				response.Error(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
+				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
 			default:
-				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
 			return
 		}
@@ -171,7 +171,7 @@ func validateId(r *http.Request, w http.ResponseWriter) (int, bool) {
 	id := chi.URLParam(r, "id")
 	idParsed, err := strconv.Atoi(id)
 	if err != nil {
-		response.Error(w, http.StatusBadRequest, ErrInvalidId.Error())
+		dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
 		return 0, true
 	}
 	return idParsed, false

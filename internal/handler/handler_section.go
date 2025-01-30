@@ -100,36 +100,37 @@ func (h *SectionDefault) CreateSection() http.HandlerFunc {
 	}
 }
 
-// func (h *SectionDefault) PatchSection() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		// Obtener la ID de la URL
-// 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
-// 		if err != nil {
-// 			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
-// 			return
-// 		}
-// 		// Decodificar el cuerpo de la solicitud
-// 		var sectionDoc models.SectionDoc
-// 		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
-// 			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
-// 			return
-// 		}
+func (h *SectionDefault) PatchSection() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Obtener la ID de la URL
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+			return
+		}
+		// Decodificar el cuerpo de la solicitud
+		var sectionDoc models.SectionDoc
+		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
+			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+			return
+		}
 
-// 		// Convertir SectionDoc a Section
-// 		section := ConvertSectionDocToSection(sectionDoc)
+		section := ConvertSectionDocToSection(sectionDoc)
 
-// 		// Actualizar la sección
-// 		if err := h.sv.PatchSection(id, section); err != nil {
-// 			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
-// 			return
-// 		}
+		section, err = h.sv.PatchSection(id, section)
+		if err != nil {
+			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
+			return
+		}
 
-// 		// Responder con éxito
-// 		response.JSON(w, http.StatusOK, map[string]any{
-// 			"message": "section updated successfully",
-// 		})
-// 	}
-// }
+		// response
+		data := ConvertSectionToSectionDoc(section)
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
+	}
+}
 
 func (h *SectionDefault) DeleteSection() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

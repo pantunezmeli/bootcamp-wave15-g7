@@ -3,10 +3,10 @@ package section
 import (
 	"errors"
 
-	//"github.com/imdario/mergo"
-
+	"dario.cat/mergo"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/errorbase"
 )
 
 // NewSectionMap is a function that returns a new instance of SectionMap
@@ -57,53 +57,53 @@ func (r *SectionMap) Create(v models.Section) (err error) {
 }
 
 // Patch is a method that updates a Section by its ID
-/*func (r *SectionMap) Update(id int, v models.Section) (models.Section, error) {
+func (r *SectionMap) Update(id int, v models.Section) (models.Section, error) {
 	element, ok := r.db[id]
 	if !ok {
 		return models.Section{}, errorbase.ErrConflict
 	}
 
-	if sectionNumber, err := domain.NewSectionNumber(v.Section_Number); err == nil {
-		element.Section_Number = sectionNumber.GetSectionNumber()
-	}
-
-	if currentTemperature, err := domain.NewCurrentTemperature(v.Current_Temperature); err == nil {
-		element.Current_Temperature = currentTemperature.GetCurrentTemperature()
-	}
-
-	if minimumTemperature, err := domain.NewMinimumTemperature(v.Minimum_Temperature); err == nil {
-		element.Minimum_Temperature = minimumTemperature.GetMinimumTemperature()
-	}
-
-	if currentCapacity, err := domain.NewCurrentCapacity(v.Current_Capacity); err == nil {
-		element.Current_Capacity = currentCapacity.GetCurrentCapacity()
-	}
-
-	if minimumCapacity, err := domain.NewMinimumCapacity(v.Minimum_Capacity); err == nil {
-		element.Minimum_Capacity = minimumCapacity.GetMinimumCapacity()
-	}
-
-	if maximumCapacity, err := domain.NewMaximumCapacity(v.Maximum_Capacity); err == nil {
-		element.Maximum_Capacity = maximumCapacity.GetMaximumCapacity()
-	}
-
-	if warehouseId, err := domain.NewWarehouseId(v.Warehouse_Id); err == nil {
-		element.Warehouse_Id = warehouseId.GetWarehouseId()
-	}
-
-	if productTypeId, err := domain.NewProductTypeId(v.Product_Type_Id); err == nil {
-		element.Product_Type_Id = productTypeId.GetProductTypeId()
-	}
-
-	// if err := mergo.Merge(&element, v, mergo.WithOverride); err != nil {
-	// 	return models.Section{}, err
+	// if sectionNumber, err := domain.NewSectionNumber(v.Section_Number); err == nil {
+	// 	element.Section_Number = sectionNumber.GetSectionNumber()
 	// }
+
+	// if currentTemperature, err := domain.NewCurrentTemperature(v.Current_Temperature); err == nil {
+	// 	element.Current_Temperature = currentTemperature.GetCurrentTemperature()
+	// }
+
+	// if minimumTemperature, err := domain.NewMinimumTemperature(v.Minimum_Temperature); err == nil {
+	// 	element.Minimum_Temperature = minimumTemperature.GetMinimumTemperature()
+	// }
+
+	// if currentCapacity, err := domain.NewCurrentCapacity(v.Current_Capacity); err == nil {
+	// 	element.Current_Capacity = currentCapacity.GetCurrentCapacity()
+	// }
+
+	// if minimumCapacity, err := domain.NewMinimumCapacity(v.Minimum_Capacity); err == nil {
+	// 	element.Minimum_Capacity = minimumCapacity.GetMinimumCapacity()
+	// }
+
+	// if maximumCapacity, err := domain.NewMaximumCapacity(v.Maximum_Capacity); err == nil {
+	// 	element.Maximum_Capacity = maximumCapacity.GetMaximumCapacity()
+	// }
+
+	// if warehouseId, err := domain.NewWarehouseId(v.Warehouse_Id); err == nil {
+	// 	element.Warehouse_Id = warehouseId.GetWarehouseId()
+	// }
+
+	// if productTypeId, err := domain.NewProductTypeId(v.Product_Type_Id); err == nil {
+	// 	element.Product_Type_Id = productTypeId.GetProductTypeId()
+	// }
+
+	if err := mergo.Merge(&element, v, mergo.WithOverride); err != nil {
+		return models.Section{}, err
+	}
 
 	loaderV := loader.NewSectionJSONFile("../docs/db/section_data.json")
 	loaderV.Save(element)
 	r.db[id] = element
 	return element, nil
-}*/
+}
 
 // Delete is a method that deletes a Section by its ID
 func (r *SectionMap) Delete(id int) (err error) {

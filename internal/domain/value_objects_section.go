@@ -48,7 +48,7 @@ func (f SectionNumber) GetSectionNumber() int {
 }
 
 func NewCurrentTemperature(currentTemperature int) (CurrentTemperature, error) {
-	if currentTemperature <= -50 || currentTemperature >= 50 {
+	if currentTemperature <= 0 {
 		return CurrentTemperature{}, errorbase.ErrInvalidNumber
 	}
 	return CurrentTemperature{current_Temperature: currentTemperature}, nil
@@ -59,7 +59,7 @@ func (l CurrentTemperature) GetCurrentTemperature() int {
 }
 
 func NewMinimumTemperature(minimumTemperature int) (MinimumTemperature, error) {
-	if minimumTemperature <= -50 || minimumTemperature >= 50 {
+	if minimumTemperature <= 0 {
 		return MinimumTemperature{}, errorbase.ErrInvalidNumber
 	}
 	return MinimumTemperature{minimum_Temperature: minimumTemperature}, nil
@@ -70,8 +70,8 @@ func (l MinimumTemperature) GetMinimumTemperature() int {
 }
 
 func NewCurrentCapacity(currentCapacity int) (CurrentCapacity, error) {
-	if currentCapacity <= 0 {
-		return CurrentCapacity{}, errorbase.ErrEmptyParameters
+	if currentCapacity < 0 || currentCapacity > 1000 {
+		return CurrentCapacity{}, errorbase.ErrInvalidId
 	}
 	return CurrentCapacity{current_Capacity: currentCapacity}, nil
 }
@@ -81,8 +81,8 @@ func (l CurrentCapacity) GetCurrentCapacity() int {
 }
 
 func NewMinimumCapacity(minimumCapacity int) (MinimumCapacity, error) {
-	if minimumCapacity <= 0 {
-		return MinimumCapacity{}, errorbase.ErrEmptyParameters
+	if minimumCapacity < 0 || minimumCapacity > 1000 {
+		return MinimumCapacity{}, errorbase.ErrInvalidId
 	}
 	return MinimumCapacity{minimum_Capacity: minimumCapacity}, nil
 }
@@ -92,8 +92,8 @@ func (l MinimumCapacity) GetMinimumCapacity() int {
 }
 
 func NewMaximumCapacity(maximumCapacity int) (MaximumCapacity, error) {
-	if maximumCapacity <= 0 {
-		return MaximumCapacity{}, errorbase.ErrEmptyParameters
+	if maximumCapacity < 0 || maximumCapacity > 2000 {
+		return MaximumCapacity{}, errorbase.ErrInvalidId
 	}
 	return MaximumCapacity{maximum_Capacity: maximumCapacity}, nil
 }
@@ -104,7 +104,7 @@ func (l MaximumCapacity) GetMaximumCapacity() int {
 
 func NewWarehouseId(warehouseId int) (WarehouseId, error) {
 	if warehouseId <= 0 {
-		return WarehouseId{}, errorbase.ErrEmptyParameters
+		return WarehouseId{}, errorbase.ErrInvalidId
 	}
 	return WarehouseId{warehouse_Id: warehouseId}, nil
 }
@@ -115,7 +115,7 @@ func (l WarehouseId) GetWarehouseId() int {
 
 func NewProductTypeId(productTypeId int) (ProductTypeId, error) {
 	if productTypeId <= 0 {
-		return ProductTypeId{}, errorbase.ErrEmptyParameters
+		return ProductTypeId{}, errorbase.ErrInvalidId
 	}
 	return ProductTypeId{product_Type_Id: productTypeId}, nil
 }

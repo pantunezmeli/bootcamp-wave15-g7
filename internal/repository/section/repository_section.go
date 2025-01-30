@@ -13,7 +13,7 @@ type SectionRepository interface {
 	// Create is a method that creates a new section
 	Create(v models.Section) (err error)
 	// Patch is a method that updates a section by its ID
-	//Update(id int, v models.Section) (err error)
+	Update(id int, e models.Section) (updatedSection models.Section, err error)
 	// Delete is a method that deletes a section by its ID
 	Delete(id int) (err error)
 }

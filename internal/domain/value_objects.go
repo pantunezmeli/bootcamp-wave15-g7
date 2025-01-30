@@ -76,8 +76,6 @@ func NewCompanyName(value string) (companyName CompanyName, err error){
         return
     }
 
-	//validar caracteres?
-
 	companyName = CompanyName{value}
 	return
 }

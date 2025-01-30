@@ -63,7 +63,7 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 			}
 			return
 		}
-		
+
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": res,
 		})
@@ -83,11 +83,14 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 		res, err := h.sv.Save(reqBody)
 		if err != nil {
 			var missingParamErr *seller.ErrMissingParameters
+			var invalidParamErr *seller.ErrInvalidParameter
 			switch{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
 				response.Error(w, http.StatusConflict, ErrCidExists.Error())
 			case errors.As(err, &missingParamErr):
 				response.Error(w, http.StatusBadRequest, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
+			case errors.As(err, &invalidParamErr):
+				response.Error(w, http.StatusBadRequest, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
 			default:
 				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
@@ -141,12 +144,14 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 
 		res, err := h.sv.Update(reqBody)
 		if err != nil {
-			//handlear los errores que faltan
+			var invalidParamErr *seller.ErrInvalidParameter
 			switch{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
 				response.Error(w, http.StatusConflict, ErrCidExists.Error())
 			case errors.Is(err, repo.ErrSellerNotFound):
 				response.Error(w, http.StatusNotFound, ErrSellerNotFound.Error())
+			case errors.As(err, &invalidParamErr):
+				response.Error(w, http.StatusBadRequest, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
 			default:
 				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}

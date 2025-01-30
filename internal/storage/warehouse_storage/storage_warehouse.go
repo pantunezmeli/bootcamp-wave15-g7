@@ -2,6 +2,7 @@ package warehouse_storage
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
@@ -24,7 +25,7 @@ func (s *WareHouseJSONFile) Load() (w map[int]models.WareHouse, err error) {
 
 	file, err := os.Open(s.path)
 	if err != nil {
-		return
+		return nil, fmt.Errorf("failed to open file: %w", err)
 	}
 	defer file.Close()
 

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
@@ -35,7 +36,7 @@ func (s *EmployeeJSONFile) Load() (employees map[int]models.Employee, err error)
 
 	employees = make(map[int]models.Employee)
 	for _, em := range EmployeesJSON {
-		employees[em.Id], err = dto.EmployeeDtoTomodels(em)
+		employees[em.Id], err = dto.EmployeeDtoToModel(em)
 	}
 
 	return
@@ -46,11 +47,16 @@ func (s *EmployeeJSONFile) Save(employee models.Employee) (err error) {
 	if err != nil {
 		return
 	}
+	fmt.Println("length map: ", len(employees))
+	fmt.Println("employee map: ", employees)
 	employeeList := make([]dto.EmployeeDoc, 0, len(employees))
 	for _, e := range employees {
-		employeeList = append(employeeList, dto.EmployeemodelsToDto(e))
+		employeeData := dto.EmployeeModelToDto(e)
+		fmt.Printf("Converted employee: %+v\n", employeeData)
+		employeeList = append(employeeList, employeeData)
 	}
-	employeeList = append(employeeList, dto.EmployeemodelsToDto(employee))
+	fmt.Println("employeeList: ", employeeList)
+	employeeList = append(employeeList, dto.EmployeeModelToDto(employee))
 
 	// Convertir la lista en JSON
 	data, err := json.MarshalIndent(employeeList, "", "  ")
@@ -72,7 +78,7 @@ func (s *EmployeeJSONFile) Erase(employee models.Employee) (err error) {
 	employeeList := make([]dto.EmployeeDoc, 0, len(employees))
 	for _, e := range employees {
 		if e.Id.GetId() != employee.Id.GetId() {
-			employeeList = append(employeeList, dto.EmployeemodelsToDto(e))
+			employeeList = append(employeeList, dto.EmployeeModelToDto(e))
 		}
 	}
 

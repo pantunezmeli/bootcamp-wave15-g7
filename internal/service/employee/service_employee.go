@@ -25,7 +25,7 @@ func (s *DefaultService) FindAll() (employeesData map[int]dto.EmployeeDoc, err e
 	}
 	employeesData = make(map[int]dto.EmployeeDoc)
 	for key, value := range employeesFound {
-		employeesData[key] = dto.EmployeemodelsToDto(value)
+		employeesData[key] = dto.EmployeeModelToDto(value)
 	}
 	return
 }
@@ -38,7 +38,7 @@ func (s *DefaultService) FindById(id int) (employeeData dto.EmployeeDoc, err err
 		}
 		return
 	}
-	employeeData = dto.EmployeemodelsToDto(employeeFound)
+	employeeData = dto.EmployeeModelToDto(employeeFound)
 	return
 }
 
@@ -48,7 +48,8 @@ func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.
 		return
 	}
 
-	employee, err := dto.EmployeeDtoTomodels(employeeData)
+	employeeData.Id++
+	employee, err := dto.EmployeeDtoToModel(employeeData)
 	if err != nil {
 		return
 	}
@@ -58,7 +59,7 @@ func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.
 		return
 	}
 
-	newEmployeeData = dto.EmployeemodelsToDto(newEmployee)
+	newEmployeeData = dto.EmployeeModelToDto(newEmployee)
 	return
 }
 
@@ -71,7 +72,7 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 		return
 	}
 
-	employee, err := dto.EmployeeDtoToModeWithoutValidation(employeeData)
+	employee, err := dto.EmployeeDtoToModelWithoutValidation(employeeData)
 	if err != nil {
 		return
 	}
@@ -80,7 +81,7 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 		return
 	}
 
-	newEmployeeData = dto.EmployeemodelsToDto(updatedEmployee)
+	newEmployeeData = dto.EmployeeModelToDto(updatedEmployee)
 	return
 }
 

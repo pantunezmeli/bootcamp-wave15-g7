@@ -5,6 +5,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/employee"
+	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
+	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 
 	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
@@ -67,20 +71,29 @@ type ServerChi struct {
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
-	//? DEPENDENCIES
-	// loader
+
+	// - loader
+	est := storage.NewEmployeeJSONFile(a.loaderFilePath)
 	buyerSt := buyerstorage.NewBuyerJSONFile(a.buyerFilePath)
 	warehouseSt := warehouseStorage.NewWareHouseJSONFile(a.warehouseFilePath)
 	ldProduct := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
 
+	// Employee
+	employeeRepository := erp.NewEmployeeMap(*est)
+	employeeService := esv.NewDefaultService(employeeRepository)
+	employeeHandler := ehd.NewDefaultHandler(employeeService)
+
+	// Buyer
 	by_rp := buyerRepository.NewBuyerRepository(buyerSt)
 	by_sv := buyerService.NewBuyerService(by_rp)
 	by_hd := handler.NewBuyerHandler(by_sv)
 
+	// Warehouse
 	wh_rp := warehouse_rp.NewWareHouseRepository(warehouseSt)
 	wh_sv := warehouse_sv.NewWareHouseService(wh_rp)
 	wh_h := handler.NewWareHouseHandler(wh_sv)
 
+	// Product
 	rpProduct := product_rp.NewProductRepositoryMap(ldProduct)
 	svProduct := product_sv.NewProductService(rpProduct)
 	hdProduct := product_hd.NewProductHandler(svProduct)
@@ -118,7 +131,11 @@ func (a *ServerChi) Run() (err error) {
 		})
 
 		rt.Route("/employees", func(rt chi.Router) {
-			// Agrega tus rutas de employees aquí
+			rt.Get("/", employeeHandler.GetAll())
+			rt.Get("/{id}", employeeHandler.GetById())
+			rt.Post("/", employeeHandler.Add())
+			rt.Patch("/{id}", employeeHandler.Update())
+			rt.Delete("/{id}", employeeHandler.DeleteById())
 		})
 
 		rt.Route("/buyers", func(rt chi.Router) {

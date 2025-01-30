@@ -6,7 +6,12 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
-
+const (
+	AddressString = "address"
+	CidString = "cid"
+	TelephoneString = "telephone"
+	CompanyNameString = "company_name"
+)
 type ErrMissingParameters struct {
 	missingParameter string;
 }

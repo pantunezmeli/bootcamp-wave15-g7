@@ -96,19 +96,19 @@ func (s *SellerDefault) Update(reqBody dto.SellerDoc) (seller dto.SellerDoc, err
 
 func (s *SellerDefault) ValidateAllParameters(reqBody dto.SellerDoc) (err error) {
 	if reqBody.Address == nil {
-		err = &ErrMissingParameters{"address"}
+		err = &ErrMissingParameters{AddressString}
 		return
 	}
 	if reqBody.Cid == nil {
-		err = &ErrMissingParameters{"cid"}
+		err = &ErrMissingParameters{CidString}
 		return
 	}
 	if reqBody.Telephone == nil {
-		err = &ErrMissingParameters{"telephone"}
+		err = &ErrMissingParameters{TelephoneString}
 		return
 	}
 	if reqBody.CompanyName == nil {
-		err = &ErrMissingParameters{"company_name"}
+		err = &ErrMissingParameters{CompanyNameString}
 		return
 	}
 	return

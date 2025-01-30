@@ -122,7 +122,7 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 			return
 		}
 
-		response.Text(w, http.StatusNoContent, "seller deleted")
+		response.JSON(w, http.StatusNoContent, nil)
 
 	}
 }

@@ -28,14 +28,13 @@ func (h *DefaultHandler) GetAll() http.HandlerFunc {
 		// process
 		employees, err := h.sv.FindAll()
 		if err != nil {
-			response.JSON(w, http.StatusInternalServerError, nil)
+			response.Error(w, http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
 		// response
 		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    employees,
+			"data": employees,
 		})
 	}
 }
@@ -52,17 +51,16 @@ func (h *DefaultHandler) GetById() http.HandlerFunc {
 		employee, err := h.sv.FindById(id)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				response.JSON(w, http.StatusNotFound, nil)
+				response.Error(w, http.StatusNotFound, "Employee not found")
 				return
 			}
-			response.JSON(w, http.StatusInternalServerError, nil)
+			response.Error(w, http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
 		// response
 		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    employee,
+			"data": employee,
 		})
 	}
 }
@@ -72,7 +70,7 @@ func (h *DefaultHandler) Add() http.HandlerFunc {
 		// request
 		var employeeData dto.EmployeeDoc
 		if err := request.JSON(r, &employeeData); err != nil {
-			response.JSON(w, http.StatusBadRequest, nil)
+			response.Error(w, http.StatusBadRequest, "Bad request: invalid data")
 			return
 		}
 
@@ -80,17 +78,16 @@ func (h *DefaultHandler) Add() http.HandlerFunc {
 		newEmployee, err := h.sv.New(employeeData)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmptyField) {
-				response.JSON(w, http.StatusUnprocessableEntity, nil)
+				response.Error(w, http.StatusUnprocessableEntity, "Unprocessable entity: empty field/s")
 				return
 			}
-			response.JSON(w, http.StatusInternalServerError, nil)
+			response.Error(w, http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
 		// response
 		response.JSON(w, http.StatusCreated, map[string]any{
-			"message": "success",
-			"data":    newEmployee,
+			"data": newEmployee,
 		})
 	}
 }
@@ -100,12 +97,12 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		// request
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, nil)
+			response.Error(w, http.StatusBadRequest, "Bad request: invalid id")
 		}
 
 		var employeeData dto.EmployeeDoc
 		if err := request.JSON(r, &employeeData); err != nil {
-			response.JSON(w, http.StatusBadRequest, nil)
+			response.Error(w, http.StatusBadRequest, "Bad request: invalid data")
 			return
 		}
 
@@ -113,17 +110,16 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		updatedEmployee, err := h.sv.Edit(id, employeeData)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				response.JSON(w, http.StatusNotFound, nil)
+				response.Error(w, http.StatusNotFound, "Employee not found")
 				return
 			}
-			response.JSON(w, http.StatusInternalServerError, nil)
+			response.Error(w, http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
 		// response
 		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    updatedEmployee,
+			"data": updatedEmployee,
 		})
 	}
 }
@@ -133,23 +129,21 @@ func (h *DefaultHandler) DeleteById() http.HandlerFunc {
 		// request
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, nil)
+			response.Error(w, http.StatusBadRequest, "Bad request: invalid id")
 		}
 
 		// process
 		err = h.sv.DeleteById(id)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				response.JSON(w, http.StatusNotFound, nil)
+				response.Error(w, http.StatusNotFound, "Employee not found")
 				return
 			}
-			response.JSON(w, http.StatusInternalServerError, nil)
+			response.Error(w, http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
 		// response
-		response.JSON(w, http.StatusNoContent, map[string]any{
-			"message": "success",
-		})
+		response.JSON(w, http.StatusNoContent, nil)
 	}
 }

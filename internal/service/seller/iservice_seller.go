@@ -1,15 +1,19 @@
 package seller
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
 
-var (
-	ErrMissingParameters = errors.New("missing parameters")
-)
+type ErrMissingParameters struct {
+	missingParameter string;
+}
+
+func(e *ErrMissingParameters) Error() string {
+	return fmt.Sprintf("%s is needed", e.missingParameter)
+}
 
 type SellerService interface {
 	GetAll() (sellers []dto.SellerDoc, err error)

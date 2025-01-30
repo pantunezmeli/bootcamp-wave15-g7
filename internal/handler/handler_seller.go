@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -13,8 +14,15 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
-// cambiar errores
-// Preguntar si response es un array 
+
+var (
+	ErrInternalServerError = errors.New("internal server error, please try again later")
+	ErrInvalidId = errors.New("invalid id, id should be a number")
+	ErrSellerNotFound = errors.New("seller not found")
+	ErrInvalidBody = errors.New("invalid body")
+	ErrCidExists = errors.New("cid already exists and should be unique")
+)
+
 
 type SellerDefault struct {
 	sv seller.SellerService
@@ -29,11 +37,7 @@ func (h *SellerDefault) GetAll() http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request){
 		res, err := h.sv.GetAll()
 		if err != nil {
-			switch {
-			default:
-				response.Error(w, http.StatusInternalServerError, "please try again later")
-			}
-			return
+			response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
@@ -45,22 +49,19 @@ func (h *SellerDefault) GetAll() http.HandlerFunc {
 func (h *SellerDefault) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
-		if id == "" {
-			response.Error(w, http.StatusBadRequest, "invalid id")
-			return
-		}
 		idParsed, err := strconv.Atoi(id)
 		if err != nil{
-			response.Error(w, http.StatusBadRequest, "id should be a number")
+			response.Error(w, http.StatusBadRequest, ErrInvalidId.Error())
 			return
 		}
+
 		res, err := h.sv.GetById(idParsed)
 		if err != nil {
 			switch {
 			case errors.Is(err, repo.ErrSellerNotFound):
-				response.Error(w, http.StatusNotFound, "seller not found")
+				response.Error(w, http.StatusNotFound, ErrSellerNotFound.Error())
 			default:
-				response.Error(w, http.StatusInternalServerError, "please try again later")
+				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
 			return
 		}
@@ -75,18 +76,20 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
 		var reqBody dto.SellerDoc
 		if err := request.JSON(r, &reqBody); err != nil{
-			response.Error(w, http.StatusBadRequest, "invalid body")
+			response.Error(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
 
 		res, err := h.sv.Save(reqBody)
 		if err != nil {
-			//handlear los errores que faltan
+			var missingParamErr *seller.ErrMissingParameters
 			switch{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
-				response.Error(w, http.StatusConflict, "cid already exists")
+				response.Error(w, http.StatusConflict, ErrCidExists.Error())
+			case errors.As(err, &missingParamErr):
+				response.Error(w, http.StatusBadRequest, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
 			default:
-				response.Error(w, http.StatusInternalServerError, "please try again later")
+				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
 			return
 		}
@@ -102,13 +105,9 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
 		//CODIGO REPETIDO
 		id := chi.URLParam(r, "id")
-		if id == "" {
-			response.Error(w, http.StatusBadRequest, "invalid id")
-			return
-		}
 		idParsed, err := strconv.Atoi(id)
 		if err != nil{
-			response.Error(w, http.StatusBadRequest, "id should be a number")
+			response.Error(w, http.StatusBadRequest, ErrInvalidId.Error())
 			return
 		}
 
@@ -116,9 +115,9 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 		if err != nil {
 			switch {
 			case errors.Is(err, repo.ErrSellerNotFound):
-				response.Error(w, http.StatusNotFound, "seller not found")
+				response.Error(w, http.StatusNotFound, ErrSellerNotFound.Error())
 			default:
-				response.Error(w, http.StatusInternalServerError, "please try again later")
+				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
 			return
 		}
@@ -130,21 +129,16 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 
 func (h *SellerDefault) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//CODIGO REPETIDO
 		id := chi.URLParam(r, "id")
-		if id == "" {
-			response.Error(w, http.StatusBadRequest, "invalid id")
-			return
-		}
 		idParsed, err := strconv.Atoi(id)
 		if err != nil{
-			response.Error(w, http.StatusBadRequest, "id should be a number")
+			response.Error(w, http.StatusBadRequest, ErrInvalidId.Error())
 			return
 		}
 
 		var reqBody dto.SellerDoc
 		if err := request.JSON(r, &reqBody); err != nil{
-			response.Error(w, http.StatusBadRequest, "invalid body")
+			response.Error(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
 		reqBody.ID = &idParsed
@@ -154,11 +148,11 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 			//handlear los errores que faltan
 			switch{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
-				response.Error(w, http.StatusConflict, "cid already exists")
+				response.Error(w, http.StatusConflict, ErrCidExists.Error())
 			case errors.Is(err, repo.ErrSellerNotFound):
-				response.Error(w, http.StatusNotFound, "seller not found")
+				response.Error(w, http.StatusNotFound, ErrSellerNotFound.Error())
 			default:
-				response.Error(w, http.StatusInternalServerError, "please try again later")
+				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
 			return
 		}

@@ -8,16 +8,16 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
 )
 
-func NewProductRepositoryMap(loader product.IProductLoader) *ProductRepositoryMap {
-	return &ProductRepositoryMap{loader: loader}
+func NewProductRepositoryMap(storage product.IProductLoader) *ProductRepositoryMap {
+	return &ProductRepositoryMap{storage: storage}
 }
 
 type ProductRepositoryMap struct {
-	loader product.IProductLoader
+	storage product.IProductLoader
 }
 
 func (p ProductRepositoryMap) GetAll() (map[int]models.Product, error) {
-	products, err := p.loader.GetDb()
+	products, err := p.storage.GetDb()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -44,7 +44,7 @@ func (p ProductRepositoryMap) DeleteProduct(id int) error {
 		return errSearch
 	}
 
-	errDelete := p.loader.RemoveProduct(productSearch.ID.Value())
+	errDelete := p.storage.RemoveProduct(productSearch.ID.Value())
 	if errDelete != nil {
 		return ErrProductRepository{msg: "Error deleting product"}
 	}
@@ -53,7 +53,7 @@ func (p ProductRepositoryMap) DeleteProduct(id int) error {
 }
 
 func (p ProductRepositoryMap) CreateProduct(product models.Product) error {
-	return p.loader.SaveProduct(product)
+	return p.storage.SaveProduct(product)
 }
 
 func (p ProductRepositoryMap) ProductCodeExist(productCode string) bool {
@@ -80,5 +80,5 @@ func (p ProductRepositoryMap) GetLastID() v.Id {
 }
 
 func (p ProductRepositoryMap) UpdateProduct(product models.Product) error {
-	return p.loader.SaveProduct(product)
+	return p.storage.SaveProduct(product)
 }

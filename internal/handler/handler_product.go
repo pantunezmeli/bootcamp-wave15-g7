@@ -46,7 +46,7 @@ func (h *ProductHandle) GetById() http.HandlerFunc {
 	}
 }
 
-func (h *ProductHandle) DeleteProduct() http.HandlerFunc {
+func (h *ProductHandle) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		idPath, errPath := strconv.Atoi(chi.URLParam(r, "id"))
@@ -65,7 +65,7 @@ func (h *ProductHandle) DeleteProduct() http.HandlerFunc {
 	}
 }
 
-func (h ProductHandle) CreateProduct() http.HandlerFunc {
+func (h ProductHandle) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var newProduct product2.ProductDTO
@@ -86,7 +86,7 @@ func (h ProductHandle) CreateProduct() http.HandlerFunc {
 
 }
 
-func (h ProductHandle) UpdateProduct() http.HandlerFunc {
+func (h ProductHandle) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		idPath, errPath := strconv.Atoi(chi.URLParam(r, "id"))
@@ -108,24 +108,30 @@ func (h ProductHandle) UpdateProduct() http.HandlerFunc {
 		}
 
 		response.JSON(w, http.StatusOK, dto.GenericResponse{Data: productUpdate})
+
 	}
 }
 
 func validErrorResponse(w http.ResponseWriter, err error) {
-	if errors.As(err, &product.ErrNotFoundProduct{}) {
-		response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: err.Error()})
-		return
+
+	switch {
+	case errors.As(err, &product.ErrNotFoundProduct{}):
+		{
+			response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: err.Error()})
+			break
+		}
+	case errors.As(err, &product.ErrValidProduct{}):
+		{
+			response.JSON(w, http.StatusUnprocessableEntity, dto.GenericResponse{Message: err.Error()})
+			break
+		}
+	default:
+		{
+			//Only for debug
+			//fmt.Printf("Error: %v\n", err)
+			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			break
+		}
 	}
 
-	if errors.As(err, &product.ErrValidProduct{}) {
-		response.JSON(w, http.StatusUnprocessableEntity, dto.GenericResponse{Message: err.Error()})
-		return
-	}
-
-	if errors.As(err, &product.ErrProduct{}) {
-		response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: err.Error()})
-		return
-	}
-
-	response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
 }

@@ -10,28 +10,26 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/errorbase"
 )
-
-// NewSectionDefault is a function that returns a new instance of SectionDefault
-func NewSectionDefault(sv section.SectionServiceV2) *SectionDefault {
-	return &SectionDefault{sv: sv}
-}
 
 // SectionDefault is a struct with methods that represent handlers for sections
 type SectionDefault struct {
 	// sv is the service that will be used by the handler
-	sv section.SectionServiceV2
+	service section.ISectionService
+}
+
+// NewSectionDefault is a function that returns a new instance of SectionDefault
+func NewSectionDefault(sv section.ISectionService) *SectionDefault {
+	return &SectionDefault{service: sv}
 }
 
 // ListSections is a method that returns a handler for the route GET /sections
-func (h *SectionDefault) ListSections() http.HandlerFunc {
+func (h *SectionDefault) Get() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// request
-		// ...
-
 		// process
 		// - get all Sections
-		v, err := h.sv.ListSections()
+		v, err := h.service.ListSections()
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
 			return
@@ -43,13 +41,12 @@ func (h *SectionDefault) ListSections() http.HandlerFunc {
 			data[key] = ConvertSectionToSectionDoc(value)
 		}
 		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    data,
+			"data": data,
 		})
 	}
 }
 
-func (h *SectionDefault) GetSection() http.HandlerFunc {
+func (h *SectionDefault) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Obtener la ID de la URL
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
@@ -60,7 +57,7 @@ func (h *SectionDefault) GetSection() http.HandlerFunc {
 
 		// process
 		// - get the Section by ID
-		section, err := h.sv.GetSection(id)
+		section, err := h.service.GetSection(id)
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
 			return
@@ -69,13 +66,12 @@ func (h *SectionDefault) GetSection() http.HandlerFunc {
 		// response
 		data := ConvertSectionToSectionDoc(section)
 		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    data,
+			"data": data,
 		})
 	}
 }
 
-func (h *SectionDefault) CreateSection() http.HandlerFunc {
+func (h *SectionDefault) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var v models.SectionDoc
 		if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
@@ -85,7 +81,7 @@ func (h *SectionDefault) CreateSection() http.HandlerFunc {
 
 		section := ConvertSectionDocToSection(v)
 
-		if err := h.sv.CreateSection(section); err != nil {
+		if err := h.service.CreateSection(section); err != nil {
 			if err.Error() == "section already exists" {
 				response.JSON(w, http.StatusConflict, nil)
 			} else {
@@ -100,24 +96,24 @@ func (h *SectionDefault) CreateSection() http.HandlerFunc {
 	}
 }
 
-func (h *SectionDefault) PatchSection() http.HandlerFunc {
+func (h *SectionDefault) Patch() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Obtener la ID de la URL
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+			response.JSON(w, http.StatusBadRequest, map[string]string{"error": errorbase.ErrInvalidId.Error()})
 			return
 		}
 		// Decodificar el cuerpo de la solicitud
 		var sectionDoc models.SectionDoc
 		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+			response.JSON(w, http.StatusBadRequest, map[string]string{"error": errorbase.ErrInvalidRequest.Error()})
 			return
 		}
 
 		section := ConvertSectionDocToSection(sectionDoc)
 
-		section, err = h.sv.PatchSection(id, section)
+		section, err = h.service.PatchSection(id, section)
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
 			return
@@ -132,7 +128,7 @@ func (h *SectionDefault) PatchSection() http.HandlerFunc {
 	}
 }
 
-func (h *SectionDefault) DeleteSection() http.HandlerFunc {
+func (h *SectionDefault) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Obtener la ID de la URL
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
@@ -143,7 +139,7 @@ func (h *SectionDefault) DeleteSection() http.HandlerFunc {
 
 		// process
 		// - get the Section by ID
-		err = h.sv.DeleteSection(id)
+		err = h.service.DeleteSection(id)
 		if err != nil {
 			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
 			return

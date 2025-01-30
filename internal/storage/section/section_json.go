@@ -10,9 +10,7 @@ import (
 
 // NewSectionJSONFile is a function that returns a new instance of SectionJSONFile
 func NewSectionJSONFile(path string) *SectionJSONFile {
-	return &SectionJSONFile{
-		path: path,
-	}
+	return &SectionJSONFile{path: path}
 }
 
 // SectionJSONFile is a struct that implements the LoaderSection interface
@@ -90,6 +88,48 @@ func (l *SectionJSONFile) Save(section models.Section) error {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(sections); err != nil {
+		return errors.New("error encoding")
+	}
+
+	return nil
+}
+
+func (l *SectionJSONFile) Delete(buyerID int) error {
+	var sections []models.Section
+
+	file, err := os.Open(l.path)
+	if err == nil {
+		defer file.Close()
+		decoder := json.NewDecoder(file)
+		_ = decoder.Decode(&sections)
+	} else if !os.IsNotExist(err) {
+		return errors.New("error reading")
+	}
+
+	var updatedSections []models.Section
+	found := false
+
+	for _, buyer := range sections {
+		if buyer.Id != buyerID {
+			updatedSections = append(updatedSections, buyer)
+		} else {
+			found = true
+		}
+	}
+
+	if !found {
+		return errors.New("buyer not found")
+	}
+
+	file, err = os.Create(l.path)
+	if err != nil {
+		return errors.New("error writing")
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(updatedSections); err != nil {
 		return errors.New("error encoding")
 	}
 

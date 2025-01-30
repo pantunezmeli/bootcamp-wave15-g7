@@ -5,16 +5,16 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/employee"
 	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
+	SellerRepo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
+	SellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 
-	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
+	buyerStorageorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
-	product_hd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 	product_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	PATH_PRODUCT_JSON_FILE = "docs/db/product_data.json"
+	PATH_PRODUCT_JSON_FILE = "../docs/db/product_data.json"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -81,49 +81,39 @@ type ServerChi struct {
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 
-	// dependencies
-	// - storage
-	ld := storage.NewSellerJSONFile("./docs/db/seller_data.json")
 
-
-	// - repository
-	sellerRepository := SellerRepo.NewSellerStorage(*ld)
-
-
-
-	// - service
-	sellerService := SellerService.NewSellerDefault(sellerRepository)
-
-
-	// - handler
-	sellerHandler := handler.NewSellerDefault(sellerService)
-
-
-	// - loader
-	employeeSt := storage.NewEmployeeJSONFile(a.employeeFilPath)
-	buyerSt := buyerstorage.NewBuyerJSONFile(a.buyerFilePath)
 	warehouseSt := warehouseStorage.NewWareHouseJSONFile(a.warehouseFilePath)
 	ldProduct := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
 
-	// Employee
-	employeeRepository := erp.NewEmployeeMap(*employeeSt)
-	employeeService := esv.NewDefaultService(employeeRepository)
-	employeeHandler := ehd.NewDefaultHandler(employeeService)
 
-	// Buyer
-	by_rp := buyerRepository.NewBuyerRepository(buyerSt)
+	// Sellers
+	ld := storage.NewSellerJSONFile("../docs/db/seller_data.json")
+	sellerRepository := SellerRepo.NewSellerStorage(*ld)
+	sellerService := SellerService.NewSellerDefault(sellerRepository)
+	sellerHandler := handler.NewSellerDefault(sellerService)
+
+
+	// Employees
+	employeeStorage := storage.NewEmployeeJSONFile(a.employeeFilPath)
+	employeeRepository := erp.NewEmployeeMap(*employeeStorage)
+	employeeService := esv.NewDefaultService(employeeRepository)
+	employeeHandler := handler.NewDefaultHandler(employeeService)
+
+	// Buyers
+	buyerStorage := buyerStorageorage.NewBuyerJSONFile(a.buyerFilePath)
+	by_rp := buyerRepository.NewBuyerRepository(buyerStorage)
 	by_sv := buyerService.NewBuyerService(by_rp)
 	by_hd := handler.NewBuyerHandler(by_sv)
 
-	// Warehouse
+	// Warehouses
 	wh_rp := warehouse_rp.NewWareHouseRepository(warehouseSt)
 	wh_sv := warehouse_sv.NewWareHouseService(wh_rp)
 	wh_h := handler.NewWareHouseHandler(wh_sv)
 
-	// Product
+	// Products
 	rpProduct := product_rp.NewProductRepositoryMap(ldProduct)
 	svProduct := product_sv.NewProductService(rpProduct)
-	hdProduct := product_hd.NewProductHandler(svProduct)
+	hdProduct := handler.NewProductHandler(svProduct)
 
 	// router
 	rt := chi.NewRouter()
@@ -143,7 +133,7 @@ func (a *ServerChi) Run() (err error) {
 			r.Patch("/{id}", sellerHandler.Update())
 		})
 
-		rt.Route("/warehouses", func(rt chi.Router) {
+		r.Route("/warehouses", func(rt chi.Router) {
 			rt.Get("/", wh_h.Get())
 			rt.Get("/{id}", wh_h.GetById())
 			rt.Post("/", wh_h.Create())
@@ -151,11 +141,11 @@ func (a *ServerChi) Run() (err error) {
 			rt.Delete("/{id}", wh_h.Delete())
 		})
 
-		rt.Route("/sections", func(rt chi.Router) {
+		r.Route("/sections", func(rt chi.Router) {
 			// Agrega tus rutas de sections aquí
 		})
 
-		rt.Route("/products", func(r chi.Router) {
+		r.Route("/products", func(r chi.Router) {
 			r.Get("/", hdProduct.GetAll())
 			r.Get("/{id}", hdProduct.GetById())
 			r.Post("/", hdProduct.Create())
@@ -163,7 +153,7 @@ func (a *ServerChi) Run() (err error) {
 			r.Delete("/{id}", hdProduct.Delete())
 		})
 
-		rt.Route("/employees", func(rt chi.Router) {
+		r.Route("/employees", func(rt chi.Router) {
 			rt.Get("/", employeeHandler.GetAll())
 			rt.Get("/{id}", employeeHandler.GetById())
 			rt.Post("/", employeeHandler.Add())
@@ -171,7 +161,7 @@ func (a *ServerChi) Run() (err error) {
 			rt.Delete("/{id}", employeeHandler.DeleteById())
 		})
 
-		rt.Route("/buyers", func(rt chi.Router) {
+		r.Route("/buyers", func(rt chi.Router) {
 			rt.Get("/", by_hd.GetAll())
 			rt.Get("/{id}", by_hd.GetBuyerById())
 			rt.Post("/", by_hd.CreateBuyer())

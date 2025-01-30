@@ -48,10 +48,8 @@ func (h *SellerDefault) GetAll() http.HandlerFunc {
 
 func (h *SellerDefault) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
-		idParsed, err := strconv.Atoi(id)
-		if err != nil{
-			response.Error(w, http.StatusBadRequest, ErrInvalidId.Error())
+		idParsed, isInvalid := validateId(r, w)
+		if isInvalid {
 			return
 		}
 
@@ -65,11 +63,13 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 			}
 			return
 		}
+		
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": res,
 		})
 	}
 }
+
 
 
 func (h *SellerDefault) Create() http.HandlerFunc{
@@ -103,15 +103,12 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 
 func (h *SellerDefault) Delete() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		//CODIGO REPETIDO
-		id := chi.URLParam(r, "id")
-		idParsed, err := strconv.Atoi(id)
-		if err != nil{
-			response.Error(w, http.StatusBadRequest, ErrInvalidId.Error())
+		idParsed, isInvalid := validateId(r, w)
+		if isInvalid {
 			return
 		}
 
-		err = h.sv.Delete(idParsed)
+		err := h.sv.Delete(idParsed)
 		if err != nil {
 			switch {
 			case errors.Is(err, repo.ErrSellerNotFound):
@@ -121,6 +118,7 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 			}
 			return
 		}
+
 		response.Text(w, http.StatusNoContent, "seller deleted")
 
 	}
@@ -129,10 +127,8 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 
 func (h *SellerDefault) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
-		idParsed, err := strconv.Atoi(id)
-		if err != nil{
-			response.Error(w, http.StatusBadRequest, ErrInvalidId.Error())
+		idParsed, isInvalid := validateId(r, w)
+		if isInvalid {
 			return
 		}
 
@@ -164,4 +160,14 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 
 
 	}
+}
+
+func validateId(r *http.Request, w http.ResponseWriter) (int, bool) {
+	id := chi.URLParam(r, "id")
+	idParsed, err := strconv.Atoi(id)
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, ErrInvalidId.Error())
+		return 0, true
+	}
+	return idParsed, false
 }

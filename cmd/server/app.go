@@ -34,6 +34,7 @@ type ConfigServerChi struct {
 	BuyerLoaderFilePath     string
 	WarehouseLoaderFilePath string
 	EmployeeLoaderFilePath  string
+
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -64,6 +65,7 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		buyerFilePath:     defaultConfig.BuyerLoaderFilePath,
 		warehouseFilePath: defaultConfig.WarehouseLoaderFilePath,
 		employeeFilPath:   defaultConfig.EmployeeLoaderFilePath,
+
 	}
 }
 
@@ -73,10 +75,29 @@ type ServerChi struct {
 	buyerFilePath     string
 	warehouseFilePath string
 	employeeFilPath   string
+
 }
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
+
+	// dependencies
+	// - storage
+	ld := storage.NewSellerJSONFile("./docs/db/seller_data.json")
+
+
+	// - repository
+	sellerRepository := SellerRepo.NewSellerStorage(*ld)
+
+
+
+	// - service
+	sellerService := SellerService.NewSellerDefault(sellerRepository)
+
+
+	// - handler
+	sellerHandler := handler.NewSellerDefault(sellerService)
+
 
 	// - loader
 	employeeSt := storage.NewEmployeeJSONFile(a.employeeFilPath)
@@ -112,8 +133,14 @@ func (a *ServerChi) Run() (err error) {
 	rt.Use(middleware.Recoverer)
 
 	// - endpoints
-	rt.Route("/api/v1", func(rt chi.Router) {
-		rt.Route("/sellers", func(rt chi.Router) {
+
+	rt.Route("/api/v1", func(r chi.Router) {
+		r.Route("/sellers", func(r chi.Router) {
+			r.Get("/", sellerHandler.GetAll())
+			r.Get("/{id}", sellerHandler.GetById())
+			r.Post("/", sellerHandler.Create())
+			r.Delete("/{id}", sellerHandler.Delete())
+			r.Patch("/{id}", sellerHandler.Update())
 		})
 
 		rt.Route("/warehouses", func(rt chi.Router) {

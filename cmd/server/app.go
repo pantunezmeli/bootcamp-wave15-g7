@@ -13,11 +13,19 @@ import (
 	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
+	product_hd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
+	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
+	product_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	warehouse_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse_repository"
 	buyerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
+	product_sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	warehouse_sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse_service"
 	loader "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
+)
+
+const (
+	PATH_PRODUCT_JSON_FILE = "docs/db/product_data.json"
 )
 
 // ConfigServerChi is a struct that represents the configuration for ServerChi
@@ -57,6 +65,7 @@ type ServerChi struct {
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// dependencies
+
 	// - loader
 	est := storage.NewEmployeeJSONFile(a.loaderFilePath)
 
@@ -71,6 +80,7 @@ func (a *ServerChi) Run() (err error) {
 	buyerSt := buyerstorage.NewBuyerJSONFile(a.loaderFilePath)
 	warehouseSt := loader.NewWareHouseJSONFile(a.loaderFilePath)
 	dbwarehouse, _ := warehouseSt.Load()
+	ldProduct := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
 
 	// if err2 != nil {
 	// 	return
@@ -83,6 +93,10 @@ func (a *ServerChi) Run() (err error) {
 	wh_rp := warehouse_rp.NewWareHouseRepository(dbwarehouse, warehouseSt)
 	wh_sv := warehouse_sv.NewWareHouseService(wh_rp)
 	wh_h := handler.NewWareHouseHandler(wh_sv)
+
+	rpProduct := product_rp.NewProductRepositoryMap(ldProduct)
+	svProduct := product_sv.NewProductService(rpProduct)
+	hdProduct := product_hd.NewProductHandler(svProduct)
 
 	// router
 	rt := chi.NewRouter()
@@ -108,8 +122,12 @@ func (a *ServerChi) Run() (err error) {
 			// Agrega tus rutas de sections aquí
 		})
 
-		rt.Route("/products", func(rt chi.Router) {
-			// Agrega tus rutas de products aquí
+		rt.Route("/products", func(r chi.Router) {
+			r.Get("/", hdProduct.GetAll())
+			r.Get("/{id}", hdProduct.GetById())
+			r.Post("/", hdProduct.Create())
+			r.Patch("/{id}", hdProduct.Update())
+			r.Delete("/{id}", hdProduct.Delete())
 		})
 
 		rt.Route("/employees", func(rt chi.Router) {

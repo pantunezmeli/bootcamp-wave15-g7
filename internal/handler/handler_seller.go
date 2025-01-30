@@ -88,9 +88,9 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
 				response.Error(w, http.StatusConflict, ErrCidExists.Error())
 			case errors.As(err, &missingParamErr):
-				response.Error(w, http.StatusBadRequest, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
+				response.Error(w, http.StatusUnprocessableEntity, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
 			case errors.As(err, &invalidParamErr):
-				response.Error(w, http.StatusBadRequest, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
+				response.Error(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
 			default:
 				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}
@@ -151,7 +151,7 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 			case errors.Is(err, repo.ErrSellerNotFound):
 				response.Error(w, http.StatusNotFound, ErrSellerNotFound.Error())
 			case errors.As(err, &invalidParamErr):
-				response.Error(w, http.StatusBadRequest, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
+				response.Error(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
 			default:
 				response.Error(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			}

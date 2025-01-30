@@ -33,6 +33,7 @@ type ConfigServerChi struct {
 	ServerAddress           string
 	BuyerLoaderFilePath     string
 	WarehouseLoaderFilePath string
+	EmployeeLoaderFilePath  string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -53,12 +54,16 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.WarehouseLoaderFilePath != "" {
 			defaultConfig.WarehouseLoaderFilePath = cfg.WarehouseLoaderFilePath
 		}
+		if cfg.EmployeeLoaderFilePath != "" {
+			defaultConfig.EmployeeLoaderFilePath = cfg.EmployeeLoaderFilePath
+		}
 	}
 
 	return &ServerChi{
 		serverAddress:     defaultConfig.ServerAddress,
 		buyerFilePath:     defaultConfig.BuyerLoaderFilePath,
 		warehouseFilePath: defaultConfig.WarehouseLoaderFilePath,
+		employeeFilPath:   defaultConfig.EmployeeLoaderFilePath,
 	}
 }
 
@@ -67,19 +72,20 @@ type ServerChi struct {
 	serverAddress     string
 	buyerFilePath     string
 	warehouseFilePath string
+	employeeFilPath   string
 }
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 
 	// - loader
-	est := storage.NewEmployeeJSONFile(a.loaderFilePath)
+	employeeSt := storage.NewEmployeeJSONFile(a.employeeFilPath)
 	buyerSt := buyerstorage.NewBuyerJSONFile(a.buyerFilePath)
 	warehouseSt := warehouseStorage.NewWareHouseJSONFile(a.warehouseFilePath)
 	ldProduct := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
 
 	// Employee
-	employeeRepository := erp.NewEmployeeMap(*est)
+	employeeRepository := erp.NewEmployeeMap(*employeeSt)
 	employeeService := esv.NewDefaultService(employeeRepository)
 	employeeHandler := ehd.NewDefaultHandler(employeeService)
 

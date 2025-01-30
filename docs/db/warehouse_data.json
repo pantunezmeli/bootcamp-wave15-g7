@@ -1,7 +1,15 @@
 [
  {
-  "id": 1,
-  "warehouse_code": "WH111",
+  "id": 3,
+  "warehouse_code": "WH003",
+  "address": "789 Oak St, Mendoza",
+  "telephone": "1144556677",
+  "minimun_capacity": 600,
+  "minimun_temperature": -8
+ },
+ {
+  "id": 11,
+  "warehouse_code": "WH128",
   "address": "Casa 1",
   "telephone": "1560151819",
   "minimun_capacity": 100,
@@ -22,14 +30,6 @@
   "telephone": "1199001122",
   "minimun_capacity": 800,
   "minimun_temperature": -15
- },
- {
-  "id": 9,
-  "warehouse_code": "WH009",
-  "address": "606 Cherry St, San Juan",
-  "telephone": "1100112233",
-  "minimun_capacity": 450,
-  "minimun_temperature": -11
  },
  {
   "id": 2,
@@ -56,19 +56,27 @@
   "minimun_temperature": -6
  },
  {
-  "id": 3,
-  "warehouse_code": "WH003",
-  "address": "789 Oak St, Mendoza",
-  "telephone": "1144556677",
-  "minimun_capacity": 600,
-  "minimun_temperature": -8
- },
- {
   "id": 10,
   "warehouse_code": "WH010",
   "address": "707 Oakwood St, Neuquén",
   "telephone": "1111223344",
   "minimun_capacity": 900,
   "minimun_temperature": -20
+ },
+ {
+  "id": 1,
+  "warehouse_code": "WH111",
+  "address": "Casa 1",
+  "telephone": "1560151819",
+  "minimun_capacity": 100,
+  "minimun_temperature": -18
+ },
+ {
+  "id": 9,
+  "warehouse_code": "WH009",
+  "address": "606 Cherry St, San Juan",
+  "telephone": "1100112233",
+  "minimun_capacity": 450,
+  "minimun_temperature": -11
  }
 ]

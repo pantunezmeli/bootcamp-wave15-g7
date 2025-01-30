@@ -2,7 +2,6 @@ package storage
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
@@ -47,15 +46,11 @@ func (s *EmployeeJSONFile) Save(employee models.Employee) (err error) {
 	if err != nil {
 		return
 	}
-	fmt.Println("length map: ", len(employees))
-	fmt.Println("employee map: ", employees)
 	employeeList := make([]dto.EmployeeDoc, 0, len(employees))
 	for _, e := range employees {
 		employeeData := dto.EmployeeModelToDto(e)
-		fmt.Printf("Converted employee: %+v\n", employeeData)
 		employeeList = append(employeeList, employeeData)
 	}
-	fmt.Println("employeeList: ", employeeList)
 	employeeList = append(employeeList, dto.EmployeeModelToDto(employee))
 
 	// Convertir la lista en JSON

@@ -29,7 +29,7 @@ func (l *SectionJSONFile) Load() (v map[int]models.Section, err error) {
 	defer file.Close()
 
 	// decode file
-	var sectionsJSON []models.SectionDoc
+	var sectionsJSON []models.Section
 	err = json.NewDecoder(file).Decode(&sectionsJSON)
 	if err != nil {
 		return

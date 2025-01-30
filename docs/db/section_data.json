@@ -11,17 +11,6 @@
     "Product_Type_Id": 81
   },
   {
-    "Id": 2,
-    "Section_Number": 91,
-    "Current_Temperature": 0,
-    "Minimum_Temperature": 10,
-    "Current_Capacity": 0,
-    "Minimum_Capacity": 0,
-    "Maximum_Capacity": 0,
-    "Warehouse_Id": 23,
-    "Product_Type_Id": 46
-  },
-  {
     "Id": 3,
     "Section_Number": 57,
     "Current_Temperature": 0,
@@ -1098,5 +1087,16 @@
     "Maximum_Capacity": 1945,
     "Warehouse_Id": 13,
     "Product_Type_Id": 14
+  },
+  {
+    "Id": 0,
+    "Section_Number": 500,
+    "Current_Temperature": 5,
+    "Minimum_Temperature": 45,
+    "Current_Capacity": 23,
+    "Minimum_Capacity": 12,
+    "Maximum_Capacity": 43,
+    "Warehouse_Id": 500,
+    "Product_Type_Id": 500
   }
 ]

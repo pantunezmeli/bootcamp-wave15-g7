@@ -48,19 +48,19 @@ func (r *StRepository) FindByID(id int) (entity models.Section, err error) {
 }
 
 // Create is a method that creates a new Section
-func (r *StRepository) Create(entity models.Section) (err error) {
+func (r *StRepository) Create(entity models.Section) (models.Section, error) {
 	data, err := r.storage.Load()
 	if err != nil {
-		return err
+		return models.Section{}, err
 	}
 	if _, exists := data[entity.Id]; exists {
-		return errors.New("section already exists")
+		return models.Section{}, errors.New("section already exists")
 	}
 	data[entity.Id] = entity
 	if err := r.storage.Save(entity); err != nil {
-		return err
+		return models.Section{}, err
 	}
-	return
+	return entity, nil
 }
 
 // Patch is a method that updates a Section by its ID

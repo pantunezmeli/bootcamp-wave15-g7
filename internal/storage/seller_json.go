@@ -1,4 +1,4 @@
-package loader
+package storage
 
 import (
 	"encoding/json"

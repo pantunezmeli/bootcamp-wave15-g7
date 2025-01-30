@@ -1,4 +1,4 @@
-package loader
+package storage
 
 import ("github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 "errors"
@@ -11,6 +11,7 @@ var (
 
 
 
-type SellerLoader interface {
+type SellerStorage interface {
 	Load() (v map[int]models.Seller, err error)
+	Save(map[int]models.Seller) (err error)
 }

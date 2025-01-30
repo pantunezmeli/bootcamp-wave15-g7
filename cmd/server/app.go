@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 	SellerRepo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	SellerService"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
@@ -15,8 +15,8 @@ import (
 type ConfigServerChi struct {
 	// ServerAddress is the address where the server will be listening
 	ServerAddress string
-	// LoaderFilePath is the path to the file that contains the vehicles
-	LoaderFilePath string
+	// storageFilePath is the path to the file that contains the vehicles
+	StorageFilePath string
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -29,14 +29,14 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePath != "" {
-			defaultConfig.LoaderFilePath = cfg.LoaderFilePath
+		if cfg.StorageFilePath != "" {
+			defaultConfig.StorageFilePath = cfg.StorageFilePath
 		}
 	}
 
 	return &ServerChi{
 		serverAddress:  defaultConfig.ServerAddress,
-		loaderFilePath: defaultConfig.LoaderFilePath,
+		StorageFilePath: defaultConfig.StorageFilePath,
 	}
 }
 
@@ -44,15 +44,15 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 type ServerChi struct {
 	// serverAddress is the address where the server will be listening
 	serverAddress string
-	// loaderFilePath is the path to the file that contains the vehicles
-	loaderFilePath string
+	// storageFilePath is the path to the file that contains the vehicles
+	StorageFilePath string
 }
 
 // Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
 	// dependencies
-	// - loader
-	ld := loader.NewSellerJSONFile("./docs/db/seller_data.json")
+	// - storage
+	ld := storage.NewSellerJSONFile("./docs/db/seller_data.json")
 
 
 	// - repository

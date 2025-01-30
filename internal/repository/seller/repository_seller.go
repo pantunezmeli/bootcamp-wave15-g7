@@ -3,19 +3,19 @@ package seller
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 )
 
 type SellerStorage struct {
-	loader loader.SellerJSONFile 
+	storage storage.SellerJSONFile 
 }
 
-func NewSellerStorage(loader loader.SellerJSONFile) *SellerStorage {
-	return &SellerStorage{loader}
+func NewSellerStorage(storage storage.SellerJSONFile) *SellerStorage {
+	return &SellerStorage{storage}
 }
 
 func (s *SellerStorage) GetAll() (sellers []models.Seller, err error) {
-	sellersMap, err := s.loader.Load()
+	sellersMap, err := s.storage.Load()
 	if err != nil{
 		return
 	}
@@ -26,7 +26,7 @@ func (s *SellerStorage) GetAll() (sellers []models.Seller, err error) {
 }
 
 func  (s *SellerStorage) GetById(id int) (seller models.Seller, err error) {
-	sellersMap, err := s.loader.Load()
+	sellersMap, err := s.storage.Load()
 	if err != nil{
 		return
 	}
@@ -38,7 +38,7 @@ func  (s *SellerStorage) GetById(id int) (seller models.Seller, err error) {
 }
 
 func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller, err error) {
-	sellersMap, err := s.loader.Load()
+	sellersMap, err := s.storage.Load()
 	if err != nil {
 		return
 	}
@@ -56,12 +56,12 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 	seller = modelWithoutId
 	sellersMap[newId] = seller
 
-	err = s.loader.Save(sellersMap)
+	err = s.storage.Save(sellersMap)
 	return
 }
 
 func (s *SellerStorage) Delete(id int) (err error){
-	sellersMap, err := s.loader.Load()
+	sellersMap, err := s.storage.Load()
 	if err != nil {
 		return
 	}
@@ -73,7 +73,7 @@ func (s *SellerStorage) Delete(id int) (err error){
 
 	delete(sellersMap, id)
 
-	err = s.loader.Save(sellersMap)
+	err = s.storage.Save(sellersMap)
 	return
 
 
@@ -91,7 +91,7 @@ func (s *SellerStorage) CheckCid(sellerModel models.Seller, sellersMap map[int]m
 }
 
 func(s *SellerStorage) Update(sellerModel models.Seller) (sellerUpdated models.Seller, err error){
-	sellersMap, err := s.loader.Load()
+	sellersMap, err := s.storage.Load()
 	if err != nil {
 		return
 	}
@@ -101,7 +101,7 @@ func(s *SellerStorage) Update(sellerModel models.Seller) (sellerUpdated models.S
 	
 	sellerUpdated = sellerModel
 	sellersMap[*sellerModel.ID.Value()] = sellerUpdated
-	err = s.loader.Save(sellersMap)
+	err = s.storage.Save(sellersMap)
 	return
 }
 

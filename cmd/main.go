@@ -15,7 +15,7 @@ func main() {
 	// - config
 	cfg := &server.ConfigServerChi{
 		ServerAddress:  ":8080",
-		LoaderFilePath: "",
+		StorageFilePath: "",
 	}
 	app := server.NewServerChi(cfg)
 	// - run

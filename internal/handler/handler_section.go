@@ -18,7 +18,7 @@ import (
 
 // SectionDefault is a struct with methods that represent handlers for sections
 type SectionDefault struct {
-	// sv is the service that will be used by the handler
+	// service is the service that will be used by the handler
 	service section.ISectionService
 }
 
@@ -30,15 +30,14 @@ func NewSectionDefault(sv section.ISectionService) *SectionDefault {
 // ListSections is a method that returns a handler for the route GET /sections
 func (h *SectionDefault) Get() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// process
-		// - get all Sections
+		// Get all Sections
 		sections, err := h.service.ListSections()
 		if err != nil {
-			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
+			dto.JSONError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		// response
+		// Response
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": sections,
 		})
@@ -47,22 +46,30 @@ func (h *SectionDefault) Get() http.HandlerFunc {
 
 func (h *SectionDefault) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Obtener la ID de la URL
+		// Obtein the ID from the URL
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+			dto.JSONError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		// process
-		// - get the Section by ID
+		// Get the Section by ID
 		section, err := h.service.GetSection(id)
 		if err != nil {
-			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
+			if errors.Is(err, errorbase.ErrNotFound) {
+				dto.JSONError(w, http.StatusNotFound, err.Error())
+				return
+			}
+			if errors.Is(err, errorbase.ErrInvalidId) {
+				dto.JSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			dto.JSONError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		// response
+		// Response
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": section,
 		})
@@ -75,7 +82,7 @@ func (h *SectionDefault) Create() http.HandlerFunc {
 		// Decode the request body
 		var newSection models.Section
 		if err := json.NewDecoder(r.Body).Decode(&newSection); err != nil {
-			response.JSON(w, http.StatusBadRequest, nil)
+			dto.JSONError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -83,16 +90,21 @@ func (h *SectionDefault) Create() http.HandlerFunc {
 		section, err := h.service.CreateSection(newSection)
 
 		// Handle Errors
-		if errors.Is(err, errorbase.ErrConflict) {
-			response.JSON(w, http.StatusConflict, nil)
-			return
-		}
-		if errors.Is(err, errorbase.ErrStorageOperationFailed) {
-			response.JSON(w, http.StatusInternalServerError, nil)
-			return
-		}
 		if err != nil {
-			response.JSON(w, http.StatusUnprocessableEntity, nil)
+			if errors.Is(err, errorbase.ErrConflict) {
+				dto.JSONError(w, http.StatusConflict, err.Error())
+				return
+			}
+			if errors.Is(err, errorbase.ErrEmptyParameters) {
+				dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
+				return
+			}
+			if errors.Is(err, errorbase.ErrInvalidRequest) {
+				dto.JSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			dto.JSONError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -105,26 +117,38 @@ func (h *SectionDefault) Create() http.HandlerFunc {
 
 func (h *SectionDefault) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Obtener la ID de la URL
+		// Get the ID from the URL
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]string{"error": errorbase.ErrInvalidId.Error()})
+			dto.JSONError(w, http.StatusBadRequest, errorbase.ErrInvalidId.Error())
 			return
 		}
 
-		// Decodificar el cuerpo de la solicitud
+		// Decode the request body
 		var sectionDoc dto.SectionResponse
 		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]string{"error": errorbase.ErrInvalidRequest.Error()})
+			dto.JSONError(w, http.StatusBadRequest, errorbase.ErrInvalidRequest.Error())
 			return
 		}
 
 		section, err := h.service.PatchSection(id, sectionDoc)
+
+		// Handle Errors
 		if err != nil {
-			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
+			if errors.Is(err, errorbase.ErrNotFound) {
+				dto.JSONError(w, http.StatusNotFound, err.Error())
+				return
+			}
+			// if errors.Is(err, errorbase.ErrConflict) {
+			// 	dto.JSONError(w, http.StatusConflict, err.Error())
+			// 	return
+			// }
+
+			dto.JSONError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
+		// Response
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": section,
 		})
@@ -136,20 +160,28 @@ func (h *SectionDefault) Delete() http.HandlerFunc {
 		// Obtener la ID de la URL
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+			dto.JSONError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		// process
-		// - get the Section by ID
+		// Get the Section by ID
 		err = h.service.DeleteSection(id)
 		if err != nil {
-			response.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Internal Server Error"})
+			if errors.Is(err, errorbase.ErrNotFound) {
+				dto.JSONError(w, http.StatusNotFound, err.Error())
+				return
+			}
+			if errors.Is(err, errorbase.ErrInvalidId) {
+				dto.JSONError(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			dto.JSONError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		// response
-		response.JSON(w, http.StatusOK, map[string]any{
+		// Response
+		response.JSON(w, http.StatusNoContent, map[string]any{
 			"message": "section deleted succesfully",
 		})
 	}

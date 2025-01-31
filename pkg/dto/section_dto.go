@@ -18,7 +18,7 @@ type SectionResponse struct {
 	Product_Type_Id     int `json:"product_type_id"`
 }
 
-func GenerateBuyerResponseList(sections map[int]models.Section) []SectionResponse {
+func GenerateSectionsResponseList(sections map[int]models.Section) []SectionResponse {
 	var list []SectionResponse
 	for _, value := range sections {
 		list = append(list, SectionResponse{
@@ -56,7 +56,6 @@ func GenerateSectionResponse(section models.Section) SectionResponse {
 
 func GenerateSectionRequest(section SectionResponse) models.Section {
 	SectionResponse := models.Section{
-		Id:                  section.Id,
 		Section_Number:      section.Section_Number,
 		Current_Temperature: section.Current_Temperature,
 		Minimum_Temperature: section.Minimum_Temperature,

@@ -74,7 +74,7 @@ func (p ProductService) CreateProduct(product product2.ProductDTO) (productDto p
 	}
 
 	if p.rp.ProductCodeExist(newProduct.ProductCode) {
-		err = ErrValidProduct{message: "Product code already exists"}
+		err = ErrProductConflict{message: "Product code already exists"}
 		return
 	}
 

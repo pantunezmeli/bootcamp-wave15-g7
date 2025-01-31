@@ -26,7 +26,7 @@ func (s *SectionService) ListSections() ([]dto.SectionResponse, error) {
 	}
 
 	// Generate the response and return it
-	sections := dto.GenerateResponseList(list)
+	sections := dto.GenerateSectionsResponseList(list)
 	return sections, nil
 }
 

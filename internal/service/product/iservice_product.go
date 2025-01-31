@@ -37,3 +37,12 @@ type ErrNotFoundProduct struct {
 func (e ErrNotFoundProduct) Error() string {
 	return e.message
 }
+
+type ErrProductConflict struct {
+	message string
+}
+
+func (e ErrProductConflict) Error() string {
+	return e.message
+}
+

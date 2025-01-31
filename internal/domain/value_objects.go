@@ -9,12 +9,20 @@ var (
 	ErrInvalidMinimunCapacity = errors.New("invalid minimun capacity")
 	ErrMinimunTemperature     = errors.New("invalid minimun temperature")
 	ErrInvalidAddress         = errors.New("invalid address")
+	ErrInvalidName            = errors.New("invalid name")
+	ErrInvalidCardNumber      = errors.New("invalid card number")
 )
 
 // * ##################### Id ######################
 // Estructura
 type Id struct {
 	value int
+}
+type CardNumber struct {
+	value string
+}
+type Name struct {
+	value string
 }
 
 // Validación
@@ -24,10 +32,39 @@ func NewId(value int) (id Id, err error) {
 	}
 	return Id{value: value}, nil
 }
+func NewCardNumber(value string) (cardNumber CardNumber, err error) {
+	if value == "" {
+		return CardNumber{}, ErrInvalidCardNumber
+	}
+	return CardNumber{value: value}, nil
+}
+func NewName(value string) (name Name, err error) {
+	if value == "" {
+		return Name{}, ErrInvalidName
+	}
+	return Name{value: value}, nil
+}
+
+// Seteo sin validación
+func NewOptionalId(value int) Id {
+	return Id{value: value}
+}
+func NewOptionalCardNumber(value string) CardNumber {
+	return CardNumber{value: value}
+}
+func NewOptionalName(value string) Name {
+	return Name{value: value}
+}
 
 // Obtener el valor
 func (id Id) GetId() int {
 	return id.value
+}
+func (cardNumber CardNumber) GetCardNumber() string {
+	return cardNumber.value
+}
+func (name Name) GetName() string {
+	return name.value
 }
 
 // * ##################### WareHouse_Code ######################

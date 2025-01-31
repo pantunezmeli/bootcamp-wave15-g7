@@ -4,7 +4,7 @@ import (
 	"dario.cat/mergo"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
+	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 // StRepository is a struct that represents a Section repository
@@ -88,6 +88,15 @@ func (r *StRepository) Update(id int, entity models.Section) (models.Section, er
 	element, ok := data[id]
 	if !ok {
 		return models.Section{}, errorbase.ErrNotFound
+	}
+
+	// Check if ID is new
+	if !(entity.Section_Number == data[id].Section_Number) {
+		for _, section := range data {
+			if section.Section_Number == entity.Section_Number {
+				return models.Section{}, errorbase.ErrConflict
+			}
+		}
 	}
 
 	// Merge the new data with the existing data

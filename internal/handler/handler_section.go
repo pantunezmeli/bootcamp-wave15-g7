@@ -14,7 +14,7 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 	dtoSection "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/section"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
+	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 // SectionDefault is a struct with methods that represent handlers for sections
@@ -50,7 +50,7 @@ func (h *SectionDefault) GetById() http.HandlerFunc {
 		// Obtein the ID from the URL
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			dto.JSONError(w, http.StatusBadRequest, err.Error())
+			dto.JSONError(w, http.StatusBadRequest, errorbase.ErrInvalidId.Error())
 			return
 		}
 
@@ -83,7 +83,7 @@ func (h *SectionDefault) Create() http.HandlerFunc {
 		// Decode the request body
 		var newSection models.Section
 		if err := json.NewDecoder(r.Body).Decode(&newSection); err != nil {
-			dto.JSONError(w, http.StatusBadRequest, err.Error())
+			dto.JSONError(w, http.StatusBadRequest, errorbase.ErrInvalidRequest.Error())
 			return
 		}
 
@@ -101,11 +101,10 @@ func (h *SectionDefault) Create() http.HandlerFunc {
 				return
 			}
 			if errors.Is(err, errorbase.ErrInvalidRequest) {
-				dto.JSONError(w, http.StatusBadRequest, err.Error())
+				dto.JSONError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
-
-			dto.JSONError(w, http.StatusInternalServerError, err.Error())
+			dto.JSONError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -140,12 +139,12 @@ func (h *SectionDefault) Update() http.HandlerFunc {
 				dto.JSONError(w, http.StatusNotFound, err.Error())
 				return
 			}
-			// if errors.Is(err, errorbase.ErrConflict) {
-			// 	dto.JSONError(w, http.StatusConflict, err.Error())
-			// 	return
-			// }
+			if errors.Is(err, errorbase.ErrConflict) {
+				dto.JSONError(w, http.StatusConflict, "section number already exists")
+				return
+			}
 
-			dto.JSONError(w, http.StatusInternalServerError, err.Error())
+			dto.JSONError(w, http.StatusInternalServerError, "section number already exists")
 			return
 		}
 
@@ -161,7 +160,7 @@ func (h *SectionDefault) Delete() http.HandlerFunc {
 		// Obtener la ID de la URL
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			dto.JSONError(w, http.StatusBadRequest, err.Error())
+			dto.JSONError(w, http.StatusBadRequest, errorbase.ErrInvalidId.Error())
 			return
 		}
 

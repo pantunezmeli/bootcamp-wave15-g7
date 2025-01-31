@@ -46,7 +46,7 @@ func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) 
 
 	_, ok := buyers[entity.Id]
 
-	exist := searchCardId(buyers, buyer, entity.Card_Number_Id)
+	exist := searchCardId(buyers, entity.Card_Number_Id)
 
 	if ok || exist {
 		return models.Buyer{}, errorbase.ErrConflict
@@ -65,7 +65,6 @@ func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) 
 	entity.Id = getLastId(buyers)
 	buyers[entity.Id] = entity
 
-	//loader := loaderfile.NewBuyerJSONFile("../docs/db/buyer_data.json")
 	err2 := buyer.storage.Save(entity)
 	if err2 != nil {
 		return models.Buyer{}, errorbase.ErrStorageOperationFailed
@@ -74,7 +73,7 @@ func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) 
 	return entity, nil
 }
 
-func searchCardId(buyers map[int]models.Buyer, buyer *BuyerRepository, id int) bool {
+func searchCardId(buyers map[int]models.Buyer, id int) bool {
 
 	var found bool = false
 	var i int = 0
@@ -92,16 +91,38 @@ func (buyer *BuyerRepository) Update(id int, entity models.Buyer) (models.Buyer,
 	if !ok {
 		return models.Buyer{}, errorbase.ErrNotFound
 	}
-	if cardNumberId, err := value_objects.NewCardNumberId(id); err == nil {
+
+	var coincidence bool = false
+	var i int = 0
+	for i <= len(buyers) && !coincidence {
+		coincidence = buyers[i].Card_Number_Id == entity.Card_Number_Id
+		i++
+	}
+
+	if coincidence {
+		return models.Buyer{}, errorbase.ErrConflict
+	}
+
+	cardNumberId, err := value_objects.NewCardNumberId(id)
+	if err == nil {
 		element.Card_Number_Id = cardNumberId.GetCardNumberId()
+	} else {
+		return models.Buyer{}, errorbase.ErrModelInvalid
 	}
 
-	if firstName, err := value_objects.NewFirstName(entity.First_Name); err == nil {
+	firstName, err := value_objects.NewFirstName(entity.First_Name)
+	if err == nil {
 		element.First_Name = firstName.GetFirstName()
+	} else {
+		return models.Buyer{}, errorbase.ErrModelInvalid
 	}
 
-	if lastName, err := value_objects.NewLastName(entity.Last_Name); err == nil {
+	lastName, err := value_objects.NewLastName(entity.Last_Name)
+	if err == nil {
 		element.Last_Name = lastName.GetLastName()
+	} else {
+		return models.Buyer{}, errorbase.ErrModelInvalid
+
 	}
 	//if err := mergo.Merge(&element, entity, mergo.WithOverride); err != nil {
 	// 	return models.Buyer{}, err

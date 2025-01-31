@@ -10,7 +10,6 @@ import (
 	rep "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	sec "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
 	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
-	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/employee"
 	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	SellerRepo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
@@ -96,8 +95,6 @@ func (a *ServerChi) Run() (err error) {
 	st_sv := sec.NewSectionService(st_rp)
 	// - handler
 	st_hd := handler.NewSectionDefault(st_sv)
-	employeeSt := storage.NewEmployeeJSONFile(a.employeeFilPath)
-	buyerSt := buyerstorage.NewBuyerJSONFile(a.buyerFilePath)
 	warehouseSt := warehouseStorage.NewWareHouseJSONFile(a.warehouseFilePath)
 	productSt := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
 
@@ -164,7 +161,8 @@ func (a *ServerChi) Run() (err error) {
 			rt.Get("/{id}", st_hd.GetById())
 			rt.Post("/", st_hd.Create())
 			rt.Patch("/{id}", st_hd.Update())
-			rt.Delete("/{id}", st_hd.Delete())		})
+			rt.Delete("/{id}", st_hd.Delete())		
+		})
 
 		rt.Route("/products", func(rt chi.Router) {
 			rt.Get("/", hdProduct.GetAll())

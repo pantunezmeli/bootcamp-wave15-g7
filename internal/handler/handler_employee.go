@@ -12,6 +12,16 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
+
+var (
+	ErrInternalServerError = errors.New("internal server error, please try again later")
+	ErrInvalidId           = errors.New("invalid id, id should be a number")
+	ErrEmployeeNotFound    = errors.New("employee not found")
+	ErrInvalidBody         = errors.New("invalid body")
+	ErrCardNumberExists    = errors.New("card number already exists")
+	ErrEmptyField          = errors.New("employee data lacks a required field")
+)
+
 func NewDefaultHandler(service sv.EmployeeService) *DefaultHandler {
 	return &DefaultHandler{sv: service}
 }
@@ -28,7 +38,8 @@ func (h *DefaultHandler) GetAll() http.HandlerFunc {
 		// process
 		employees, err := h.sv.FindAll()
 		if err != nil {
-			response.Error(w, http.StatusInternalServerError, "Internal server error")
+
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
 
@@ -44,17 +55,18 @@ func (h *DefaultHandler) GetById() http.HandlerFunc {
 		// request
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.JSON(w, http.StatusBadRequest, nil)
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
+			return
 		}
 
 		// process
 		employee, err := h.sv.FindById(id)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				response.Error(w, http.StatusNotFound, "Employee not found")
+				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
 				return
 			}
-			response.Error(w, http.StatusInternalServerError, "Internal server error")
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
 
@@ -70,7 +82,7 @@ func (h *DefaultHandler) Add() http.HandlerFunc {
 		// request
 		var employeeData dto.EmployeeDoc
 		if err := request.JSON(r, &employeeData); err != nil {
-			response.Error(w, http.StatusBadRequest, "Bad request: invalid data")
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
 
@@ -78,10 +90,14 @@ func (h *DefaultHandler) Add() http.HandlerFunc {
 		newEmployee, err := h.sv.New(employeeData)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmptyField) {
-				response.Error(w, http.StatusUnprocessableEntity, "Unprocessable entity: empty field/s")
+				dto.JSONError(w, http.StatusUnprocessableEntity, ErrEmptyField.Error())
 				return
 			}
-			response.Error(w, http.StatusInternalServerError, "Internal server error")
+			if errors.Is(err, sv.ErrCardNumberAlreadyExists) {
+				dto.JSONError(w, http.StatusBadRequest, ErrCardNumberExists.Error())
+				return
+			}
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
 
@@ -97,12 +113,13 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		// request
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Bad request: invalid id")
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
+			return
 		}
 
 		var employeeData dto.EmployeeDoc
 		if err := request.JSON(r, &employeeData); err != nil {
-			response.Error(w, http.StatusBadRequest, "Bad request: invalid data")
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
 
@@ -110,10 +127,14 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		updatedEmployee, err := h.sv.Edit(id, employeeData)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				response.Error(w, http.StatusNotFound, "Employee not found")
+				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
 				return
 			}
-			response.Error(w, http.StatusInternalServerError, "Internal server error")
+			if errors.Is(err, sv.ErrCardNumberAlreadyExists) {
+				dto.JSONError(w, http.StatusBadRequest, ErrCardNumberExists.Error())
+				return
+			}
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
 
@@ -129,17 +150,17 @@ func (h *DefaultHandler) DeleteById() http.HandlerFunc {
 		// request
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Bad request: invalid id")
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
 		}
 
 		// process
 		err = h.sv.DeleteById(id)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				response.Error(w, http.StatusNotFound, "Employee not found")
+				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
 				return
 			}
-			response.Error(w, http.StatusInternalServerError, "Internal server error")
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
 

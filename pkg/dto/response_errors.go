@@ -7,6 +7,7 @@ import (
 )
 
 
+
 func JSONError(w http.ResponseWriter, statusCode int, message string) {
 	defaultStatusCode := http.StatusInternalServerError
 	if statusCode > 299 && statusCode < 600 {
@@ -17,7 +18,6 @@ func JSONError(w http.ResponseWriter, statusCode int, message string) {
 		Status:  http.StatusText(defaultStatusCode),
 		Message: message,
 	}
-	
 
 	bytes, err := json.Marshal(body)
 	if err != nil {

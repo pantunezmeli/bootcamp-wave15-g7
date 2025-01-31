@@ -2,8 +2,8 @@
   {
     "Id": 1,
     "Section_Number": 44,
-    "Current_Temperature": 31,
-    "Minimum_Temperature": 12,
+    "Current_Temperature": 20,
+    "Minimum_Temperature": 25,
     "Current_Capacity": 415,
     "Minimum_Capacity": 618,
     "Maximum_Capacity": 430,
@@ -24,8 +24,8 @@
   {
     "Id": 4,
     "Section_Number": 12,
-    "Current_Temperature": 0,
-    "Minimum_Temperature": -49,
+    "Current_Temperature": 20,
+    "Minimum_Temperature": 10,
     "Current_Capacity": 944,
     "Minimum_Capacity": 873,
     "Maximum_Capacity": 1936,
@@ -526,17 +526,6 @@
     "Maximum_Capacity": 514,
     "Warehouse_Id": 63,
     "Product_Type_Id": 83
-  },
-  {
-    "Id": 50,
-    "Section_Number": 16,
-    "Current_Temperature": 50,
-    "Minimum_Temperature": 37,
-    "Current_Capacity": 869,
-    "Minimum_Capacity": 47,
-    "Maximum_Capacity": 535,
-    "Warehouse_Id": 86,
-    "Product_Type_Id": 21
   },
   {
     "Id": 51,
@@ -1089,13 +1078,24 @@
     "Product_Type_Id": 14
   },
   {
-    "Id": 0,
+    "Id": 101,
+    "Section_Number": 2,
+    "Current_Temperature": 50,
+    "Minimum_Temperature": 50,
+    "Current_Capacity": 50,
+    "Minimum_Capacity": 50,
+    "Maximum_Capacity": 50,
+    "Warehouse_Id": 2,
+    "Product_Type_Id": 2
+  },
+  {
+    "Id": 102,
     "Section_Number": 500,
-    "Current_Temperature": 5,
-    "Minimum_Temperature": 45,
-    "Current_Capacity": 23,
-    "Minimum_Capacity": 12,
-    "Maximum_Capacity": 43,
+    "Current_Temperature": 23,
+    "Minimum_Temperature": 12,
+    "Current_Capacity": 25,
+    "Minimum_Capacity": 2,
+    "Maximum_Capacity": 30,
     "Warehouse_Id": 500,
     "Product_Type_Id": 500
   }

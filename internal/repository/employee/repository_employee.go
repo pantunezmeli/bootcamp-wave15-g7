@@ -75,8 +75,6 @@ func (r *EmployeeMap) Edit(id int, employee models.Employee) (updatedEmployee mo
 
 	for _, value := range file {
 		if value.Id.GetId() == id {
-			var cardNumber string
-			cardNumber, err = r.st.GetCardNumberById(id)
 			if err != nil {
 				return
 			}
@@ -85,7 +83,7 @@ func (r *EmployeeMap) Edit(id int, employee models.Employee) (updatedEmployee mo
 
 			if employee.CardNumber.GetCardNumber() != "" {
 				updatedEmployee.CardNumber = employee.CardNumber
-				if updatedEmployee.CardNumber.GetCardNumber() == cardNumber {
+				if err = r.st.CheckCardNumber(employee.CardNumber.GetCardNumber()); err != nil {
 					err = ErrCardNumberNotUnique
 					return
 				}

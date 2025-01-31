@@ -124,3 +124,17 @@ func (s *EmployeeJSONFile) GetCardNumberById(id int) (cardNumber string, err err
 	}
 	return
 }
+
+func (s *EmployeeJSONFile) CheckCardNumber(cardNumber string) (err error) {
+	employees, err := s.Load()
+	if err != nil {
+		return
+	}
+	for _, value := range employees {
+		if value.CardNumber.GetCardNumber() == cardNumber {
+			err = ErrCardNumberExists
+			return
+		}
+	}
+	return
+}

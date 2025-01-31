@@ -1,6 +1,5 @@
 package handler
 
-
 import (
 	"errors"
 	"fmt"
@@ -13,6 +12,7 @@ import (
 	repo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	seller_dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/seller"
 )
 
 
@@ -75,7 +75,7 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 
 func (h *SellerDefault) Create() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		var reqBody dto.SellerDoc
+		var reqBody seller_dto.SellerDoc
 		if err := request.JSON(r, &reqBody); err != nil{
 			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
@@ -136,7 +136,7 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 			return
 		}
 
-		var reqBody dto.SellerDoc
+		var reqBody seller_dto.SellerDoc
 		if err := request.JSON(r, &reqBody); err != nil{
 			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return

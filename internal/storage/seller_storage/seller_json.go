@@ -7,7 +7,7 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	seller_dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/seller"
 )
 
 
@@ -31,7 +31,7 @@ func (l *SellerJSONFile) Load() (sellerMap map[int]models.Seller, err error) {
 	}
 	defer file.Close()
 
-	var sellersJSON []dto.SellerDoc
+	var sellersJSON []seller_dto.SellerDoc
 	err = json.NewDecoder(file).Decode(&sellersJSON)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -80,9 +80,9 @@ func (l *SellerJSONFile) Save(bd map[int]models.Seller) (err error) {
     }
    defer file.Close()
 
-    sellers := make([]dto.SellerDoc, 0, len(bd))
+    sellers := make([]seller_dto.SellerDoc, 0, len(bd))
     for _, seller := range bd {
-        sellerParsed :=dto.SellerDoc{
+        sellerParsed :=seller_dto.SellerDoc{
 			ID: seller.ID.Value(),
 			Cid: seller.Cid.Value(),
 			CompanyName: seller.CompanyName.Value(),

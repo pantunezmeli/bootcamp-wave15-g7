@@ -7,7 +7,7 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/warehouse"
 )
 
 type WareHouseJSONFile struct {
@@ -38,32 +38,32 @@ func (s *WareHouseJSONFile) Load() (w map[int]models.WareHouse, err error) {
 	w = make(map[int]models.WareHouse)
 	for _, wh := range wareHouseJSON {
 
-		id, err :=value_objects.NewId(wh.Id)
+		id, err := value_objects.NewId(wh.Id)
 		if err != nil {
 			return nil, err
 		}
 
-		whCode, err :=value_objects.NewWareHouseCode(wh.WareHouseCode)
+		whCode, err := value_objects.NewWareHouseCode(wh.WareHouseCode)
 		if err != nil {
 			return nil, err
 		}
 
-		address, err :=value_objects.NewAddress(wh.Address)
+		address, err := value_objects.NewAddress(wh.Address)
 		if err != nil {
 			return nil, err
 		}
 
-		telephone, err :=value_objects.NewTelephone(wh.Telephone)
+		telephone, err := value_objects.NewTelephone(wh.Telephone)
 		if err != nil {
 			return nil, err
 		}
 
-		minCapacity, err :=value_objects.NewMinimunCapacity(wh.MinimunCapacity)
+		minCapacity, err := value_objects.NewMinimunCapacity(wh.MinimunCapacity)
 		if err != nil {
 			return nil, err
 		}
 
-		minTemperature, err :=value_objects.NewMinimunTemperature(wh.MinimunTemperature)
+		minTemperature, err := value_objects.NewMinimunTemperature(wh.MinimunTemperature)
 		if err != nil {
 			return nil, err
 		}

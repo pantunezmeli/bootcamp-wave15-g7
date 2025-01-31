@@ -8,7 +8,7 @@ import (
 	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
+	storage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 
 	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"

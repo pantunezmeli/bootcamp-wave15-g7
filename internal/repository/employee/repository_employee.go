@@ -5,7 +5,7 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
+	storage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 )
 
 var ErrIdNotFound = errors.New("employee not found")
@@ -80,19 +80,15 @@ func (r *EmployeeMap) Edit(id int, employee models.Employee) (updatedEmployee mo
 			if err != nil {
 				return
 			}
-			if updatedEmployee.CardNumber.GetCardNumber() == cardNumber {
-				err = ErrCardNumberNotUnique
-				return
-			}
 
 			updatedEmployee = value
-			err = r.st.Erase(value)
-			if err != nil {
-				return
-			}
 
 			if employee.CardNumber.GetCardNumber() != "" {
 				updatedEmployee.CardNumber = employee.CardNumber
+				if updatedEmployee.CardNumber.GetCardNumber() == cardNumber {
+					err = ErrCardNumberNotUnique
+					return
+				}
 			}
 			if employee.FirstName.GetName() != "" {
 				updatedEmployee.FirstName = employee.FirstName
@@ -102,6 +98,11 @@ func (r *EmployeeMap) Edit(id int, employee models.Employee) (updatedEmployee mo
 			}
 			if employee.WarehouseId.GetId() != 0 {
 				updatedEmployee.WarehouseId = employee.WarehouseId
+			}
+
+			err = r.st.Erase(value)
+			if err != nil {
+				return
 			}
 
 			err = r.st.Save(updatedEmployee)

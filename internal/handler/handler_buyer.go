@@ -25,47 +25,47 @@ func NewBuyerHandler(sv buyer.IServiceBuyer) *BuyerHandler {
 func (handler *BuyerHandler) GetAll() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		buyers, err := handler.service.GetBuyers()
-		if errors.Is(err, errorbase.ErrEmptyList) {
-			jsonResponse(writer, http.StatusNotFound, "the buyer list is empty", nil)
+		switch {
+		case errors.Is(err, errorbase.ErrEmptyList):
+			jsonResponse(writer, http.StatusNotFound, MSG_ErrEmptyList, nil)
 			return
-		}
-
-		if err != nil {
-			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
+		case err != nil:
+			jsonResponse(writer, http.StatusInternalServerError, MSG_ErrInternalError, nil)
 			return
+		default:
+			jsonResponse(writer, http.StatusOK, MsgSuccess, buyers)
 		}
-		jsonResponse(writer, http.StatusOK, "success", buyers)
 	}
 }
 
-func (handler *BuyerHandler) GetBuyerById() http.HandlerFunc {
+func (handler *BuyerHandler) GetById() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		idParam := chi.URLParam(request, "id")
 		id, err2 := strconv.Atoi(idParam)
 
 		if err2 != nil {
-			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
+			jsonResponse(writer, http.StatusInternalServerError, MSG_ErrInternalError, nil)
 			return
 		}
 		buyer, err := handler.service.GetBuyer(id)
-		if errors.Is(err, errorbase.ErrInvalidId) {
-			jsonResponse(writer, http.StatusBadRequest, "invalid Id parameters", nil)
+		switch {
+		case errors.Is(err, errorbase.ErrInvalidId):
+			jsonResponse(writer, http.StatusBadRequest, MSG_ErrInvalidId, nil)
 			return
-		}
-		if errors.Is(err, errorbase.ErrNotFound) {
-			jsonResponse(writer, http.StatusNotFound, "buyer not found", nil)
+		case errors.Is(err, errorbase.ErrNotFound):
+			jsonResponse(writer, http.StatusNotFound, MSG_ErrNotFound, nil)
 			return
-		}
-		if err != nil {
-			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
+		case err != nil:
+			jsonResponse(writer, http.StatusInternalServerError, MSG_ErrInternalError, nil)
 			return
+		default:
+			jsonResponse(writer, http.StatusOK, MsgSuccess, buyer)
 		}
-		jsonResponse(writer, http.StatusOK, "success", buyer)
 	}
 }
 
-func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
+func (handler *BuyerHandler) Create() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		var newBuyer models.Buyer
@@ -73,109 +73,92 @@ func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
 		isEmpty := newBuyer == models.Buyer{}
 
 		if err2 != nil || isEmpty {
-			jsonResponse(writer, http.StatusBadRequest, "invalid JSON format", nil)
+			jsonResponse(writer, http.StatusBadRequest, MSG_ErrJsonFormat, nil)
 			return
 		}
 
 		buyer, err := handler.service.CreateBuyer(newBuyer)
 
-		if errors.Is(err, errorbase.ErrConflict) {
-			jsonResponse(writer, http.StatusConflict, "the buyer already exist", nil)
+		switch {
+		case errors.Is(err, errorbase.ErrConflict):
+			jsonResponse(writer, http.StatusConflict, MSG_ErrConflict, nil)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrStorageOperationFailed) {
-			jsonResponse(writer, http.StatusInternalServerError, "operation failed in storage", nil)
+		case errors.Is(err, errorbase.ErrStorageOperationFailed):
+			jsonResponse(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed, nil)
 			return
-		}
-
-		if err != nil {
-			jsonResponse(writer, http.StatusUnprocessableEntity, "the fields are empty or incorrect", nil)
+		case err != nil:
+			jsonResponse(writer, http.StatusUnprocessableEntity, MSG_ErrIncorrectParameters, nil)
 			return
+		default:
+			jsonResponse(writer, http.StatusCreated, MsgCreated, buyer)
 		}
-
-		jsonResponse(writer, http.StatusCreated, "buyer created", buyer)
 	}
 
 }
 
-func (handler *BuyerHandler) UpdateBuyer() http.HandlerFunc {
+func (handler *BuyerHandler) Update() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		idParam := chi.URLParam(request, "id")
-		id, err3 := strconv.Atoi(idParam)
-
-		if err3 != nil {
-			jsonResponse(writer, http.StatusBadRequest, "invalid Id parameters", nil)
+		id, err := strconv.Atoi(idParam)
+		if err != nil {
+			jsonResponse(writer, http.StatusBadRequest, MSG_ErrInvalidId, nil)
 			return
 		}
 
 		var entity dto.BuyerResponse
-		err2 := json.NewDecoder(request.Body).Decode(&entity)
-		if err2 != nil {
-			jsonResponse(writer, http.StatusBadRequest, "invalid JSON format", nil)
+		if err := json.NewDecoder(request.Body).Decode(&entity); err != nil {
+			jsonResponse(writer, http.StatusBadRequest, MSG_ErrJsonFormat, nil)
 			return
 		}
 
 		buyer, err := handler.service.UpdateBuyer(id, entity)
 
-		if errors.Is(err, errorbase.ErrNotFound) {
-			jsonResponse(writer, http.StatusNotFound, "buyer not found", nil)
+		switch {
+		case errors.Is(err, errorbase.ErrNotFound):
+			jsonResponse(writer, http.StatusNotFound, MSG_ErrNotFound, nil)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrInvalidId) {
-			jsonResponse(writer, http.StatusBadRequest, "invalid Id parameters", nil)
+		case errors.Is(err, errorbase.ErrInvalidId):
+			jsonResponse(writer, http.StatusBadRequest, MSG_ErrInvalidId, nil)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrStorageOperationFailed) {
-			jsonResponse(writer, http.StatusInternalServerError, "operation failed in storage", nil)
+		case errors.Is(err, errorbase.ErrStorageOperationFailed):
+			jsonResponse(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed, nil)
 			return
-		}
-
-		if err != nil {
-			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
+		case err != nil:
+			jsonResponse(writer, http.StatusInternalServerError, MSG_ErrInternalError, nil)
 			return
+		default:
+			jsonResponse(writer, http.StatusOK, MsgUpdated, buyer)
 		}
-
-		jsonResponse(writer, http.StatusOK, "success", buyer)
 	}
 }
 
-func (handler *BuyerHandler) DeleteBuyer() http.HandlerFunc {
+func (handler *BuyerHandler) Delete() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-
 		idParam := chi.URLParam(request, "id")
-		id, err2 := strconv.Atoi(idParam)
-
-		if err2 != nil {
-			jsonResponse(writer, http.StatusBadRequest, "invalid Id parameters", nil)
-			return
-		}
-
-		err := handler.service.DeleteBuyer(id)
-		if errors.Is(err, errorbase.ErrInvalidId) {
-			jsonResponse(writer, http.StatusBadRequest, "invalid Id parameters", nil)
-			return
-		}
-
-		if errors.Is(err, errorbase.ErrNotFound) {
-			jsonResponse(writer, http.StatusNotFound, "buyer not found", nil)
-			return
-		}
-
-		if errors.Is(err, errorbase.ErrStorageOperationFailed) {
-			jsonResponse(writer, http.StatusInternalServerError, "operation failed in storage", nil)
-			return
-		}
-
+		id, err := strconv.Atoi(idParam)
 		if err != nil {
-			jsonResponse(writer, http.StatusInternalServerError, "internal server error", nil)
+			jsonResponse(writer, http.StatusBadRequest, MSG_ErrInvalidId, nil)
 			return
 		}
 
-		jsonResponse(writer, http.StatusNoContent, "success", nil)
+		err = handler.service.DeleteBuyer(id)
+		switch {
+		case errors.Is(err, errorbase.ErrInvalidId):
+			jsonResponse(writer, http.StatusBadRequest, MSG_ErrInvalidId, nil)
+			return
+		case errors.Is(err, errorbase.ErrNotFound):
+			jsonResponse(writer, http.StatusNotFound, MSG_ErrNotFound, nil)
+			return
+		case errors.Is(err, errorbase.ErrStorageOperationFailed):
+			jsonResponse(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed, nil)
+			return
+		case err != nil:
+			jsonResponse(writer, http.StatusInternalServerError, MSG_ErrInternalError, nil)
+			return
+		default:
+			jsonResponse(writer, http.StatusNoContent, MsgSuccess, nil)
+		}
 	}
 }
 

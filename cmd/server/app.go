@@ -16,15 +16,12 @@ import (
 	loader "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 )
 
-// ConfigServerChi is a struct that represents the configuration for ServerChi
 type ConfigServerChi struct {
-	ServerAddress  string
-	LoaderFilePath string
+	ServerAddress string
+	Path          string
 }
 
-// NewServerChi is a function that returns a new instance of ServerChi
 func NewServerChi(cfg *ConfigServerChi) *ServerChi {
-	// default values
 	defaultConfig := &ConfigServerChi{
 		ServerAddress: ":8080",
 	}
@@ -32,35 +29,28 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.LoaderFilePath != "" {
-			defaultConfig.LoaderFilePath = cfg.LoaderFilePath
+		if cfg.Path != "" {
+			defaultConfig.Path = cfg.Path
 
 		}
 	}
 
 	return &ServerChi{
-		serverAddress:  defaultConfig.ServerAddress,
-		loaderFilePath: defaultConfig.LoaderFilePath,
+		serverAddress: defaultConfig.ServerAddress,
+		path:          defaultConfig.Path,
 	}
 }
 
-// ServerChi is a struct that implements the Application interface
 type ServerChi struct {
-	serverAddress  string
-	loaderFilePath string
+	serverAddress string
+	path          string
 }
 
-// Run is a method that runs the server
 func (a *ServerChi) Run() (err error) {
-	// dependencies
-	// - loader
-	buyerSt := buyerstorage.NewBuyerJSONFile(a.loaderFilePath)
-	warehouseSt := loader.NewWareHouseJSONFile(a.loaderFilePath)
-	dbwarehouse, _ := warehouseSt.Load()
 
-	// if err2 != nil {
-	// 	return
-	// }
+	buyerSt := buyerstorage.NewBuyerJSONFile(a.path)
+	warehouseSt := loader.NewWareHouseJSONFile(a.path)
+	dbwarehouse, _ := warehouseSt.Load()
 
 	by_rp := buyerRepository.NewBuyerRepository(buyerSt)
 	by_sv := buyerService.NewBuyerService(by_rp)
@@ -104,10 +94,10 @@ func (a *ServerChi) Run() (err error) {
 
 		rt.Route("/buyers", func(rt chi.Router) {
 			rt.Get("/", by_hd.GetAll())
-			rt.Get("/{id}", by_hd.GetBuyerById())
-			rt.Post("/", by_hd.CreateBuyer())
-			rt.Patch("/{id}", by_hd.UpdateBuyer())
-			rt.Delete("/{id}", by_hd.DeleteBuyer())
+			rt.Get("/{id}", by_hd.GetById())
+			rt.Post("/", by_hd.Create())
+			rt.Patch("/{id}", by_hd.Update())
+			rt.Delete("/{id}", by_hd.Delete())
 		})
 	})
 

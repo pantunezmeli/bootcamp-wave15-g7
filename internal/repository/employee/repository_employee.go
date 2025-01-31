@@ -5,10 +5,11 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
+	storage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 )
 
 var ErrIdNotFound = errors.New("employee not found")
+var ErrCardNumberNotUnique = errors.New("card number must be unique")
 
 func NewEmployeeMap(storage storage.EmployeeJSONFile) *EmployeeMap {
 	return &EmployeeMap{st: storage}
@@ -60,6 +61,9 @@ func (r *EmployeeMap) New(employee models.Employee) (newEmployee models.Employee
 		return
 	}
 	err = r.st.Save(newEmployee)
+	if err == storage.ErrCardNumberExists {
+		err = ErrCardNumberNotUnique
+	}
 	return
 }
 
@@ -71,14 +75,20 @@ func (r *EmployeeMap) Edit(id int, employee models.Employee) (updatedEmployee mo
 
 	for _, value := range file {
 		if value.Id.GetId() == id {
-			updatedEmployee = value
-			err = r.st.Erase(value)
+			var cardNumber string
+			cardNumber, err = r.st.GetCardNumberById(id)
 			if err != nil {
 				return
 			}
 
+			updatedEmployee = value
+
 			if employee.CardNumber.GetCardNumber() != "" {
 				updatedEmployee.CardNumber = employee.CardNumber
+				if updatedEmployee.CardNumber.GetCardNumber() == cardNumber {
+					err = ErrCardNumberNotUnique
+					return
+				}
 			}
 			if employee.FirstName.GetName() != "" {
 				updatedEmployee.FirstName = employee.FirstName
@@ -88,6 +98,11 @@ func (r *EmployeeMap) Edit(id int, employee models.Employee) (updatedEmployee mo
 			}
 			if employee.WarehouseId.GetId() != 0 {
 				updatedEmployee.WarehouseId = employee.WarehouseId
+			}
+
+			err = r.st.Erase(value)
+			if err != nil {
+				return
 			}
 
 			err = r.st.Save(updatedEmployee)

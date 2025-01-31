@@ -9,6 +9,7 @@ import (
 
 var ErrEmployeeNotFound = errors.New("employee not found")
 var ErrEmptyField = errors.New("employee data lacks a required field")
+var ErrCardNumberAlreadyExists = errors.New("employee card number already exists")
 
 func NewDefaultService(repository employee.EmployeeRepository) *DefaultService {
 	return &DefaultService{rp: repository}
@@ -49,13 +50,16 @@ func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.
 	}
 
 	employeeData.Id++
-	employee, err := dto.EmployeeDtoToModel(employeeData)
+	employeeModel, err := dto.EmployeeDtoToModel(employeeData)
 	if err != nil {
 		return
 	}
 
-	newEmployee, err := s.rp.New(employee)
+	newEmployee, err := s.rp.New(employeeModel)
 	if err != nil {
+		if err == employee.ErrCardNumberNotUnique {
+			err = ErrCardNumberAlreadyExists
+		}
 		return
 	}
 
@@ -72,12 +76,15 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 		return
 	}
 
-	employee, err := dto.EmployeeDtoToModelWithoutValidation(employeeData)
+	employeeModel, err := dto.EmployeeDtoToModelWithoutValidation(employeeData)
 	if err != nil {
 		return
 	}
-	updatedEmployee, err := s.rp.Edit(id, employee)
+	updatedEmployee, err := s.rp.Edit(id, employeeModel)
 	if err != nil {
+		if err == employee.ErrCardNumberNotUnique {
+			err = ErrCardNumberAlreadyExists
+		}
 		return
 	}
 

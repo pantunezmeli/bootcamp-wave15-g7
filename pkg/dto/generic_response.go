@@ -5,3 +5,4 @@ type GenericResponse struct {
 	Data    any    `json:"data,omitempty"`
 	Status  string `json:"status,omitempty"`
 }
+

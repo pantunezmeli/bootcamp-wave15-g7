@@ -2,11 +2,14 @@ package storage
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
+
+var ErrCardNumberExists = errors.New("card number already exists")
 
 func NewEmployeeJSONFile(path string) *EmployeeJSONFile {
 	return &EmployeeJSONFile{
@@ -46,6 +49,12 @@ func (s *EmployeeJSONFile) Save(employee models.Employee) (err error) {
 	if err != nil {
 		return
 	}
+	for _, value := range employees {
+		if value.CardNumber == employee.CardNumber {
+			err = ErrCardNumberExists
+			return
+		}
+	}
 	employeeList := make([]dto.EmployeeDoc, 0, len(employees))
 	for _, e := range employees {
 		employeeData := dto.EmployeeModelToDto(e)
@@ -80,7 +89,7 @@ func (s *EmployeeJSONFile) Erase(employee models.Employee) (err error) {
 	// Convertir la lista en JSON
 	data, err := json.MarshalIndent(employeeList, "", "  ")
 	if err != nil {
-		return err
+		return
 	}
 
 	// Escribir el JSON generado en el archivo
@@ -99,5 +108,19 @@ func (s *EmployeeJSONFile) GetLastId() (id int, err error) {
 		return
 	}
 	id = s.lastId
+	return
+}
+
+func (s *EmployeeJSONFile) GetCardNumberById(id int) (cardNumber string, err error) {
+	employees, err := s.Load()
+	if err != nil {
+		return
+	}
+	for _, value := range employees {
+		if value.Id.GetId() == id {
+			cardNumber = value.CardNumber.GetCardNumber()
+			return
+		}
+	}
 	return
 }

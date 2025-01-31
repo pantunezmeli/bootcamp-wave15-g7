@@ -1,6 +1,7 @@
 package server
 
 import (
+	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -15,7 +16,7 @@ import (
 	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
-	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
+	product_hd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 	product_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	warehouse_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse_repository"
@@ -83,7 +84,7 @@ func (a *ServerChi) Run() (err error) {
 
 
 	warehouseSt := warehouseStorage.NewWareHouseJSONFile(a.warehouseFilePath)
-	ldProduct := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
+	productSt := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
 
 
 	// Sellers
@@ -110,8 +111,8 @@ func (a *ServerChi) Run() (err error) {
 	wh_sv := warehouse_sv.NewWareHouseService(wh_rp)
 	wh_h := handler.NewWareHouseHandler(wh_sv)
 
-	// Products
-	rpProduct := product_rp.NewProductRepositoryMap(ldProduct)
+	// Product
+	rpProduct := product_rp.NewProductRepositoryMap(productSt)
 	svProduct := product_sv.NewProductService(rpProduct)
 	hdProduct := handler.NewProductHandler(svProduct)
 

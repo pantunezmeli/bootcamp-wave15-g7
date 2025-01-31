@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler/employee"
+	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"

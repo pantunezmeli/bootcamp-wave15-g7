@@ -133,12 +133,12 @@ func (handler *BuyerHandler) Update() http.HandlerFunc {
 		}
 
 		if errors.Is(err, errorbase.ErrConflict) {
-			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrConflict)
+			dtoResponse.JSONError(writer, http.StatusConflict, MSG_ErrConflict)
 			return
 		}
 
 		if errors.Is(err, errorbase.ErrModelInvalid) {
-			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrModelInvalid)
+			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrModelInvalid)
 			return
 		}
 

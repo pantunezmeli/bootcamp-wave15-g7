@@ -1,13 +1,12 @@
-package warehouse_service
+package warehouse
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	repository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse_repository"
-	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	repository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/warehouse"
 )
 
 var (
@@ -45,10 +44,9 @@ func (s *WarehouseService) GetWareHouseById(id int) (w dto.WareHouseDoc, err err
 		return dto.WareHouseDoc{}, ErrWareHouseNotFound
 	}
 
-	// Convert to DTO
 	whDTO, err := dto.WareHouseDoc{}.ConvertToDTO(wh)
 	if err != nil {
-		return dto.WareHouseDoc{}, err // CAPTURAR EL ERROR
+		return dto.WareHouseDoc{}, err
 	}
 	return whDTO, nil
 }
@@ -56,13 +54,11 @@ func (s *WarehouseService) GetWareHouseById(id int) (w dto.WareHouseDoc, err err
 // ! 3)
 func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (dto.WareHouseDoc, error) {
 
-	// Validation and convert to model
 	warehouse, err := req.ConvertToModel(req)
 	if err != nil {
-		return dto.WareHouseDoc{}, fmt.Errorf("failed to convert warehouse: %w", err)
+		return dto.WareHouseDoc{}, ErrInvalidParameter{Parameter: err.Error()}
 	}
 
-	// Validation of warehouse code
 	_, err = s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
 	if err == nil {
 		return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
@@ -72,7 +68,6 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (dto.WareHouseDoc,
 		return dto.WareHouseDoc{}, err
 	}
 
-	// Generation of new Id
 	warehouses, err := s.rp.GetAllWareHouses()
 	if err != nil {
 		return dto.WareHouseDoc{}, err
@@ -86,21 +81,18 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (dto.WareHouseDoc,
 	}
 	newId++
 
-	// Asignation of Id
-	newIdObj, err := domain.NewId(newId)
+	newIdObj, err := value_objects.NewId(newId)
 	if err != nil {
 		return dto.WareHouseDoc{}, ErrInvalidIdGenerated
 	}
 
 	warehouse.Id = newIdObj
 
-	// Call the repository
 	err = s.rp.CreateNewWareHouse(warehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, err
 	}
 
-	// Convert model to DTO
 	whDTO, err := dto.WareHouseDoc{}.ConvertToDTO(warehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, err
@@ -127,19 +119,17 @@ func (s *WarehouseService) MapWareHouseToDTO(w map[int]models.WareHouse) (r map[
 
 // ! 4)
 func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (whDTO dto.WareHouseDoc, err error) {
-	// Get previous instance
+
 	existingWarehouse, err := s.rp.GetWareHouseById(id)
 	if err != nil {
 		return dto.WareHouseDoc{}, ErrWareHouseNotFound
 	}
 
-	// Validation and convert to model
 	warehouse, err := req.ConvertToModelPatch(req, existingWarehouse)
 	if err != nil {
-		return dto.WareHouseDoc{}, fmt.Errorf("failed to convert warehouse: %w", err)
+		return dto.WareHouseDoc{}, ErrInvalidParameter{Parameter: err.Error()}
 	}
 
-	// Verify warehouse_code
 	if warehouse.WareHouseCode.GetWareHouseCode() != existingWarehouse.WareHouseCode.GetWareHouseCode() {
 		_, err := s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
 		if err == nil {
@@ -149,14 +139,11 @@ func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (whDTO dt
 
 	warehouse.Id = existingWarehouse.Id
 
-	// Call Repository
 	err = s.rp.UpdateWarehouse(warehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, err
 	}
 
-	// Convert to DTO
-	// wh, err = wh.ConvertToDTO(warehouse)
 	whDTO, err = dto.WareHouseDoc{}.ConvertToDTO(warehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, err
@@ -167,13 +154,11 @@ func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (whDTO dt
 // ! 5)
 func (s *WarehouseService) DeleteWarehouse(id int) error {
 
-	// Get previous instance
 	_, err := s.rp.GetWareHouseById(id)
 	if err != nil {
 		return ErrWareHouseNotFound
 	}
 
-	// Call repository
 	err = s.rp.DeleteWarehouse(id)
 	if err != nil {
 		return err

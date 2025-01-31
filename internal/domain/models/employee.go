@@ -1,11 +1,11 @@
 package models
 
-import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
+import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 
 type Employee struct {
-	Id          domain.Id
-	CardNumber  domain.CardNumber
-	FirstName   domain.Name
-	LastName    domain.Name
-	WarehouseId domain.Id
+	Id          value_objects.Id
+	CardNumber  value_objects.CardNumber
+	FirstName   value_objects.Name
+	LastName    value_objects.Name
+	WarehouseId value_objects.Id
 }

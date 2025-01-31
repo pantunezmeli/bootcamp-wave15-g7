@@ -1,10 +1,8 @@
 package dto
 
 import (
-	"fmt"
-
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 )
 
 type EmployeeDoc struct {
@@ -16,23 +14,23 @@ type EmployeeDoc struct {
 }
 
 func EmployeeDtoToModel(dto EmployeeDoc) (employee models.Employee, err error) {
-	newId, errValidation := domain.NewId(dto.Id)
+	newId, errValidation := value_objects.NewId(dto.Id)
 	if errValidation != nil {
 		return
 	}
-	newCardNumber, errValidation := domain.NewCardNumber(dto.CardNumber)
+	newCardNumber, errValidation := value_objects.NewCardNumber(dto.CardNumber)
 	if errValidation != nil {
 		return
 	}
-	newFirstName, errValidation := domain.NewName(dto.FirstName)
+	newFirstName, errValidation := value_objects.NewName(dto.FirstName)
 	if errValidation != nil {
 		return
 	}
-	newLastName, errValidation := domain.NewName(dto.LastName)
+	newLastName, errValidation := value_objects.NewName(dto.LastName)
 	if errValidation != nil {
 		return
 	}
-	newWarehouseId, errValidation := domain.NewId(dto.WarehouseId)
+	newWarehouseId, errValidation := value_objects.NewId(dto.WarehouseId)
 	if errValidation != nil {
 		return
 	}
@@ -48,11 +46,11 @@ func EmployeeDtoToModel(dto EmployeeDoc) (employee models.Employee, err error) {
 
 func EmployeeDtoToModelWithoutValidation(dto EmployeeDoc) (employee models.Employee, err error) {
 	employee = models.Employee{
-		Id:          domain.NewOptionalId(dto.Id),
-		CardNumber:  domain.NewOptionalCardNumber(dto.CardNumber),
-		FirstName:   domain.NewOptionalName(dto.FirstName),
-		LastName:    domain.NewOptionalName(dto.LastName),
-		WarehouseId: domain.NewOptionalId(dto.WarehouseId),
+		Id:          value_objects.NewOptionalId(dto.Id),
+		CardNumber:  value_objects.NewOptionalCardNumber(dto.CardNumber),
+		FirstName:   value_objects.NewOptionalName(dto.FirstName),
+		LastName:    value_objects.NewOptionalName(dto.LastName),
+		WarehouseId: value_objects.NewOptionalId(dto.WarehouseId),
 	}
 	return
 }
@@ -68,151 +66,50 @@ func EmployeeModelToDto(employee models.Employee) (dto EmployeeDoc) {
 	return
 }
 
-type WareHouseDoc struct {
-	Id                 int    `json:"id"`
-	WareHouseCode      string `json:"warehouse_code"`
-	Address            string `json:"address"`
-	Telephone          string `json:"telephone"`
-	MinimunCapacity    int    `json:"minimun_capacity"`
-	MinimunTemperature int    `json:"minimun_temperature"`
-}
-
-func (w WareHouseDoc) ConvertToModel(req WareHouseDoc) (models.WareHouse, error) {
-
-	wareHouseCode, err := domain.NewWareHouseCode(req.WareHouseCode)
-	if err != nil {
-		return models.WareHouse{}, fmt.Errorf("invalid warehouse code '%s': %w", req.WareHouseCode, err)
-	}
-
-	address, err := domain.NewAddress(req.Address)
-	if err != nil {
-		return models.WareHouse{}, fmt.Errorf("invalid warehouse address '%s': %w", req.Address, err)
-	}
-
-	telephone, err := domain.NewTelephone(req.Telephone)
-	if err != nil {
-		return models.WareHouse{}, fmt.Errorf("invalid warehouse telephone '%s': %w", req.Telephone, err)
-	}
-
-	minCapacity, err := domain.NewMinimunCapacity(req.MinimunCapacity)
-	if err != nil {
-		return models.WareHouse{}, fmt.Errorf("invalid warehouse minimun capacity '%d': %w", req.MinimunCapacity, err)
-	}
-
-	minTemp, err := domain.NewMinimunTemperature(req.MinimunTemperature)
-	if err != nil {
-		return models.WareHouse{}, fmt.Errorf("invalid warehouse minimun temperature '%d': %w", req.MinimunTemperature, err)
-	}
-
-	wh := models.WareHouse{
-		WareHouseCode:      wareHouseCode,
-		Address:            address,
-		Telephone:          telephone,
-		MinimunCapacity:    minCapacity,
-		MinimunTemperature: minTemp,
-	}
-	return wh, nil
-}
-
-func (w WareHouseDoc) ConvertToDTO(req models.WareHouse) (wh WareHouseDoc, err error) {
-	return WareHouseDoc{
-		Id:                 domain.Id.GetId(req.Id),                                                 // Convertir value object Id a int
-		WareHouseCode:      domain.WareHouseCode.GetWareHouseCode(req.WareHouseCode),                // Convertir value object WareHouseCode a string
-		Address:            domain.Address.GetAddress(req.Address),                                  // Convertir value object Address a string
-		Telephone:          domain.Telephone.GetTelephone(req.Telephone),                            // Convertir value object Telephone a string
-		MinimunCapacity:    domain.MinimunCapacity.GetMinimunCapacity(req.MinimunCapacity),          // Convertir value object MinimunCapacity a int
-		MinimunTemperature: domain.MinimunTemperature.GetMinimunTemperature(req.MinimunTemperature), // Convertir value object MinimunTemperature a int
-	}, nil
-}
-
-func (w WareHouseDoc) ConvertToModelPatch(req WareHouseDoc, existingWarehouse models.WareHouse) (models.WareHouse, error) {
-	if req.WareHouseCode != "" {
-		newCode, err := domain.NewWareHouseCode(req.WareHouseCode)
-		if err != nil {
-			return models.WareHouse{}, fmt.Errorf("invalid warehouse code '%s': %w", req.WareHouseCode, err)
-		}
-		existingWarehouse.WareHouseCode = newCode
-	}
-
-	if req.Address != "" {
-		newAddress, err := domain.NewAddress(req.Address)
-		if err != nil {
-			return models.WareHouse{}, fmt.Errorf("invalid warehouse address '%s': %w", req.Address, err)
-		}
-		existingWarehouse.Address = newAddress
-	}
-	if req.Telephone != "" {
-		newTelephone, err := domain.NewTelephone(req.Telephone)
-		if err != nil {
-			return models.WareHouse{}, fmt.Errorf("invalid warehouse telephone '%s': %w", req.Telephone, err)
-		}
-		existingWarehouse.Telephone = newTelephone
-	}
-	if req.MinimunCapacity > 0 {
-		newMinCapacity, err := domain.NewMinimunCapacity(req.MinimunCapacity)
-		if err != nil {
-			return models.WareHouse{}, fmt.Errorf("invalid warehouse minimun capacity '%d': %w", req.MinimunCapacity, err)
-		}
-		existingWarehouse.MinimunCapacity = newMinCapacity
-	}
-
-	if req.MinimunTemperature > -100 {
-		newMinTemp, err := domain.NewMinimunTemperature(req.MinimunTemperature)
-		if err != nil {
-			return models.WareHouse{}, fmt.Errorf("invalid warehouse minimun temperature '%d': %w", req.MinimunTemperature, err)
-		}
-		existingWarehouse.MinimunTemperature = newMinTemp
-	}
-	return existingWarehouse, nil
-}
-
-
 type SellerDoc struct {
-	ID  *int `json:"id"`
-	Cid *int `json:"cid"`
+	ID          *int    `json:"id"`
+	Cid         *int    `json:"cid"`
 	CompanyName *string `json:"company_name"`
-	Address *string `json:"address"`
-	Telephone *string `json:"telephone"`
+	Address     *string `json:"address"`
+	Telephone   *string `json:"telephone"`
 }
 
-
-func ParseModelToDto(sellerModel models.Seller) (sellerDto SellerDoc){
+func ParseModelToDto(sellerModel models.Seller) (sellerDto SellerDoc) {
 	sellerDto = SellerDoc{
-			ID: sellerModel.ID.Value(),
-			Cid: sellerModel.Cid.Value(),
-			CompanyName: sellerModel.CompanyName.Value(),
-			Address: sellerModel.Address.Value(),
-			Telephone: sellerModel.Telephone.Value(),
-		}
+		ID:          sellerModel.ID.Value(),
+		Cid:         sellerModel.Cid.Value(),
+		CompanyName: sellerModel.CompanyName.Value(),
+		Address:     sellerModel.Address.Value(),
+		Telephone:   sellerModel.Telephone.Value(),
+	}
 	return
 }
 
-func ParseDtoToModel(sellerDto SellerDoc) (sellerModel models.Seller, err error){
-	cid, err := domain.NewCid(*sellerDto.Cid)
-	if err != nil{
-		return
-	}
-	companyName, err := domain.NewCompanyName(*sellerDto.CompanyName)
+func ParseDtoToModel(sellerDto SellerDoc) (sellerModel models.Seller, err error) {
+	cid, err := value_objects.NewCid(*sellerDto.Cid)
 	if err != nil {
 		return
 	}
-	address, err := domain.NewSellerAddress(*sellerDto.Address)
-	if err != nil{
+	companyName, err := value_objects.NewCompanyName(*sellerDto.CompanyName)
+	if err != nil {
 		return
 	}
-	telephone, err := domain.NewSellerTelephone(*sellerDto.Telephone)
+	address, err := value_objects.NewSellerAddress(*sellerDto.Address)
+	if err != nil {
+		return
+	}
+	telephone, err := value_objects.NewSellerTelephone(*sellerDto.Telephone)
 	if err != nil {
 		return
 	}
 
 	sellerModel = models.Seller{
 		SellerAttributes: models.SellerAttributes{
-			Cid: cid,
+			Cid:         cid,
 			CompanyName: companyName,
-			Address: address,
-			Telephone: telephone,
+			Address:     address,
+			Telephone:   telephone,
 		},
 	}
 	return
 }
-

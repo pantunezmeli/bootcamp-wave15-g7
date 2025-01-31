@@ -20,9 +20,13 @@ type ProductHandle struct {
 	sv product.IProductService
 }
 
-func (h *ProductHandle) GetAll() http.HandlerFunc {
+func (h *ProductHandle) Get() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		products, _ := h.sv.GetAll()
+		products, errSearch := h.sv.GetAll()
+		if errSearch != nil {
+			validErrorResponse(w, errSearch)
+			return
+		}
 		response.JSON(w, http.StatusOK, dto.GenericResponse{Data: products})
 	}
 }
@@ -32,7 +36,7 @@ func (h *ProductHandle) GetById() http.HandlerFunc {
 
 		idPath, errPath := strconv.Atoi(chi.URLParam(r, "id"))
 		if errPath != nil {
-			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid ID"})
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
 			return
 		}
 
@@ -51,7 +55,7 @@ func (h *ProductHandle) Delete() http.HandlerFunc {
 
 		idPath, errPath := strconv.Atoi(chi.URLParam(r, "id"))
 		if errPath != nil {
-			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid ID"})
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
 			return
 		}
 
@@ -71,7 +75,7 @@ func (h ProductHandle) Create() http.HandlerFunc {
 		var newProduct product2.ProductDTO
 
 		if errDecode := json.NewDecoder(r.Body).Decode(&newProduct); errDecode != nil {
-			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid Body"})
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
 
@@ -91,19 +95,19 @@ func (h ProductHandle) Update() http.HandlerFunc {
 
 		idPath, errPath := strconv.Atoi(chi.URLParam(r, "id"))
 		if errPath != nil {
-			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid ID"})
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
 			return
 		}
 
 		var productRequest product2.UpdateProductRequest
 		if errDecode := json.NewDecoder(r.Body).Decode(&productRequest); errDecode != nil {
-			response.JSON(w, http.StatusBadRequest, dto.GenericResponse{Message: "Invalid Body"})
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
 
-		productUpdate, errPatch := h.sv.UpdateProduct(idPath, productRequest)
-		if errPatch != nil {
-			validErrorResponse(w, errPath)
+		productUpdate, errUpdate := h.sv.UpdateProduct(idPath, productRequest)
+		if errUpdate != nil {
+			validErrorResponse(w, errUpdate)
 			return
 		}
 
@@ -116,22 +120,16 @@ func validErrorResponse(w http.ResponseWriter, err error) {
 
 	switch {
 	case errors.As(err, &product.ErrNotFoundProduct{}):
-		{
-			dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
-			break
-		}
+		dto.JSONError(w, http.StatusNotFound, err.Error())
+
 	case errors.As(err, &product.ErrValidProduct{}):
-		{
-			dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
-			break
-		}
+		dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
+
+	case errors.As(err, &product.ErrProductConflict{}):
+		dto.JSONError(w, http.StatusConflict, err.Error())
+
 	default:
-		{
-			//Only for debug
-			//fmt.Printf("Error: %v\n", err)
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			break
-		}
+		dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 	}
 
 }

@@ -2,7 +2,7 @@ package buyer
 
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/buyer"
 )
 
 type IServiceBuyer interface {

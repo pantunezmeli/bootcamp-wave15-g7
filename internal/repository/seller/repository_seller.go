@@ -1,16 +1,16 @@
 package seller
 
 import (
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 )
 
 type SellerStorage struct {
-	storage storage.SellerJSONFile 
+	storage seller_storage.SellerJSONFile 
 }
 
-func NewSellerStorage(storage storage.SellerJSONFile) *SellerStorage {
+func NewSellerStorage(storage seller_storage.SellerJSONFile) *SellerStorage {
 	return &SellerStorage{storage}
 }
 
@@ -48,7 +48,7 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 	
 	newId := nextId(sellersMap)
 	
-	id, err := domain.NewSellerId(newId)
+	id, err := value_objects.NewSellerId(newId)
 	if err != nil {
 		return
 	} 

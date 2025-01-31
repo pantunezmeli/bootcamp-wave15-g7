@@ -1,4 +1,4 @@
-package domain
+package value_objects
 
 import "errors"
 

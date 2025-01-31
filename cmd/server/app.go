@@ -3,124 +3,110 @@ package server
 import (
 	"net/http"
 
-	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-
-	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
-	rep "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
-	SellerRepo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
-	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
-	sec "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
-	SellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
-	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
-
-	buyerStorageorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
-	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
-
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 
-	product_hd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
+	//Products
+	productRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
+	productService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
+	productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
+
+	//Sellers
+	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
+	sellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
+	sellerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
+
+	// Employees
+	employeeRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
+	employeeService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
+	employeeStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
+
+	//Sections
+	sectionRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
+	sectionService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
+	sectionStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
+
+	//Buyer
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
-	product_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
-	warehouse_rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse_repository"
 	buyerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
-	product_sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
-	warehouse_sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse_service"
+	buyerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
+
+	// Warehouse
+	warehouseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
+	warehouseService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse"
+	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 )
 
 const (
-	PATH_PRODUCT_JSON_FILE = "../docs/db/product_data.json"
+	productFilePath   = "../docs/db/product_data.json"
+	buyerFilePath     = "../docs/db/buyer_data.json"
+	warehouseFilePath = "../docs/db/warehouse_data.json"
+	employeeFilePath  = "../docs/db/employee_data.json"
+	sellerFilePath    = "../docs/db/seller_data.json"
+	sectionFilePath   = "../docs/db/section_data.json"
 )
 
 type ConfigServerChi struct {
-	ServerAddress           string
-	BuyerLoaderFilePath     string
-	WarehouseLoaderFilePath string
-	EmployeeLoaderFilePath  string
+	ServerAddress string
 }
 
 func NewServerChi(cfg *ConfigServerChi) *ServerChi {
-
 	defaultConfig := &ConfigServerChi{
-		ServerAddress:           ":8080",
-		BuyerLoaderFilePath:     "../docs/db/buyer_data.json",
-		WarehouseLoaderFilePath: "../docs/db/warehouse_data.json",
+		ServerAddress: ":8080",
 	}
 	if cfg != nil {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
-		if cfg.BuyerLoaderFilePath != "" {
-			defaultConfig.BuyerLoaderFilePath = cfg.BuyerLoaderFilePath
-		}
-		if cfg.WarehouseLoaderFilePath != "" {
-			defaultConfig.WarehouseLoaderFilePath = cfg.WarehouseLoaderFilePath
-		}
-		if cfg.EmployeeLoaderFilePath != "" {
-			defaultConfig.EmployeeLoaderFilePath = cfg.EmployeeLoaderFilePath
-		}
 	}
 
 	return &ServerChi{
-		serverAddress:     defaultConfig.ServerAddress,
-		buyerFilePath:     defaultConfig.BuyerLoaderFilePath,
-		warehouseFilePath: defaultConfig.WarehouseLoaderFilePath,
-		employeeFilPath:   defaultConfig.EmployeeLoaderFilePath,
+		serverAddress: defaultConfig.ServerAddress,
 	}
 }
 
 type ServerChi struct {
-	serverAddress     string
-	buyerFilePath     string
-	warehouseFilePath string
-	employeeFilPath   string
+	serverAddress string
 }
 
 func (a *ServerChi) Run() (err error) {
 
-	// - loader
-	sectionSt := sectionstorage.NewSectionJSONFile("../docs/db/section_data.json")
-
-	// - repository
-	st_rp := rep.NewStRepository(sectionSt)
-	// - service
-	st_sv := sec.NewSectionService(st_rp)
-	// - handler
-	st_hd := handler.NewSectionDefault(st_sv)
-
-	warehouseSt := warehouseStorage.NewWareHouseJSONFile(a.warehouseFilePath)
-	productSt := product_ld.NewProductJSONFile(PATH_PRODUCT_JSON_FILE)
-
 	// Sellers
-	ld := storage.NewSellerJSONFile("../docs/db/seller_data.json")
-	sellerRepository := SellerRepo.NewSellerStorage(*ld)
-	sellerService := SellerService.NewSellerDefault(sellerRepository)
+	sellerStorage := sellerStorage.NewSellerJSONFile(sellerFilePath)
+	sellerRepository := sellerRepository.NewSellerStorage(*sellerStorage)
+	sellerService := sellerService.NewSellerDefault(sellerRepository)
 	sellerHandler := handler.NewSellerDefault(sellerService)
 
 	// Employees
-	employeeStorage := storage.NewEmployeeJSONFile(a.employeeFilPath)
-	employeeRepository := erp.NewEmployeeMap(*employeeStorage)
-	employeeService := esv.NewDefaultService(employeeRepository)
+	employeeStorage := employeeStorage.NewEmployeeJSONFile(employeeFilePath)
+	employeeRepository := employeeRepository.NewEmployeeMap(*employeeStorage)
+	employeeService := employeeService.NewDefaultService(employeeRepository)
 	employeeHandler := handler.NewDefaultHandler(employeeService)
 
 	// Buyers
-	buyerStorage := buyerStorageorage.NewBuyerJSONFile(a.buyerFilePath)
-	by_rp := buyerRepository.NewBuyerRepository(buyerStorage)
-	by_sv := buyerService.NewBuyerService(by_rp)
-	by_hd := handler.NewBuyerHandler(by_sv)
+	buyerStorage := buyerStorage.NewBuyerJSONFile(buyerFilePath)
+	buyerRepository := buyerRepository.NewBuyerRepository(buyerStorage)
+	buyerService := buyerService.NewBuyerService(buyerRepository)
+	buyerHandler := handler.NewBuyerHandler(buyerService)
 
 	// Warehouses
-	wh_rp := warehouse_rp.NewWareHouseRepository(warehouseSt)
-	wh_sv := warehouse_sv.NewWareHouseService(wh_rp)
-	wh_h := handler.NewWareHouseHandler(wh_sv)
+	warehouseStorage := warehouseStorage.NewWareHouseJSONFile(warehouseFilePath)
+	warehouseRepository := warehouseRepository.NewWareHouseRepository(warehouseStorage)
+	warehouseService := warehouseService.NewWareHouseService(warehouseRepository)
+	warehouseHandler := handler.NewWareHouseHandler(warehouseService)
 
 	// Product
-	rpProduct := product_rp.NewProductRepositoryMap(productSt)
-	svProduct := product_sv.NewProductService(rpProduct)
-	hdProduct := product_hd.NewProductHandler(svProduct)
+	productStorage := productStorage.NewProductJSONFile(productFilePath)
+	productRepository := productRepository.NewProductRepositoryMap(productStorage)
+	productService := productService.NewProductService(productRepository)
+	productHandler := handler.NewProductHandler(productService)
+
+	// Sections
+	sectionStorage := sectionStorage.NewSectionJSONFile(sectionFilePath)
+	sectionRepository := sectionRepository.NewStRepository(sectionStorage)
+	sectionService := sectionService.NewSectionService(sectionRepository)
+	sectionHandler := handler.NewSectionDefault(sectionService)
 
 	// router
 	rt := chi.NewRouter()
@@ -133,7 +119,7 @@ func (a *ServerChi) Run() (err error) {
 
 	rt.Route("/api/v1", func(r chi.Router) {
 		r.Route("/sellers", func(r chi.Router) {
-			r.Get("/", sellerHandler.GetAll())
+			r.Get("/", sellerHandler.Get())
 			r.Get("/{id}", sellerHandler.GetById())
 			r.Post("/", sellerHandler.Create())
 			r.Delete("/{id}", sellerHandler.Delete())
@@ -142,43 +128,43 @@ func (a *ServerChi) Run() (err error) {
 		})
 
 		r.Route("/warehouses", func(rt chi.Router) {
-			rt.Get("/", wh_h.Get())
-			rt.Get("/{id}", wh_h.GetById())
-			rt.Post("/", wh_h.Create())
-			rt.Patch("/{id}", wh_h.Update())
-			rt.Delete("/{id}", wh_h.Delete())
+			rt.Get("/", warehouseHandler.Get())
+			rt.Get("/{id}", warehouseHandler.GetById())
+			rt.Post("/", warehouseHandler.Create())
+			rt.Patch("/{id}", warehouseHandler.Update())
+			rt.Delete("/{id}", warehouseHandler.Delete())
 		})
 
-		rt.Route("/sections", func(rt chi.Router) {
-			rt.Get("/", st_hd.Get())
-			rt.Get("/{id}", st_hd.GetById())
-			rt.Post("/", st_hd.Create())
-			rt.Patch("/{id}", st_hd.Update())
-			rt.Delete("/{id}", st_hd.Delete())
+		r.Route("/sections", func(rt chi.Router) {
+			rt.Get("/", sectionHandler.Get())
+			rt.Get("/{id}", sectionHandler.GetById())
+			rt.Post("/", sectionHandler.Create())
+			rt.Patch("/{id}", sectionHandler.Update())
+			rt.Delete("/{id}", sectionHandler.Delete())
 		})
 
-		rt.Route("/products", func(rt chi.Router) {
-			rt.Get("/", hdProduct.GetAll())
-			rt.Get("/{id}", hdProduct.GetById())
-			rt.Post("/", hdProduct.Create())
-			rt.Patch("/{id}", hdProduct.Update())
-			rt.Delete("/{id}", hdProduct.Delete())
+		r.Route("/products", func(rt chi.Router) {
+			rt.Get("/", productHandler.Get())
+			rt.Get("/{id}", productHandler.GetById())
+			rt.Post("/", productHandler.Create())
+			rt.Patch("/{id}", productHandler.Update())
+			rt.Delete("/{id}", productHandler.Delete())
 		})
 
 		r.Route("/employees", func(rt chi.Router) {
-			rt.Get("/", employeeHandler.GetAll())
+			rt.Get("/", employeeHandler.Get())
 			rt.Get("/{id}", employeeHandler.GetById())
-			rt.Post("/", employeeHandler.Add())
+			rt.Post("/", employeeHandler.Create())
 			rt.Patch("/{id}", employeeHandler.Update())
-			rt.Delete("/{id}", employeeHandler.DeleteById())
+			rt.Delete("/{id}", employeeHandler.Delete())
 		})
 
 		r.Route("/buyers", func(rt chi.Router) {
-			rt.Get("/", by_hd.GetAll())
-			rt.Get("/{id}", by_hd.GetById())
-			rt.Post("/", by_hd.Create())
-			rt.Patch("/{id}", by_hd.Update())
-			rt.Delete("/{id}", by_hd.Delete())
+			rt.Get("/", buyerHandler.Get())
+			rt.Get("/{id}", buyerHandler.GetById())
+			rt.Post("/", buyerHandler.Create())
+			rt.Patch("/{id}", buyerHandler.Update())
+			rt.Delete("/{id}", buyerHandler.Delete())
 		})
 	})
 

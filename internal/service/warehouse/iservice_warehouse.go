@@ -1,8 +1,18 @@
-package warehouse_service
+package warehouse
 
 import (
-	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"fmt"
+
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/warehouse"
 )
+
+type ErrInvalidParameter struct {
+	Parameter string
+}
+
+func (e ErrInvalidParameter) Error() string {
+	return fmt.Sprintf("missing parameter: %s", e.Parameter)
+}
 
 type IWareHouseService interface {
 	// ! 1)

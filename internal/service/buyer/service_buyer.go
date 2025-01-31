@@ -6,7 +6,7 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/buyer"
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 

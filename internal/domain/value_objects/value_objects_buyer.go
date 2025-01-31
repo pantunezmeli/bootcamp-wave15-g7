@@ -1,4 +1,4 @@
-package domain
+package value_objects
 
 import (
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"

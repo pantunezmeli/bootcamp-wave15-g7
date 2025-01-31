@@ -3,8 +3,8 @@ package section
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/errorbase"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/section"
+	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 // NewSectionService is a function that returns a new instance of SectionService
@@ -20,15 +20,14 @@ type SectionService struct {
 
 // ListSections is a method that returns a map of all Sections
 func (s *SectionService) ListSections() ([]dto.SectionResponse, error) {
-	_, err := s.repository.FindAll()
+	list, err := s.repository.FindAll()
 	if err != nil {
 		return nil, errorbase.ErrEmptyList
 	}
 
 	// Generate the response and return it
-	// sections := dto.GenerateResponseList(list)
-	// return sections, nil
-	return nil, errorbase.ErrEmptyList
+	sections := dto.GenerateSectionsResponseList(list)
+	return sections, nil
 }
 
 // GetSection is a method that returns a Section by its ID

@@ -6,7 +6,7 @@ import (
 
 type EmployeeService interface {
 	// TODO
-	FindAll() (employeesData map[int]dto.EmployeeDoc, err error)
+	FindAll() (employeesData []dto.EmployeeDoc, err error)
 	FindById(id int) (employeeData dto.EmployeeDoc, err error)
 	New(employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error)
 	Edit(id int, employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error)

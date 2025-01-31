@@ -2,7 +2,7 @@ package section
 
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/section"
 )
 
 // SectionService is an interface that represents a section service

@@ -10,4 +10,6 @@ var (
 	ErrNotFound               = errors.New("not found")
 	ErrModelInvalid           = errors.New("model invalid")
 	ErrStorageOperationFailed = errors.New("storage operation failed")
+	ErrInvalidNumber          = errors.New("invalid number")
+	ErrInvalidRequest         = errors.New("invalid request")
 )

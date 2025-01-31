@@ -2,6 +2,7 @@ package employee
 
 import (
 	"errors"
+	"sort"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
@@ -9,6 +10,7 @@ import (
 
 var ErrEmployeeNotFound = errors.New("employee not found")
 var ErrEmptyField = errors.New("employee data lacks a required field")
+var ErrCardNumberAlreadyExists = errors.New("employee card number already exists")
 
 func NewDefaultService(repository employee.EmployeeRepository) *DefaultService {
 	return &DefaultService{rp: repository}
@@ -18,15 +20,18 @@ type DefaultService struct {
 	rp employee.EmployeeRepository
 }
 
-func (s *DefaultService) FindAll() (employeesData map[int]dto.EmployeeDoc, err error) {
+func (s *DefaultService) FindAll() (employeesData []dto.EmployeeDoc, err error) {
 	employeesFound, err := s.rp.FindAll()
 	if err != nil {
 		return
 	}
-	employeesData = make(map[int]dto.EmployeeDoc)
-	for key, value := range employeesFound {
-		employeesData[key] = dto.EmployeeModelToDto(value)
+	employeesData = make([]dto.EmployeeDoc, 0, len(employeesFound))
+	for _, value := range employeesFound {
+		employeesData = append(employeesData, dto.EmployeeModelToDto(value))
 	}
+	sort.Slice(employeesData, func(i, j int) bool {
+		return employeesData[i].Id < employeesData[j].Id
+	})
 	return
 }
 
@@ -49,13 +54,16 @@ func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.
 	}
 
 	employeeData.Id++
-	employee, err := dto.EmployeeDtoToModel(employeeData)
+	employeeModel, err := dto.EmployeeDtoToModel(employeeData)
 	if err != nil {
 		return
 	}
 
-	newEmployee, err := s.rp.New(employee)
+	newEmployee, err := s.rp.New(employeeModel)
 	if err != nil {
+		if err == employee.ErrCardNumberNotUnique {
+			err = ErrCardNumberAlreadyExists
+		}
 		return
 	}
 
@@ -72,12 +80,15 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 		return
 	}
 
-	employee, err := dto.EmployeeDtoToModelWithoutValidation(employeeData)
+	employeeModel, err := dto.EmployeeDtoToModelWithoutValidation(employeeData)
 	if err != nil {
 		return
 	}
-	updatedEmployee, err := s.rp.Edit(id, employee)
+	updatedEmployee, err := s.rp.Edit(id, employeeModel)
 	if err != nil {
+		if err == employee.ErrCardNumberNotUnique {
+			err = ErrCardNumberAlreadyExists
+		}
 		return
 	}
 

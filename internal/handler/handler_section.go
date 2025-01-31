@@ -13,7 +13,8 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/errorbase"
+	dtoSection "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/section"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 // SectionDefault is a struct with methods that represent handlers for sections
@@ -125,7 +126,7 @@ func (h *SectionDefault) Update() http.HandlerFunc {
 		}
 
 		// Decode the request body
-		var sectionDoc dto.SectionResponse
+		var sectionDoc dtoSection.SectionResponse
 		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
 			dto.JSONError(w, http.StatusBadRequest, errorbase.ErrInvalidRequest.Error())
 			return

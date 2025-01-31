@@ -10,7 +10,8 @@ var (
 	MSG_ErrConflict               = "element already exist"
 	MSG_ErrStorageOperationFailed = "operation failed in storage"
 	MSG_ErrModelInvalid           = "the fields of model is invalid"
-	MSG_ErrJsonFormat             = "invalid JSON forma"
+	MSG_ErrJsonFormat             = "invalid JSON format"
+	MSG_ErrRequest                = "invalid request type"
 )
 
 // MSG

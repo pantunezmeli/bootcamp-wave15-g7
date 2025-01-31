@@ -1,4 +1,4 @@
-package storage
+package seller_storage
 
 import ("github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 "errors"

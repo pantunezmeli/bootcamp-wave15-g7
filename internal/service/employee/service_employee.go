@@ -2,6 +2,7 @@ package employee
 
 import (
 	"errors"
+	"sort"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
@@ -19,15 +20,18 @@ type DefaultService struct {
 	rp employee.EmployeeRepository
 }
 
-func (s *DefaultService) FindAll() (employeesData map[int]dto.EmployeeDoc, err error) {
+func (s *DefaultService) FindAll() (employeesData []dto.EmployeeDoc, err error) {
 	employeesFound, err := s.rp.FindAll()
 	if err != nil {
 		return
 	}
-	employeesData = make(map[int]dto.EmployeeDoc)
-	for key, value := range employeesFound {
-		employeesData[key] = dto.EmployeeModelToDto(value)
+	employeesData = make([]dto.EmployeeDoc, 0, len(employeesFound))
+	for _, value := range employeesFound {
+		employeesData = append(employeesData, dto.EmployeeModelToDto(value))
 	}
+	sort.Slice(employeesData, func(i, j int) bool {
+		return employeesData[i].Id < employeesData[j].Id
+	})
 	return
 }
 

@@ -6,7 +6,6 @@ import (
 )
 
 type UpdateProductRequest struct {
-	ID                             *int     `json:"id"`
 	Description                    *string  `json:"description"`
 	ExpirationRate                 *float64 `json:"expiration_rate"`
 	FreezingRate                   *float64 `json:"freezing_rate"`

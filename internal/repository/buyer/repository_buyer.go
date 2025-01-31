@@ -46,7 +46,7 @@ func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) 
 
 	_, ok := buyers[entity.Id]
 
-	exist := searchCardId(buyers, buyer, entity.Card_Number_Id)
+	exist := searchCardId(buyers, entity.Card_Number_Id)
 
 	if ok || exist {
 		return models.Buyer{}, errorbase.ErrConflict
@@ -74,7 +74,7 @@ func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) 
 	return entity, nil
 }
 
-func searchCardId(buyers map[int]models.Buyer, buyer *BuyerRepository, id int) bool {
+func searchCardId(buyers map[int]models.Buyer, id int) bool {
 
 	var found bool = false
 	var i int = 0

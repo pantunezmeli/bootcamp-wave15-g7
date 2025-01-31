@@ -117,7 +117,7 @@ func validErrorResponse(w http.ResponseWriter, err error) {
 	switch {
 	case errors.As(err, &product.ErrNotFoundProduct{}):
 		{
-			dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
+			dto.JSONError(w, http.StatusNotFound, err.Error())
 			break
 		}
 	case errors.As(err, &product.ErrValidProduct{}):
@@ -125,12 +125,11 @@ func validErrorResponse(w http.ResponseWriter, err error) {
 			dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
 			break
 		}
+	case errors.As(err, &product.ErrProductConflict{}):
+		dto.JSONError(w, http.StatusConflict, err.Error())
 	default:
 		{
-			//Only for debug
-			//fmt.Printf("Error: %v\n", err)
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			break
 		}
 	}
 

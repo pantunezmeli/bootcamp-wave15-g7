@@ -7,13 +7,13 @@ import (
 )
 
 var (
-	ErrFreezingInfo = errors.New("FreezingInfo must be grater than 0")
+	ErrFreezingInfo = errors.New("FreezingInfo must be greater than 0")
 )
 
 func ValidAndParserDTO(dto ProductDTO, productToParser *models.Product) error {
 
 	if dto.ProductCode == "" {
-		return errors.New("Invalid ProductCode")
+		return errors.New("invalid ProductCode")
 	}
 	if dto.Description == "" {
 		return errors.New("description Can't be empty")
@@ -30,7 +30,7 @@ func ValidAndParserDTO(dto ProductDTO, productToParser *models.Product) error {
 	}
 
 	if dto.ProductCode == "" {
-		return errors.New("Invalid ProductCode")
+		return errors.New("invalid ProductCode")
 	}
 
 	if errDimensions := ValidDimensions(dto.Height, dto.Length, dto.NetWeight, dto.Width); errDimensions != nil {
@@ -47,16 +47,16 @@ func ValidAndParserDTO(dto ProductDTO, productToParser *models.Product) error {
 
 func ValidDimensions(Height, Length, NetWeight, Width float64) error {
 	if Height <= 0 {
-		return errors.New("Invalid Height")
+		return errors.New("invalid Height")
 	}
 	if Length <= 0 {
-		return errors.New("Invalid Length")
+		return errors.New("invalid Length")
 	}
 	if NetWeight <= 0 {
-		return errors.New("Invalid NetWeight")
+		return errors.New("invalid NetWeight")
 	}
 	if Width <= 0 {
-		return errors.New("Invalid Width")
+		return errors.New("invalid Width")
 	}
 	return nil
 }

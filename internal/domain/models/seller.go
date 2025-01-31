@@ -9,14 +9,14 @@ type SellerAttributes struct {
 
 	CompanyName v.CompanyName
 
-	Address v.Address
+	Address v.SellerAddress
 
-	Telephone v.Telephone
+	Telephone v.SellerTelephone
 
 }
 
 type Seller struct {
-	ID v.Id
+	ID v.SellerId
 
 	SellerAttributes
 }

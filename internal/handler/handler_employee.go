@@ -12,11 +12,10 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
-
 var (
-	ErrEmployeeNotFound    = errors.New("employee not found")
-	ErrCardNumberExists    = errors.New("card number already exists")
-	ErrEmptyField          = errors.New("employee data lacks a required field")
+	ErrEmployeeNotFound = errors.New("employee not found")
+	ErrCardNumberExists = errors.New("card number already exists")
+	ErrEmptyField       = errors.New("employee data lacks a required field")
 )
 
 func NewDefaultHandler(service sv.EmployeeService) *DefaultHandler {
@@ -91,7 +90,7 @@ func (h *DefaultHandler) Create() http.HandlerFunc {
 				return
 			}
 			if errors.Is(err, sv.ErrCardNumberAlreadyExists) {
-				dto.JSONError(w, http.StatusBadRequest, ErrCardNumberExists.Error())
+				dto.JSONError(w, http.StatusConflict, ErrCardNumberExists.Error())
 				return
 			}
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
@@ -128,7 +127,7 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 				return
 			}
 			if errors.Is(err, sv.ErrCardNumberAlreadyExists) {
-				dto.JSONError(w, http.StatusBadRequest, ErrCardNumberExists.Error())
+				dto.JSONError(w, http.StatusConflict, ErrCardNumberExists.Error())
 				return
 			}
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())

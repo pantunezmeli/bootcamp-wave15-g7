@@ -1,35 +1,19 @@
 [
  {
+  "id": 9,
+  "warehouse_code": "WH009",
+  "address": "606 Cherry St, San Juan",
+  "telephone": "1100112233",
+  "minimun_capacity": 450,
+  "minimun_temperature": -11
+ },
+ {
   "id": 6,
   "warehouse_code": "WH006",
   "address": "303 Birch St, Mar del Plata",
   "telephone": "1177889900",
   "minimun_capacity": 550,
   "minimun_temperature": -9
- },
- {
-  "id": 7,
-  "warehouse_code": "WH007",
-  "address": "404 Maple St, Tucumán",
-  "telephone": "1188990011",
-  "minimun_capacity": 650,
-  "minimun_temperature": -7
- },
- {
-  "id": 1,
-  "warehouse_code": "9876",
-  "address": "Casa 1",
-  "telephone": "1560151819",
-  "minimun_capacity": 100,
-  "minimun_temperature": 0
- },
- {
-  "id": 3,
-  "warehouse_code": "WH003",
-  "address": "789 Oak St, Mendoza",
-  "telephone": "1144556677",
-  "minimun_capacity": 600,
-  "minimun_temperature": -8
  },
  {
   "id": 4,
@@ -48,12 +32,52 @@
   "minimun_temperature": -20
  },
  {
-  "id": 9,
-  "warehouse_code": "WH009",
-  "address": "606 Cherry St, San Juan",
-  "telephone": "1100112233",
-  "minimun_capacity": 450,
-  "minimun_temperature": -11
+  "id": 3,
+  "warehouse_code": "WH003",
+  "address": "789 Oak St, Mendoza",
+  "telephone": "1144556677",
+  "minimun_capacity": 600,
+  "minimun_temperature": -8
+ },
+ {
+  "id": 13,
+  "warehouse_code": "9438943",
+  "address": "Casa 1",
+  "telephone": "1560151819",
+  "minimun_capacity": 100,
+  "minimun_temperature": -18
+ },
+ {
+  "id": 1,
+  "warehouse_code": "9876",
+  "address": "Casa 1",
+  "telephone": "1560151819",
+  "minimun_capacity": 100,
+  "minimun_temperature": 0
+ },
+ {
+  "id": 14,
+  "warehouse_code": "WH111",
+  "address": "Casa 30",
+  "telephone": "1560151819",
+  "minimun_capacity": 150,
+  "minimun_temperature": -18
+ },
+ {
+  "id": 15,
+  "warehouse_code": "WH128",
+  "address": "Casa 30",
+  "telephone": "1560151819",
+  "minimun_capacity": 150,
+  "minimun_temperature": -18
+ },
+ {
+  "id": 7,
+  "warehouse_code": "WH007",
+  "address": "404 Maple St, Tucumán",
+  "telephone": "1188990011",
+  "minimun_capacity": 650,
+  "minimun_temperature": -7
  },
  {
   "id": 8,
@@ -70,21 +94,5 @@
   "telephone": "1133445566",
   "minimun_capacity": 300,
   "minimun_temperature": -10
- },
- {
-  "id": 11,
-  "warehouse_code": "WH128",
-  "address": "Casa 1",
-  "telephone": "1560151819",
-  "minimun_capacity": 100,
-  "minimun_temperature": -18
- },
- {
-  "id": 13,
-  "warehouse_code": "9438943",
-  "address": "Casa 1",
-  "telephone": "1560151819",
-  "minimun_capacity": 100,
-  "minimun_temperature": -18
  }
 ]

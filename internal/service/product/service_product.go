@@ -26,6 +26,14 @@ func (p ProductService) UpdateProduct(id int, patch product2.UpdateProductReques
 		return
 	}
 
+	if patch.ProductCode != nil {
+		validConflictCode := p.validConflictCode(*patch.ProductCode)
+		if validConflictCode != nil {
+			err = validConflictCode
+			return
+		}
+	}
+
 	errPatch := product2.PatchProduct(patch, &productSearch)
 	if errPatch != nil {
 		err = ErrValidProduct{message: errPatch.Error()}
@@ -73,8 +81,9 @@ func (p ProductService) CreateProduct(product product2.ProductDTO) (productDto p
 		return
 	}
 
-	if p.rp.ProductCodeExist(newProduct.ProductCode) {
-		err = ErrProductConflict{message: "Product code already exists"}
+	validConflictCode := p.validConflictCode(newProduct.ProductCode)
+	if validConflictCode != nil {
+		err = validConflictCode
 		return
 	}
 
@@ -100,4 +109,18 @@ func (p ProductService) DeleteProduct(id int) (err error) {
 	}
 
 	return
+}
+
+func (p ProductService) validConflictCode(code string) (err error) {
+	valid, errValid := p.rp.ProductCodeExist(code)
+	if errValid != nil {
+		err = ErrProduct{message: "Error valid product code"}
+		return
+	}
+
+	if valid {
+		err = ErrProductConflict{message: "Product code already exists"}
+		return
+	}
+	return nil
 }

@@ -2,61 +2,58 @@ package server
 
 import (
 	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 
-
 	//Products
-	productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 	productRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	productService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
+	productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 
 	//Sellers
-	sellerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	sellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
+	sellerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 
 	// Employees
-	employeeStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 	employeeRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	employeeService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
+	employeeStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 
 	//Sections
-	sectionStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
 	sectionRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	sectionService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
-
+	sectionStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
 
 	//Buyer
-	buyerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 	buyerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
-
+	buyerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 
 	// Warehouse
-	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 	warehouseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
 	warehouseService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse"
+	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 )
 
 const (
-	productFilePath = "../docs/db/product_data.json"
-	buyerFilePath =    "../docs/db/buyer_data.json"
+	productFilePath   = "../docs/db/product_data.json"
+	buyerFilePath     = "../docs/db/buyer_data.json"
 	warehouseFilePath = "../docs/db/warehouse_data.json"
-	employeeFilePath =  "../docs/db/employee_data.json"
-	sellerFilePath = "../docs/db/seller_data.json"
-	sectionFilePath = "../docs/db/section_data.json"
-
+	employeeFilePath  = "../docs/db/employee_data.json"
+	sellerFilePath    = "../docs/db/seller_data.json"
+	sectionFilePath   = "../docs/db/section_data.json"
 )
 
 type ConfigServerChi struct {
-	ServerAddress           string
+	ServerAddress string
 }
 
 func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	defaultConfig := &ConfigServerChi{
-		ServerAddress:           ":8080",
+		ServerAddress: ":8080",
 	}
 	if cfg != nil {
 		if cfg.ServerAddress != "" {
@@ -65,14 +62,12 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 	}
 
 	return &ServerChi{
-		serverAddress:     defaultConfig.ServerAddress,
-
+		serverAddress: defaultConfig.ServerAddress,
 	}
 }
 
 type ServerChi struct {
-	serverAddress     string
-
+	serverAddress string
 }
 
 func (a *ServerChi) Run() (err error) {
@@ -82,7 +77,6 @@ func (a *ServerChi) Run() (err error) {
 	sellerRepository := sellerRepository.NewSellerStorage(*sellerStorage)
 	sellerService := sellerService.NewSellerDefault(sellerRepository)
 	sellerHandler := handler.NewSellerDefault(sellerService)
-
 
 	// Employees
 	employeeStorage := employeeStorage.NewEmployeeJSONFile(employeeFilePath)
@@ -107,7 +101,6 @@ func (a *ServerChi) Run() (err error) {
 	productRepository := productRepository.NewProductRepositoryMap(productStorage)
 	productService := productService.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
-
 
 	// Sections
 	sectionStorage := sectionStorage.NewSectionJSONFile(sectionFilePath)
@@ -142,13 +135,12 @@ func (a *ServerChi) Run() (err error) {
 			rt.Delete("/{id}", warehouseHandler.Delete())
 		})
 
-
 		r.Route("/sections", func(rt chi.Router) {
 			rt.Get("/", sectionHandler.Get())
 			rt.Get("/{id}", sectionHandler.GetById())
 			rt.Post("/", sectionHandler.Create())
 			rt.Patch("/{id}", sectionHandler.Update())
-			rt.Delete("/{id}", sectionHandler.Delete())		
+			rt.Delete("/{id}", sectionHandler.Delete())
 		})
 
 		r.Route("/products", func(rt chi.Router) {

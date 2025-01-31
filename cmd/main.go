@@ -2,30 +2,30 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
+	//"log"
+	//"os"
 
-	"github.com/joho/godotenv"
+	//"github.com/joho/godotenv"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/cmd/server"
 )
 
 func main() {
 
-	if err := godotenv.Load("../.env"); err != nil {
-		log.Fatal("could not be read env files")
-	}
+	// if err := godotenv.Load("../.env"); err != nil {
+	// 	log.Fatal("could not be read env files")
+	// }
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8081" // value default
-	}
+	// port := os.Getenv("PORT")
+	// if port == "" {
+	// 	port = "8081" // value default
+	// }
 
-	path := os.Getenv("JSON")
-	if path == "" {
-		log.Fatal("could not be read path")
-	}
+	// path := os.Getenv("JSON")
+	// if path == "" {
+	// 	log.Fatal("could not be read path")
+	// }
 
-	fmt.Println("Project running in the port : ", port)
+	fmt.Println("Project running in the port : 8080")
 	cfg := &server.ConfigServerChi{
 		ServerAddress:           ":8080",
 		BuyerLoaderFilePath:     "../docs/db/buyer_data.json",

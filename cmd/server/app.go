@@ -17,6 +17,7 @@ import (
 	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
+
 	product_hd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
@@ -39,6 +40,7 @@ type ConfigServerChi struct {
 }
 
 func NewServerChi(cfg *ConfigServerChi) *ServerChi {
+
 	defaultConfig := &ConfigServerChi{
 		ServerAddress:           ":8080",
 		BuyerLoaderFilePath:     "../docs/db/buyer_data.json",
@@ -76,20 +78,11 @@ type ServerChi struct {
 
 func (a *ServerChi) Run() (err error) {
 
-	// dependencies
-	// - storage
 	ld := storage.NewSellerJSONFile("./docs/db/seller_data.json")
-
-	// - repository
 	sellerRepository := SellerRepo.NewSellerStorage(*ld)
-
-	// - service
 	sellerService := SellerService.NewSellerDefault(sellerRepository)
-
-	// - handler
 	sellerHandler := handler.NewSellerDefault(sellerService)
 
-	// - loader
 	employeeSt := storage.NewEmployeeJSONFile(a.employeeFilPath)
 	buyerSt := buyerstorage.NewBuyerJSONFile(a.buyerFilePath)
 	warehouseSt := warehouseStorage.NewWareHouseJSONFile(a.warehouseFilePath)

@@ -1,20 +1,21 @@
 package server
 
 import (
-	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 	"net/http"
+
+	product_ld "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	rep "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
-	sec "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
-	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
 	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
+	rep "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	SellerRepo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
+	sec "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
 	SellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
+	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
 
 	buyerStorageorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
@@ -156,7 +157,7 @@ func (a *ServerChi) Run() (err error) {
 		})
 
 
-		rt.Route("/sections", func(rt chi.Router) {
+		r.Route("/sections", func(rt chi.Router) {
 			rt.Get("/", st_hd.Get())
 			rt.Get("/{id}", st_hd.GetById())
 			rt.Post("/", st_hd.Create())
@@ -164,7 +165,7 @@ func (a *ServerChi) Run() (err error) {
 			rt.Delete("/{id}", st_hd.Delete())		
 		})
 
-		rt.Route("/products", func(rt chi.Router) {
+		r.Route("/products", func(rt chi.Router) {
 			rt.Get("/", hdProduct.GetAll())
 			rt.Get("/{id}", hdProduct.GetById())
 			rt.Post("/", hdProduct.Create())

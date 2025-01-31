@@ -1,4 +1,4 @@
-package storage
+package employee_storage
 
 import (
 	"encoding/json"

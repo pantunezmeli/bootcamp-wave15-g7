@@ -1,4 +1,4 @@
-package storage
+package seller_storage
 
 import (
 	"encoding/json"

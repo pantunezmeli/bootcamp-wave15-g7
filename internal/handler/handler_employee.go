@@ -14,10 +14,7 @@ import (
 
 
 var (
-	ErrInternalServerError = errors.New("internal server error, please try again later")
-	ErrInvalidId           = errors.New("invalid id, id should be a number")
 	ErrEmployeeNotFound    = errors.New("employee not found")
-	ErrInvalidBody         = errors.New("invalid body")
 	ErrCardNumberExists    = errors.New("card number already exists")
 	ErrEmptyField          = errors.New("employee data lacks a required field")
 )

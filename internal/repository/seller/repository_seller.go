@@ -3,14 +3,14 @@ package seller
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 )
 
 type SellerStorage struct {
-	storage storage.SellerJSONFile 
+	storage seller_storage.SellerJSONFile 
 }
 
-func NewSellerStorage(storage storage.SellerJSONFile) *SellerStorage {
+func NewSellerStorage(storage seller_storage.SellerJSONFile) *SellerStorage {
 	return &SellerStorage{storage}
 }
 

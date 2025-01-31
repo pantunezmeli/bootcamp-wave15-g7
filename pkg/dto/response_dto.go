@@ -196,11 +196,11 @@ func ParseDtoToModel(sellerDto SellerDoc) (sellerModel models.Seller, err error)
 	if err != nil {
 		return
 	}
-	address, err := domain.NewAddress(*sellerDto.Address)
+	address, err := domain.NewSellerAddress(*sellerDto.Address)
 	if err != nil{
 		return
 	}
-	telephone, err := domain.NewTelephone(*sellerDto.Telephone)
+	telephone, err := domain.NewSellerTelephone(*sellerDto.Telephone)
 	if err != nil {
 		return
 	}

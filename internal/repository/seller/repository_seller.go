@@ -48,7 +48,7 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 	
 	newId := nextId(sellersMap)
 	
-	id, err := domain.NewId(newId)
+	id, err := domain.NewSellerId(newId)
 	if err != nil {
 		return
 	} 

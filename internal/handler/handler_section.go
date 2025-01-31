@@ -66,7 +66,7 @@ func (h *SectionDefault) GetById() http.HandlerFunc {
 				return
 			}
 
-			dto.JSONError(w, http.StatusInternalServerError, err.Error())
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
 
@@ -104,7 +104,7 @@ func (h *SectionDefault) Create() http.HandlerFunc {
 				dto.JSONError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
-			dto.JSONError(w, http.StatusBadRequest, err.Error())
+			dto.JSONError(w, http.StatusBadRequest, ErrInternalServerError.Error())
 			return
 		}
 
@@ -144,7 +144,7 @@ func (h *SectionDefault) Update() http.HandlerFunc {
 				return
 			}
 
-			dto.JSONError(w, http.StatusInternalServerError, "section number already exists")
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
 
@@ -176,7 +176,7 @@ func (h *SectionDefault) Delete() http.HandlerFunc {
 				return
 			}
 
-			dto.JSONError(w, http.StatusInternalServerError, err.Error())
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
 

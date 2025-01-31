@@ -57,15 +57,18 @@ func (p ProductRepositoryMap) CreateProduct(product models.Product) error {
 	return p.storage.SaveProduct(product)
 }
 
-func (p ProductRepositoryMap) ProductCodeExist(productCode string) bool {
-	products, _ := p.GetAll()
+func (p ProductRepositoryMap) ProductCodeExist(productCode string) (bool, error) {
+	products, errGetAll := p.GetAll()
+	if errGetAll != nil {
+		return false, errGetAll
+	}
 
 	for _, productMap := range products {
 		if productMap.ProductCode == productCode {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
 func (p ProductRepositoryMap) GetLastID() value_objects.Id {

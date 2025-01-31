@@ -22,7 +22,7 @@ type IProductRepository interface {
 	GetByID(id int) (models.Product, error)
 	CreateProduct(product models.Product) error
 	DeleteProduct(id int) error
-	ProductCodeExist(productCode string) bool
+	ProductCodeExist(productCode string) (bool, error)
 	GetLastID() value_objects.Id
 	UpdateProduct(product models.Product) error
 }

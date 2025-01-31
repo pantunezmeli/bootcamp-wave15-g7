@@ -7,12 +7,6 @@ import (
 	"os"
 )
 
-type IProductLoader interface {
-	GetDb() (map[int]models.Product, error)
-	RemoveProduct(productID int) error
-	SaveProduct(newProduct models.Product) error
-}
-
 type ProductJSONFile struct {
 	path string
 }

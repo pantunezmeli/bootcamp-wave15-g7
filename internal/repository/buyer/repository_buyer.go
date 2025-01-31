@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	//"dario.cat/mergo"
+	"dario.cat/mergo"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
@@ -92,41 +93,22 @@ func (buyer *BuyerRepository) Update(id int, entity models.Buyer) (models.Buyer,
 		return models.Buyer{}, errorbase.ErrNotFound
 	}
 
-	var coincidence bool = false
-	var i int = 0
-	for i <= len(buyers) && !coincidence {
-		coincidence = buyers[i].Card_Number_Id == entity.Card_Number_Id
-		i++
+	if entity.Card_Number_Id > 0 {
+		var coincidence bool = false
+		var i int = 0
+		for i <= len(buyers) && !coincidence {
+			coincidence = buyers[i].Card_Number_Id == entity.Card_Number_Id
+			i++
+		}
+
+		if coincidence {
+			return models.Buyer{}, errorbase.ErrConflict
+		}
 	}
 
-	if coincidence {
-		return models.Buyer{}, errorbase.ErrConflict
+	if err := mergo.Merge(&element, entity, mergo.WithOverride); err != nil {
+		return models.Buyer{}, err
 	}
-
-	cardNumberId, err := value_objects.NewCardNumberId(id)
-	if err == nil {
-		element.Card_Number_Id = cardNumberId.GetCardNumberId()
-	} else {
-		return models.Buyer{}, errorbase.ErrModelInvalid
-	}
-
-	firstName, err := value_objects.NewFirstName(entity.First_Name)
-	if err == nil {
-		element.First_Name = firstName.GetFirstName()
-	} else {
-		return models.Buyer{}, errorbase.ErrModelInvalid
-	}
-
-	lastName, err := value_objects.NewLastName(entity.Last_Name)
-	if err == nil {
-		element.Last_Name = lastName.GetLastName()
-	} else {
-		return models.Buyer{}, errorbase.ErrModelInvalid
-
-	}
-	//if err := mergo.Merge(&element, entity, mergo.WithOverride); err != nil {
-	// 	return models.Buyer{}, err
-	// }
 
 	buyers[id] = element
 	err2 := buyer.storage.Save(element)

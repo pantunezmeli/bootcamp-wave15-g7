@@ -18,7 +18,7 @@ type SectionResponse struct {
 	Product_Type_Id     int `json:"product_type_id"`
 }
 
-func GenerateResponseList(sections map[int]models.Section) []SectionResponse {
+func GenerateBuyerResponseList(sections map[int]models.Section) []SectionResponse {
 	var list []SectionResponse
 	for _, value := range sections {
 		list = append(list, SectionResponse{

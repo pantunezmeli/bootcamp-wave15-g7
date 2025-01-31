@@ -9,6 +9,7 @@ import (
 )
 
 var ErrIdNotFound = errors.New("employee not found")
+var ErrCardNumberNotUnique = errors.New("card number must be unique")
 
 func NewEmployeeMap(storage storage.EmployeeJSONFile) *EmployeeMap {
 	return &EmployeeMap{st: storage}
@@ -60,6 +61,9 @@ func (r *EmployeeMap) New(employee models.Employee) (newEmployee models.Employee
 		return
 	}
 	err = r.st.Save(newEmployee)
+	if err == storage.ErrCardNumberExists {
+		err = ErrCardNumberNotUnique
+	}
 	return
 }
 
@@ -71,6 +75,16 @@ func (r *EmployeeMap) Edit(id int, employee models.Employee) (updatedEmployee mo
 
 	for _, value := range file {
 		if value.Id.GetId() == id {
+			var cardNumber string
+			cardNumber, err = r.st.GetCardNumberById(id)
+			if err != nil {
+				return
+			}
+			if updatedEmployee.CardNumber.GetCardNumber() == cardNumber {
+				err = ErrCardNumberNotUnique
+				return
+			}
+
 			updatedEmployee = value
 			err = r.st.Erase(value)
 			if err != nil {

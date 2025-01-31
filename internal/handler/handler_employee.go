@@ -17,7 +17,8 @@ var (
 	ErrInvalidId           = errors.New("invalid id, id should be a number")
 	ErrEmployeeNotFound    = errors.New("employee not found")
 	ErrInvalidBody         = errors.New("invalid body")
-	// ErrCidExists           = errors.New("cid already exists and should be unique")
+	ErrCardNumberExists    = errors.New("card number already exists")
+	ErrEmptyField          = errors.New("employee data lacks a required field")
 )
 
 func NewDefaultHandler(service sv.EmployeeService) *DefaultHandler {
@@ -87,7 +88,11 @@ func (h *DefaultHandler) Add() http.HandlerFunc {
 		newEmployee, err := h.sv.New(employeeData)
 		if err != nil {
 			if errors.Is(err, sv.ErrEmptyField) {
-				response.Error(w, http.StatusUnprocessableEntity, "Unprocessable entity: empty field/s")
+				dto.JSONError(w, http.StatusUnprocessableEntity, ErrEmptyField.Error())
+				return
+			}
+			if errors.Is(err, sv.ErrCardNumberAlreadyExists) {
+				dto.JSONError(w, http.StatusBadRequest, ErrCardNumberExists.Error())
 				return
 			}
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
@@ -121,6 +126,10 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
 				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
+				return
+			}
+			if errors.Is(err, sv.ErrCardNumberAlreadyExists) {
+				dto.JSONError(w, http.StatusBadRequest, ErrCardNumberExists.Error())
 				return
 			}
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())

@@ -7,19 +7,17 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	ehd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	rep "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	SellerRepo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 	sec "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
 	SellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
+	employeeStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
-	storage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
-
 	buyerStorageorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
+	sellerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 	product_hd "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
@@ -102,14 +100,14 @@ func (a *ServerChi) Run() (err error) {
 
 
 	// Sellers
-	ld := storage.NewSellerJSONFile("../docs/db/seller_data.json")
+	ld := sellerStorage.NewSellerJSONFile("../docs/db/seller_data.json")
 	sellerRepository := SellerRepo.NewSellerStorage(*ld)
 	sellerService := SellerService.NewSellerDefault(sellerRepository)
 	sellerHandler := handler.NewSellerDefault(sellerService)
 
 
 	// Employees
-	employeeStorage := storage.NewEmployeeJSONFile(a.employeeFilPath)
+	employeeStorage := employeeStorage.NewEmployeeJSONFile(a.employeeFilPath)
 	employeeRepository := erp.NewEmployeeMap(*employeeStorage)
 	employeeService := esv.NewDefaultService(employeeRepository)
 	employeeHandler := handler.NewDefaultHandler(employeeService)

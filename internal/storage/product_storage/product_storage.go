@@ -1,4 +1,4 @@
-package product
+package productstorage
 
 import (
 	"encoding/json"

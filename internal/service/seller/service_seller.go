@@ -132,7 +132,7 @@ func modifyAttributes(reqBody dto.SellerDoc, modelToModify *models.Seller) (err 
 	}
 
 	if reqBody.Address != nil {
-		address, err := domain.NewAddress(*reqBody.Address)
+		address, err := domain.NewSellerAddress(*reqBody.Address)
 		if err != nil {
 			return &ErrInvalidParameter{err.Error()}
 		}
@@ -140,7 +140,7 @@ func modifyAttributes(reqBody dto.SellerDoc, modelToModify *models.Seller) (err 
 	}
 
 	if reqBody.Telephone != nil {
-		telephone, err := domain.NewTelephone(*reqBody.Telephone)
+		telephone, err := domain.NewSellerTelephone(*reqBody.Telephone)
 		if err != nil {
 			return &ErrInvalidParameter{err.Error()}
 		}

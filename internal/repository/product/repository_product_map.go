@@ -5,15 +5,15 @@ import (
 	"fmt"
 	v "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/loader/product"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 )
 
-func NewProductRepositoryMap(storage product.IProductLoader) *ProductRepositoryMap {
+func NewProductRepositoryMap(storage productstorage.IProductLoader) *ProductRepositoryMap {
 	return &ProductRepositoryMap{storage: storage}
 }
 
 type ProductRepositoryMap struct {
-	storage product.IProductLoader
+	storage productstorage.IProductLoader
 }
 
 func (p ProductRepositoryMap) GetAll() (map[int]models.Product, error) {

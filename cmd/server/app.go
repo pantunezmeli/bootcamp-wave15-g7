@@ -125,6 +125,11 @@ func (a *ServerChi) Run() (err error) {
 	// - endpoints
 	rt.Route("/api/v1", func(rt chi.Router) {
 		rt.Route("/sellers", func(rt chi.Router) {
+			rt.Get("/", sellerHandler.GetAll())
+			rt.Get("/{id}", sellerHandler.GetById())
+			rt.Post("/", sellerHandler.Create())
+			rt.Delete("/{id}", sellerHandler.Delete())
+			rt.Patch("/{id}", sellerHandler.Update())
 		})
 
 		rt.Route("/warehouses", func(rt chi.Router) {

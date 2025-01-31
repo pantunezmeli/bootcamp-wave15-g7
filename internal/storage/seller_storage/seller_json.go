@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	d "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
@@ -40,23 +40,23 @@ func (l *SellerJSONFile) Load() (sellerMap map[int]models.Seller, err error) {
 
 	sellerMap = make(map[int]models.Seller)
 	for _, s := range sellersJSON {
-		Id, err := d.NewSellerId(*s.ID)
+		Id, err :=value_objects.NewSellerId(*s.ID)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Cid, err := d.NewCid(*s.Cid)
+		Cid, err :=value_objects.NewCid(*s.Cid)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		CompanyName, err := d.NewCompanyName(*s.CompanyName)
+		CompanyName, err :=value_objects.NewCompanyName(*s.CompanyName)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Address, err := d.NewSellerAddress(*s.Address)
+		Address, err :=value_objects.NewSellerAddress(*s.Address)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Telephone, err := d.NewSellerTelephone(*s.Telephone)
+		Telephone, err :=value_objects.NewSellerTelephone(*s.Telephone)
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
@@ -78,11 +78,11 @@ func (l *SellerJSONFile) Save(bd map[int]models.Seller) (err error) {
     if err != nil {
         return ErrSavingFile
     }
-    defer file.Close()
+   defer file.Close()
 
     sellers := make([]dto.SellerDoc, 0, len(bd))
     for _, seller := range bd {
-        sellerParsed := dto.SellerDoc{
+        sellerParsed :=dto.SellerDoc{
 			ID: seller.ID.Value(),
 			Cid: seller.Cid.Value(),
 			CompanyName: seller.CompanyName.Value(),

@@ -1,12 +1,12 @@
-package warehouse_service
+package warehouse
 
 import (
 	"errors"
 	"fmt"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	repository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse_repository"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	repository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
@@ -87,7 +87,7 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (dto.WareHouseDoc,
 	newId++
 
 	// Asignation of Id
-	newIdObj, err := domain.NewId(newId)
+	newIdObj, err := value_objects.NewId(newId)
 	if err != nil {
 		return dto.WareHouseDoc{}, ErrInvalidIdGenerated
 	}

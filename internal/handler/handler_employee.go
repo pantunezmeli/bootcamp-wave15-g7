@@ -27,7 +27,7 @@ type DefaultHandler struct {
 	sv sv.EmployeeService
 }
 
-func (h *DefaultHandler) GetAll() http.HandlerFunc {
+func (h *DefaultHandler) Get() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
 		// - nothing
@@ -74,7 +74,7 @@ func (h *DefaultHandler) GetById() http.HandlerFunc {
 	}
 }
 
-func (h *DefaultHandler) Add() http.HandlerFunc {
+func (h *DefaultHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
 		var employeeData dto.EmployeeDoc
@@ -142,7 +142,7 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 	}
 }
 
-func (h *DefaultHandler) DeleteById() http.HandlerFunc {
+func (h *DefaultHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))

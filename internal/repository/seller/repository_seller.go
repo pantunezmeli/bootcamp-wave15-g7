@@ -1,8 +1,8 @@
 package seller
 
 import (
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 )
 
@@ -48,7 +48,7 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 	
 	newId := nextId(sellersMap)
 	
-	id, err := domain.NewSellerId(newId)
+	id, err := value_objects.NewSellerId(newId)
 	if err != nil {
 		return
 	} 

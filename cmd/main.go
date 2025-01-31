@@ -7,20 +7,13 @@ import (
 )
 
 func main() {
-	// env
-	// ...
 
-	// app
-	// - config
-	fmt.Println("Proyecto corriendo...")
 	cfg := &server.ConfigServerChi{
 		ServerAddress:           ":8080",
-		BuyerLoaderFilePath:     "../docs/db/buyer_data.json",
-		WarehouseLoaderFilePath: "../docs/db/warehouse_data.json",
-		EmployeeLoaderFilePath:  "../docs/db/employee_data.json",
 	}
+	fmt.Printf("Running on localhost %s", cfg.ServerAddress)
 	app := server.NewServerChi(cfg)
-	// - run
+	
 	if err := app.Run(); err != nil {
 		fmt.Println(err)
 		return

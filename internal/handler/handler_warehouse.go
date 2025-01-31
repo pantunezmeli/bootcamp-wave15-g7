@@ -8,7 +8,7 @@ import (
 
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
-	service "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse_service"
+	service "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 

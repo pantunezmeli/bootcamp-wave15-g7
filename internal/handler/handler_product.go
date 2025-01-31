@@ -20,7 +20,7 @@ type ProductHandle struct {
 	sv product.IProductService
 }
 
-func (h *ProductHandle) GetAll() http.HandlerFunc {
+func (h *ProductHandle) Get() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		products, _ := h.sv.GetAll()
 		response.JSON(w, http.StatusOK, dto.GenericResponse{Data: products})

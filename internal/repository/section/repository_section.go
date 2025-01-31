@@ -4,7 +4,7 @@ import (
 	"dario.cat/mergo"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/errorbase"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 // StRepository is a struct that represents a Section repository

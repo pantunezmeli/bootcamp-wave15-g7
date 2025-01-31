@@ -2,8 +2,9 @@ package product
 
 import (
 	"errors"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
+
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 )
 
 var (
@@ -19,12 +20,12 @@ func ValidAndParserDTO(dto ProductDTO, productToParser *models.Product) error {
 		return errors.New("description Can't be empty")
 	}
 
-	productTypeId, errID := domain.NewId(dto.ProductTypeID)
+	productTypeId, errID := value_objects.NewId(dto.ProductTypeID)
 	if errID != nil {
 		return errID
 	}
 
-	sellerId, errID := domain.NewId(dto.SellerID)
+	sellerId, errID := value_objects.NewId(dto.SellerID)
 	if errID != nil {
 		return errID
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/buyer"
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
@@ -22,7 +22,7 @@ func NewBuyerHandler(sv buyer.IServiceBuyer) *BuyerHandler {
 	return &BuyerHandler{service: sv}
 }
 
-func (handler *BuyerHandler) GetAll() http.HandlerFunc {
+func (handler *BuyerHandler) Get() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		buyers, err := handler.service.GetBuyers()
 		if errors.Is(err, errorbase.ErrEmptyList) {
@@ -38,7 +38,7 @@ func (handler *BuyerHandler) GetAll() http.HandlerFunc {
 	}
 }
 
-func (handler *BuyerHandler) GetBuyerById() http.HandlerFunc {
+func (handler *BuyerHandler) GetById() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		idParam := chi.URLParam(request, "id")
@@ -65,7 +65,7 @@ func (handler *BuyerHandler) GetBuyerById() http.HandlerFunc {
 	}
 }
 
-func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
+func (handler *BuyerHandler) Create() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		var newBuyer models.Buyer
@@ -99,7 +99,7 @@ func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
 
 }
 
-func (handler *BuyerHandler) UpdateBuyer() http.HandlerFunc {
+func (handler *BuyerHandler) Update() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		idParam := chi.URLParam(request, "id")
@@ -143,7 +143,7 @@ func (handler *BuyerHandler) UpdateBuyer() http.HandlerFunc {
 	}
 }
 
-func (handler *BuyerHandler) DeleteBuyer() http.HandlerFunc {
+func (handler *BuyerHandler) Delete() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		idParam := chi.URLParam(request, "id")

@@ -3,8 +3,8 @@ package employee
 import (
 	"errors"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	storage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 )
 
@@ -56,7 +56,7 @@ func (r *EmployeeMap) New(employee models.Employee) (newEmployee models.Employee
 		return
 	}
 	newEmployee = employee
-	newEmployee.Id, err = domain.NewId(lastId + 1)
+	newEmployee.Id, err = value_objects.NewId(lastId + 1)
 	if err != nil {
 		return
 	}

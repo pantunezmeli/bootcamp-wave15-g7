@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	//"dario.cat/mergo"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
@@ -58,9 +58,9 @@ func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) 
 		return models.Buyer{}, err
 	}
 
-	entity.Card_Number_Id = attributes["CardNumber"].(domain.CardNumberId).GetCardNumberId()
-	entity.First_Name = attributes["FirstName"].(domain.FirstName).GetFirstName()
-	entity.Last_Name = attributes["LastName"].(domain.LastName).GetLastName()
+	entity.Card_Number_Id = attributes["CardNumber"].(value_objects.CardNumberId).GetCardNumberId()
+	entity.First_Name = attributes["FirstName"].(value_objects.FirstName).GetFirstName()
+	entity.Last_Name = attributes["LastName"].(value_objects.LastName).GetLastName()
 
 	entity.Id = getLastId(buyers)
 	buyers[entity.Id] = entity
@@ -92,15 +92,15 @@ func (buyer *BuyerRepository) Update(id int, entity models.Buyer) (models.Buyer,
 	if !ok {
 		return models.Buyer{}, errorbase.ErrNotFound
 	}
-	if cardNumberId, err := domain.NewCardNumberId(id); err == nil {
+	if cardNumberId, err := value_objects.NewCardNumberId(id); err == nil {
 		element.Card_Number_Id = cardNumberId.GetCardNumberId()
 	}
 
-	if firstName, err := domain.NewFirstName(entity.First_Name); err == nil {
+	if firstName, err := value_objects.NewFirstName(entity.First_Name); err == nil {
 		element.First_Name = firstName.GetFirstName()
 	}
 
-	if lastName, err := domain.NewLastName(entity.Last_Name); err == nil {
+	if lastName, err := value_objects.NewLastName(entity.Last_Name); err == nil {
 		element.Last_Name = lastName.GetLastName()
 	}
 	//if err := mergo.Merge(&element, entity, mergo.WithOverride); err != nil {
@@ -143,17 +143,17 @@ func getLastId(buyer map[int]models.Buyer) int {
 }
 
 func (*BuyerRepository) Validatemodels(entity models.Buyer) (map[string]any, error) {
-	cardNumber, err := domain.NewCardNumberId(entity.Card_Number_Id)
+	cardNumber, err := value_objects.NewCardNumberId(entity.Card_Number_Id)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
 
-	firstName, err := domain.NewFirstName(entity.First_Name)
+	firstName, err := value_objects.NewFirstName(entity.First_Name)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
 
-	lastName, err := domain.NewLastName(entity.Last_Name)
+	lastName, err := value_objects.NewLastName(entity.Last_Name)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}

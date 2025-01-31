@@ -1,8 +1,8 @@
 package product
 
 import (
-	v "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 )
 
 type ErrProductRepository struct {
@@ -23,6 +23,6 @@ type IProductRepository interface {
 	CreateProduct(product models.Product) error
 	DeleteProduct(id int) error
 	ProductCodeExist(productCode string) bool
-	GetLastID() v.Id
+	GetLastID() value_objects.Id
 	UpdateProduct(product models.Product) error
 }

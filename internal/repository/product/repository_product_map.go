@@ -3,8 +3,9 @@ package product
 import (
 	"errors"
 	"fmt"
-	v "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
+
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 )
 
@@ -67,7 +68,7 @@ func (p ProductRepositoryMap) ProductCodeExist(productCode string) bool {
 	return false
 }
 
-func (p ProductRepositoryMap) GetLastID() v.Id {
+func (p ProductRepositoryMap) GetLastID() value_objects.Id {
 	products, _ := p.GetAll()
 	var lastId int
 	for _, productMap := range products {
@@ -75,7 +76,7 @@ func (p ProductRepositoryMap) GetLastID() v.Id {
 			lastId = productMap.ID.GetId()
 		}
 	}
-	id, _ := v.NewId(lastId + 1)
+	id, _ := value_objects.NewId(lastId + 1)
 	return id
 }
 

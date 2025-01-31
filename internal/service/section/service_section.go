@@ -3,8 +3,8 @@ package section
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/errorbase"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/section"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 // NewSectionService is a function that returns a new instance of SectionService

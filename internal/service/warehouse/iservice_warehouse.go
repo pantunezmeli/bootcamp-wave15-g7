@@ -1,4 +1,4 @@
-package warehouse_service
+package warehouse
 
 import (
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"

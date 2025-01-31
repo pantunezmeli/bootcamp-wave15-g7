@@ -1,9 +1,10 @@
 package product
 
 import (
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"sort"
+
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 )
 
 type ProductDTO struct {
@@ -21,8 +22,8 @@ type ProductDTO struct {
 	SellerID                       int     `json:"seller_id,omitempty"`
 }
 
-func ParseDTOProduct(productTypeID, sellerID domain.Id, product ProductDTO) models.Product {
-	id, _ := domain.NewId(product.ID)
+func ParseDTOProduct(productTypeID, sellerID value_objects.Id, product ProductDTO) models.Product {
+	id, _ := value_objects.NewId(product.ID)
 	return models.Product{
 		ID:            id,
 		Description:   product.Description,

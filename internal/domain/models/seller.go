@@ -1,22 +1,20 @@
 package models
 
-import (
-	v "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain"
-)
+import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 
 type SellerAttributes struct {
-	Cid v.Cid
+	Cid value_objects.Cid
 
-	CompanyName v.CompanyName
+	CompanyName value_objects.CompanyName
 
-	Address v.SellerAddress
+	Address value_objects.SellerAddress
 
-	Telephone v.SellerTelephone
+	Telephone value_objects.SellerTelephone
 
 }
 
 type Seller struct {
-	ID v.SellerId
+	ID value_objects.SellerId
 
 	SellerAttributes
 }

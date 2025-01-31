@@ -34,7 +34,7 @@ func NewSellerDefault(sv seller.SellerService) *SellerDefault{
 }
 
 
-func (h *SellerDefault) GetAll() http.HandlerFunc {
+func (h *SellerDefault) Get() http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request){
 		res, err := h.sv.GetAll()
 		if err != nil {

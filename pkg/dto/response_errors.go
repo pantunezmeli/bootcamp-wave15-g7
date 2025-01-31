@@ -3,13 +3,10 @@ package dto
 import (
 	"encoding/json"
 	"net/http"
+
 )
 
-type GenericResponse struct {
-	Message string `json:"message,omitempty"`
-	Data    any    `json:"data,omitempty"`
-	Status  string `json:"status,omitempty"`
-}
+
 
 func JSONError(w http.ResponseWriter, statusCode int, message string) {
 	defaultStatusCode := http.StatusInternalServerError

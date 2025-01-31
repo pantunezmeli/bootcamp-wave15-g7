@@ -117,19 +117,19 @@ func validErrorResponse(w http.ResponseWriter, err error) {
 	switch {
 	case errors.As(err, &product.ErrNotFoundProduct{}):
 		{
-			response.JSON(w, http.StatusNotFound, dto.GenericResponse{Message: err.Error()})
+			dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
 			break
 		}
 	case errors.As(err, &product.ErrValidProduct{}):
 		{
-			response.JSON(w, http.StatusUnprocessableEntity, dto.GenericResponse{Message: err.Error()})
+			dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
 			break
 		}
 	default:
 		{
 			//Only for debug
 			//fmt.Printf("Error: %v\n", err)
-			response.JSON(w, http.StatusInternalServerError, dto.GenericResponse{Message: "Internal Server Error"})
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			break
 		}
 	}

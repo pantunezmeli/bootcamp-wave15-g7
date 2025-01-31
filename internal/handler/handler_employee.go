@@ -12,6 +12,7 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
+
 var (
 	ErrInternalServerError = errors.New("internal server error, please try again later")
 	ErrInvalidId           = errors.New("invalid id, id should be a number")
@@ -37,6 +38,7 @@ func (h *DefaultHandler) GetAll() http.HandlerFunc {
 		// process
 		employees, err := h.sv.FindAll()
 		if err != nil {
+
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}

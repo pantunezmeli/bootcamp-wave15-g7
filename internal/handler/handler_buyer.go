@@ -62,6 +62,7 @@ func (handler *BuyerHandler) GetById() http.HandlerFunc {
 		if err != nil {
 			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrRequest)
 			return
+
 		}
 		jsonResponse(writer, http.StatusOK, buyer)
 	}
@@ -132,12 +133,12 @@ func (handler *BuyerHandler) Update() http.HandlerFunc {
 		}
 
 		if errors.Is(err, errorbase.ErrConflict) {
-			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrConflict)
+			dtoResponse.JSONError(writer, http.StatusConflict, MSG_ErrConflict)
 			return
 		}
 
 		if errors.Is(err, errorbase.ErrModelInvalid) {
-			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrModelInvalid)
+			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrModelInvalid)
 			return
 		}
 
@@ -149,6 +150,7 @@ func (handler *BuyerHandler) Update() http.HandlerFunc {
 		if err != nil {
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
+
 		}
 
 		jsonResponse(writer, http.StatusOK, buyer)
@@ -157,7 +159,6 @@ func (handler *BuyerHandler) Update() http.HandlerFunc {
 
 func (handler *BuyerHandler) Delete() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-
 		idParam := chi.URLParam(request, "id")
 		id, err2 := strconv.Atoi(idParam)
 
@@ -184,7 +185,6 @@ func (handler *BuyerHandler) Delete() http.HandlerFunc {
 
 		if err != nil {
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
-
 			return
 		}
 

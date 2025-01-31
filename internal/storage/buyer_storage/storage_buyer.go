@@ -3,6 +3,7 @@ package buyerstorage
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
@@ -17,6 +18,7 @@ func NewBuyerJSONFile(path string) *BuyerJSONFile {
 }
 
 func (l *BuyerJSONFile) Load() (map[int]models.Buyer, error) {
+	fmt.Println(l.path)
 	file, err := os.Open(l.path)
 	if err != nil {
 		return nil, errors.New("")

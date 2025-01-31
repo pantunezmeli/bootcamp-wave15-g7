@@ -147,9 +147,9 @@ func (h *WareHouseHandler) Update() http.HandlerFunc {
 				return
 			}
 
-			var invalidFieldErr *error
+			var invalidFieldErr *service.ErrInvalidParameter
 			if errors.As(err, &invalidFieldErr) {
-				e.JSONError(w, http.StatusBadRequest, "some values are not valid")
+				e.JSONError(w, http.StatusBadRequest, err.Error())
 				return
 			}
 

@@ -3,7 +3,7 @@ package seller
 import (
 	"fmt"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	seller_dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/seller"
 )
 
 const (
@@ -29,9 +29,9 @@ func(e *ErrInvalidParameter) Error() string {
 }
 
 type SellerService interface {
-	GetAll() (sellers []dto.SellerDoc, err error)
-	GetById(int) (seller dto.SellerDoc, err error)
-	Save(dto.SellerDoc) (seller dto.SellerDoc, err error)
+	GetAll() (sellers []seller_dto.SellerDoc, err error)
+	GetById(int) (seller seller_dto.SellerDoc, err error)
+	Save(seller_dto.SellerDoc) (seller seller_dto.SellerDoc, err error)
 	Delete(id int) (err error)
-	Update(reqBody dto.SellerDoc) (seller dto.SellerDoc, err error)
+	Update(reqBody seller_dto.SellerDoc) (seller seller_dto.SellerDoc, err error)
 }

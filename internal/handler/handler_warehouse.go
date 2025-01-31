@@ -129,7 +129,7 @@ func (h *WareHouseHandler) Create() http.HandlerFunc {
 				return
 			}
 
-			var invalidFieldErr error
+			var invalidFieldErr *error
 			if errors.As(err, &invalidFieldErr) {
 				response.JSON(w, http.StatusBadRequest, map[string]any{
 					"message": "some values are not valid",
@@ -197,7 +197,7 @@ func (h *WareHouseHandler) Update() http.HandlerFunc {
 				return
 			}
 
-			var invalidFieldErr error
+			var invalidFieldErr *error
 			if errors.As(err, &invalidFieldErr) {
 				response.JSON(w, http.StatusBadRequest, map[string]any{
 					"message": "some values are not valid",

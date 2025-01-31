@@ -129,7 +129,7 @@ func validErrorResponse(w http.ResponseWriter, err error) {
 		{
 			//Only for debug
 			//fmt.Printf("Error: %v\n", err)
-			dto.JSONError(w, http.StatusInternalServerError, dto.ErrInternalServerError.Error())
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			break
 		}
 	}

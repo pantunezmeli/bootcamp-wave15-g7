@@ -7,8 +7,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	erp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
-	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 	SellerRepo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
+	esv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 	SellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage"
 
@@ -35,7 +35,6 @@ type ConfigServerChi struct {
 	BuyerLoaderFilePath     string
 	WarehouseLoaderFilePath string
 	EmployeeLoaderFilePath  string
-
 }
 
 // NewServerChi is a function that returns a new instance of ServerChi
@@ -114,7 +113,7 @@ func (a *ServerChi) Run() (err error) {
 	// Product
 	rpProduct := product_rp.NewProductRepositoryMap(productSt)
 	svProduct := product_sv.NewProductService(rpProduct)
-	hdProduct := handler.NewProductHandler(svProduct)
+	hdProduct := product_hd.NewProductHandler(svProduct)
 
 	// router
 	rt := chi.NewRouter()

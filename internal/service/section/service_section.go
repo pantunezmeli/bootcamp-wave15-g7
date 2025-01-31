@@ -1,6 +1,8 @@
 package section
 
 import (
+	"errors"
+
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/section"
@@ -101,51 +103,51 @@ func (s *SectionService) DeleteSection(id int) (err error) {
 
 func (service *SectionService) ValidateAllParameters(reqBody dto.SectionResponse) (err error) {
 	if reqBody.Section_Number == 0 {
-		err = errorbase.ErrEmptyParameters
+		err = errors.New("section number is required")
 		return
 	}
 	if reqBody.Current_Temperature == 0 {
-		err = errorbase.ErrEmptyParameters
+		err = errors.New("current temperature is required")
 		return
 	}
 	if reqBody.Minimum_Temperature == 0 {
-		err = errorbase.ErrEmptyParameters
+		err = errors.New("minimum temperature is required")
 		return
 	}
 	if condition := reqBody.Current_Temperature <= reqBody.Minimum_Temperature; condition {
-		err = errorbase.ErrInvalidRequest
+		err = errors.New("current temperature must be greater than minimum temperature")
 		return
 	}
 	if reqBody.Current_Capacity == 0 {
-		err = errorbase.ErrEmptyParameters
+		err = errors.New("current capacity is required")
 		return
 	}
 	if reqBody.Minimum_Capacity == 0 {
-		err = errorbase.ErrEmptyParameters
+		err = errors.New("minimum capacity is required")
 		return
 	}
 	if reqBody.Maximum_Capacity == 0 {
-		err = errorbase.ErrEmptyParameters
+		err = errors.New("maximum capacity is required")
 		return
 	}
 	if reqBody.Minimum_Capacity >= reqBody.Maximum_Capacity {
-		err = errorbase.ErrInvalidRequest
+		err = errors.New("minimum capacity must be less than maximum capacity")
 		return
 	}
 	if reqBody.Current_Capacity <= reqBody.Minimum_Capacity {
-		err = errorbase.ErrInvalidRequest
+		err = errors.New("current capacity must be greater than minimum capacity")
 		return
 	}
 	if reqBody.Maximum_Capacity <= reqBody.Current_Capacity {
-		err = errorbase.ErrInvalidRequest
+		err = errors.New("maximum capacity must be greater than current capacity")
 		return
 	}
 	if reqBody.Warehouse_Id == 0 {
-		err = errorbase.ErrEmptyParameters
+		err = errors.New("warehouse id is required")
 		return
 	}
 	if reqBody.Product_Type_Id == 0 {
-		err = errorbase.ErrEmptyParameters
+		err = errors.New("product type id is required")
 		return
 	}
 	return nil

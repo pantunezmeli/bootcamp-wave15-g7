@@ -12,6 +12,7 @@ var (
 	MSG_ErrModelInvalid           = "the fields of model is invalid"
 	MSG_ErrJsonFormat             = "invalid JSON format"
 	MSG_ErrRequest                = "invalid request type"
+	MSG_ErrUnprocessable          = "incorrect syntax of the request"
 )
 
 // MSG

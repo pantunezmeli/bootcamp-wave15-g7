@@ -17,6 +17,7 @@ type LastName struct {
 }
 
 func NewCardNumberId(id int) (cardNumber CardNumberId, err error) {
+
 	if id <= 0 {
 		return CardNumberId{}, errorbase.ErrInvalidId
 	}

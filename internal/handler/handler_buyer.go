@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -51,18 +52,16 @@ func (handler *BuyerHandler) GetById() http.HandlerFunc {
 			return
 		}
 		buyer, err := handler.service.GetBuyer(id)
-		if errors.Is(err, errorbase.ErrInvalidId) {
+		switch {
+		case errors.Is(err, errorbase.ErrInvalidId):
 			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrInvalidId)
 			return
-		}
-		if errors.Is(err, errorbase.ErrNotFound) {
+		case errors.Is(err, errorbase.ErrNotFound):
 			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrNotFound)
 			return
-		}
-		if err != nil {
+		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrRequest)
 			return
-
 		}
 		jsonResponse(writer, http.StatusOK, buyer)
 	}
@@ -81,25 +80,24 @@ func (handler *BuyerHandler) Create() http.HandlerFunc {
 		}
 
 		buyer, err := handler.service.CreateBuyer(newBuyer)
-
-		if errors.Is(err, errorbase.ErrConflict) {
+		switch {
+		case errors.Is(err, errorbase.ErrConflict):
 			dtoResponse.JSONError(writer, http.StatusConflict, MSG_ErrConflict)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrStorageOperationFailed) {
+		case errors.Is(err, errorbase.ErrEmptyParameters):
+			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrUnprocessable)
+			return
+		case errors.Is(err, errorbase.ErrStorageOperationFailed):
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
 			return
-		}
-
-		if err != nil {
-			dtoResponse.JSONError(writer, http.StatusConflict, MSG_ErrConflict)
+		case err != nil:
+			fmt.Println(err)
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
 		}
 
 		jsonResponse(writer, http.StatusCreated, buyer)
 	}
-
 }
 
 func (handler *BuyerHandler) Update() http.HandlerFunc {
@@ -113,7 +111,7 @@ func (handler *BuyerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		var entity dto.BuyerResponse
+		var entity dto.BuyerUpdate
 		err2 := json.NewDecoder(request.Body).Decode(&entity)
 		if err2 != nil {
 			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrJsonFormat)
@@ -121,36 +119,25 @@ func (handler *BuyerHandler) Update() http.HandlerFunc {
 		}
 
 		buyer, err := handler.service.UpdateBuyer(id, entity)
-
-		if errors.Is(err, errorbase.ErrNotFound) {
+		switch {
+		case errors.Is(err, errorbase.ErrNotFound):
 			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrNotFound)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrInvalidId) {
+		case errors.Is(err, errorbase.ErrInvalidId):
 			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrInvalidId)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrConflict) {
+		case errors.Is(err, errorbase.ErrConflict):
 			dtoResponse.JSONError(writer, http.StatusConflict, MSG_ErrConflict)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrModelInvalid) {
-			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrModelInvalid)
+		case errors.Is(err, errorbase.ErrUnprocessable):
+			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrUnprocessable)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrStorageOperationFailed) {
+		case errors.Is(err, errorbase.ErrStorageOperationFailed):
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
 			return
-		}
-
-		if err != nil {
+		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
-
 		}
 
 		jsonResponse(writer, http.StatusOK, buyer)
@@ -168,26 +155,20 @@ func (handler *BuyerHandler) Delete() http.HandlerFunc {
 		}
 
 		err := handler.service.DeleteBuyer(id)
-		if errors.Is(err, errorbase.ErrInvalidId) {
+		switch {
+		case errors.Is(err, errorbase.ErrInvalidId):
 			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrInvalidId)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrNotFound) {
+		case errors.Is(err, errorbase.ErrNotFound):
 			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrNotFound)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrStorageOperationFailed) {
+		case errors.Is(err, errorbase.ErrStorageOperationFailed):
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
 			return
-		}
-
-		if err != nil {
+		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
 		}
-
 		jsonResponse(writer, http.StatusNoContent, nil)
 	}
 }

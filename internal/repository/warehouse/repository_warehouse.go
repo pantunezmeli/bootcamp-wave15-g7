@@ -1,10 +1,12 @@
 package warehouse
 
 import (
+	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	storage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 )
 
 var (
@@ -14,113 +16,158 @@ var (
 )
 
 type WareHouseRepository struct {
-	//db     map[int]models.WareHouse
-	storage storage.IWareHouseStorage
+	db *sql.DB // Contiene una base de datos
 }
 
-// Crea una nueva 'base de datos'
-func NewWareHouseRepository(storage storage.IWareHouseStorage) *WareHouseRepository {
+// Inyección de la base de datos
+func NewWareHouseRepository(db *sql.DB) *WareHouseRepository {
 	return &WareHouseRepository{
-		storage: storage,
+		db: db,
 	}
 }
 
 // ! 1)
-func (r *WareHouseRepository) GetAllWareHouses() (map[int]models.WareHouse, error) {
-	// Load data
-	db, err := r.storage.Load()
-
-	// Fail load
+func (r *WareHouseRepository) GetAllWareHouses() ([]models.WareHouse, error) {
+	query := "SELECT id, warehouse_code, address, telephone, minimunCapacity, minimunTemperature FROM warehouse"
+	rows, err := r.db.Query(query)
 	if err != nil {
-		return map[int]models.WareHouse{}, err
+		return nil, err
 	}
+	defer rows.Close()
 
-	return db, nil
+	var warehouses []models.WareHouse
+
+	// Iteración sobre los resultados
+	for rows.Next() {
+		var warehouse models.WareHouse
+
+		err := rows.Scan(
+			&warehouse.Id,
+			&warehouse.WareHouseCode,
+			&warehouse.Address,
+			&warehouse.Telephone,
+			&warehouse.MinimunCapacity,
+			&warehouse.MinimunTemperature,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		warehouses = append(warehouses, warehouse)
+	}
+	return warehouses, nil
 }
 
 // ! 2)
-func (r *WareHouseRepository) GetWareHouseById(id int) (wh models.WareHouse, err error) {
-	db, err := r.storage.Load()
+func (r *WareHouseRepository) GetWareHouseById(id int) (models.WareHouse, error) {
+
+	var warehouse models.WareHouse
+	query := "SELECT id, wareHouseCode, address, telephone, minimunCapacity, minimunTemperature FROM warehouse WHERE id = ?"
+	row := r.db.QueryRow(query, id)
+
+	err := row.Scan(
+		&warehouse.Id,
+		&warehouse.WareHouseCode,
+		&warehouse.Address,
+		&warehouse.Telephone,
+		&warehouse.MinimunCapacity,
+		&warehouse.MinimunTemperature,
+	)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.WareHouse{}, fmt.Errorf("warehouse with id %d not found", id)
+		}
 		return models.WareHouse{}, err
 	}
-	wh, exists := db[id]
-	if !exists {
-		return models.WareHouse{}, ErrWareHouseNotFound
-	}
-	return
+	return warehouse, nil
 }
 
 // ! 3)
-func (r *WareHouseRepository) GetWareHouseByCode(code string) (wh models.WareHouse, err error) {
-	// Load data
-	db, err := r.storage.Load()
+func (r *WareHouseRepository) GetWareHouseByCode(code string) (models.WareHouse, error) {
+	var warehouse models.WareHouse
+	query := "SELECT * FROM warehouse WHERE warehouse.wareHouseCode = ?"
+	row := r.db.QueryRow(query, code)
 
-	// Fail load
+	err := row.Scan(
+		&warehouse.Id,
+		&warehouse.WareHouseCode,
+		&warehouse.Address,
+		&warehouse.Telephone,
+		&warehouse.MinimunCapacity,
+		&warehouse.MinimunTemperature,
+	)
+
 	if err != nil {
-		return models.WareHouse{}, ErrLoadingData
-	}
-
-	// Check if exists Warehouse_code
-	for _, wh := range db {
-		if wh.WareHouseCode.GetWareHouseCode() == code {
-			return wh, nil
+		if err == sql.ErrNoRows {
+			return models.WareHouse{}, ErrWareHouseCodeNotFound
 		}
+		return models.WareHouse{}, err
 	}
-
-	// Return empty
-	return models.WareHouse{}, ErrWareHouseCodeNotFound
+	return warehouse, nil
 }
 
-func (r *WareHouseRepository) CreateNewWareHouse(wh models.WareHouse) (err error) {
-	// Load data
-	db, err := r.storage.Load()
+func (r *WareHouseRepository) CreateNewWareHouse(warehouse models.WareHouse) (models.WareHouse, error) {
 
-	// Fail load
+	query := "INSERT INTO warehouse (wareHouseCode, address, telephone, minimunCapacity, minimunTemperature) VALUES (?, ?, ?, ?, ?)"
+
+	result, err := r.db.Exec(query,
+		warehouse.WareHouseCode.GetWareHouseCode(),
+		warehouse.Address.GetAddress(),
+		warehouse.Telephone.GetTelephone(),
+		warehouse.MinimunCapacity.GetMinimunCapacity(),
+		warehouse.MinimunTemperature.GetMinimunTemperature(),
+	)
+
 	if err != nil {
-		return ErrLoadingData
+		return models.WareHouse{}, err // Err
 	}
 
-	// Add wh to memory
-	db[wh.Id.GetId()] = wh
+	// Obtener el último ID
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return models.WareHouse{}, err // ErrGettingLastInsertedID
+	}
 
-	// Save data
-	r.storage.Save(db)
+	// Conversión del ID a objeto Value_object
+	newIdObj, err := value_objects.NewId(int(lastInsertID))
+	if err != nil {
+		return models.WareHouse{}, err // ErrConvertingIDToValueObject
+	}
 
-	return nil
+	warehouse.Id = newIdObj
+
+	return warehouse, nil
 }
 
 // ! 4)
-func (r *WareHouseRepository) UpdateWarehouse(wh models.WareHouse) (err error) {
+func (r *WareHouseRepository) UpdateWarehouse(warehouse models.WareHouse) error {
 
-	// Load data
-	db, err := r.storage.Load()
+	query := "UPDATE warehouse SET warehouse_code = ?, address = ?, telephone = ?, minimunCapacity = ?, minimunTemperature = ? WHERE id = ?"
+
+	_, err := r.db.Exec(query,
+		warehouse.WareHouseCode.GetWareHouseCode(),
+		warehouse.Address.GetAddress(),
+		warehouse.Telephone.GetTelephone(),
+		warehouse.MinimunCapacity.GetMinimunCapacity(),
+		warehouse.MinimunTemperature.GetMinimunTemperature(),
+		warehouse.Id.GetId(),
+	)
 	if err != nil {
-		return ErrLoadingData
+		return err // ErrExecutingDB
 	}
 
-	// Save on memory
-	db[wh.Id.GetId()] = wh
-
-	// Save on file
-	r.storage.Save(db)
 	return nil
 }
 
 // ! 5)
 func (r *WareHouseRepository) DeleteWarehouse(id int) (err error) {
+	query := "DELETE FROM warehouse WHERE id = ?"
 
-	// Load data
-	db, err := r.storage.Load()
+	_, err = r.db.Exec(query,
+		id)
 	if err != nil {
-		return ErrLoadingData
+		return err
 	}
-
-	// Delete on memory
-	delete(db, id)
-
-	// Save on file
-	r.storage.Save(db)
 
 	return nil
 }

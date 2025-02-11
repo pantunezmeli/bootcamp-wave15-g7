@@ -1,24 +1,21 @@
 package main
 
 import (
-	"fmt"
-	//"log"
-	//"os"
+	"log"
 
-	//"github.com/joho/godotenv"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/cmd/server"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/config"
 )
 
 func main() {
-
-	cfg := &server.ConfigServerChi{
-		ServerAddress: ":8080",
+	serverConfig := &server.ConfigServerChi{
+		ServerAddress: config.GetEnv("SERVER_ADDRESS", ":8080"),
 	}
-	fmt.Printf("Running on localhost %s", cfg.ServerAddress)
-	app := server.NewServerChi(cfg)
+
+	app := server.NewServerChi(serverConfig)
 
 	if err := app.Run(); err != nil {
-		fmt.Println(err)
+		log.Fatal("Error running server: %v", err)
 		return
 	}
 }

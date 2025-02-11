@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	repository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/warehouse"
 )
@@ -34,6 +33,22 @@ func (s *WarehouseService) FindAll() (w map[int]dto.WareHouseDoc, err error) {
 	}
 	w = s.MapWareHouseToDTO(wareHouses)
 
+	return
+}
+
+// TODO mover al DTO
+func (s *WarehouseService) MapWareHouseToDTO(w []models.WareHouse) (r map[int]dto.WareHouseDoc) {
+	r = make(map[int]dto.WareHouseDoc)
+	for _, wh := range w {
+		r[wh.Id.GetId()] = dto.WareHouseDoc{
+			Id:                 wh.Id.GetId(),
+			WareHouseCode:      wh.WareHouseCode.GetWareHouseCode(),
+			Address:            wh.Address.GetAddress(),
+			Telephone:          wh.Telephone.GetTelephone(),
+			MinimunCapacity:    wh.MinimunCapacity.GetMinimunCapacity(),
+			MinimunTemperature: wh.MinimunTemperature.GetMinimunTemperature(),
+		}
+	}
 	return
 }
 
@@ -68,53 +83,17 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (dto.WareHouseDoc,
 		return dto.WareHouseDoc{}, err
 	}
 
-	warehouses, err := s.rp.GetAllWareHouses()
+	createdWarehouse, err := s.rp.CreateNewWareHouse(warehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, err
 	}
 
-	var newId = 0
-	for id := range warehouses {
-		if id > newId {
-			newId = id
-		}
-	}
-	newId++
-
-	newIdObj, err := value_objects.NewId(newId)
-	if err != nil {
-		return dto.WareHouseDoc{}, ErrInvalidIdGenerated
-	}
-
-	warehouse.Id = newIdObj
-
-	err = s.rp.CreateNewWareHouse(warehouse)
-	if err != nil {
-		return dto.WareHouseDoc{}, err
-	}
-
-	whDTO, err := dto.WareHouseDoc{}.ConvertToDTO(warehouse)
+	whDTO, err := dto.WareHouseDoc{}.ConvertToDTO(createdWarehouse)
 	if err != nil {
 		return dto.WareHouseDoc{}, err
 	}
 
 	return whDTO, nil
-}
-
-// TODO mover al DTO
-func (s *WarehouseService) MapWareHouseToDTO(w map[int]models.WareHouse) (r map[int]dto.WareHouseDoc) {
-	r = make(map[int]dto.WareHouseDoc)
-	for id, wh := range w {
-		r[id] = dto.WareHouseDoc{
-			Id:                 wh.Id.GetId(),
-			WareHouseCode:      wh.WareHouseCode.GetWareHouseCode(),
-			Address:            wh.Address.GetAddress(),
-			Telephone:          wh.Telephone.GetTelephone(),
-			MinimunCapacity:    wh.MinimunCapacity.GetMinimunCapacity(),
-			MinimunTemperature: wh.MinimunTemperature.GetMinimunTemperature(),
-		}
-	}
-	return
 }
 
 // ! 4)

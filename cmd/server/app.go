@@ -23,7 +23,6 @@ import (
 	// Employees
 	employeeRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	employeeService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
-	employeeStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 
 	//Sections
 	sectionRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
@@ -94,8 +93,7 @@ func (a *ServerChi) Run() (err error) {
 	sellerHandler := handler.NewSellerDefault(sellerService)
 
 	// Employees
-	employeeStorage := employeeStorage.NewEmployeeJSONFile(employeeFilePath)
-	employeeRepository := employeeRepository.NewEmployeeMap(*employeeStorage)
+	employeeRepository := employeeRepository.NewEmployeeSQL(dbConn)
 	employeeService := employeeService.NewDefaultService(employeeRepository)
 	employeeHandler := handler.NewDefaultHandler(employeeService)
 

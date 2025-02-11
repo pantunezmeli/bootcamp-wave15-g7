@@ -1,15 +1,10 @@
 package employee
 
 import (
-	"errors"
-
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	storage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 )
-
-var ErrIdNotFound = errors.New("employee not found")
-var ErrCardNumberNotUnique = errors.New("card number must be unique")
 
 func NewEmployeeMap(storage storage.EmployeeJSONFile) *EmployeeMap {
 	return &EmployeeMap{st: storage}

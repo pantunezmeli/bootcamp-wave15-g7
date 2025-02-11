@@ -1,6 +1,13 @@
 package employee
 
-import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+import (
+	"errors"
+
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+)
+
+var ErrIdNotFound = errors.New("employee not found")
+var ErrCardNumberNotUnique = errors.New("card number must be unique")
 
 type EmployeeRepository interface {
 	// TODO

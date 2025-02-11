@@ -12,4 +12,5 @@ var (
 	ErrStorageOperationFailed = errors.New("storage operation failed")
 	ErrInvalidNumber          = errors.New("invalid number")
 	ErrInvalidRequest         = errors.New("invalid request")
+	ErrUnprocessable          = errors.New("incorrect request")
 )

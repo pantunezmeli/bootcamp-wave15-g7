@@ -1,11 +1,5 @@
 [
   {
-    "Id": 1,
-    "Card_Number_Id": 200,
-    "First_Name": "Lewis",
-    "Last_Name": "Hamilton"
-  },
-  {
     "Id": 2,
     "Card_Number_Id": 2,
     "First_Name": "Lane",
@@ -610,11 +604,5 @@
     "Card_Number_Id": 103,
     "First_Name": "Lewis",
     "Last_Name": "Hamilton"
-  },
-  {
-    "Id": 104,
-    "Card_Number_Id": 104,
-    "First_Name": "Valteri",
-    "Last_Name": "bottas"
   }
 ]

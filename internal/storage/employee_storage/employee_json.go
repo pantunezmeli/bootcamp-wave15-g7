@@ -111,20 +111,6 @@ func (s *EmployeeJSONFile) GetLastId() (id int, err error) {
 	return
 }
 
-func (s *EmployeeJSONFile) GetCardNumberById(id int) (cardNumber string, err error) {
-	employees, err := s.Load()
-	if err != nil {
-		return
-	}
-	for _, value := range employees {
-		if value.Id.GetId() == id {
-			cardNumber = value.CardNumber.GetCardNumber()
-			return
-		}
-	}
-	return
-}
-
 func (s *EmployeeJSONFile) CheckCardNumber(cardNumber string) (err error) {
 	employees, err := s.Load()
 	if err != nil {

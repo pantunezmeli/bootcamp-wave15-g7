@@ -1,10 +1,13 @@
 package server
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/config"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/db"
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 
 	//Products
@@ -35,7 +38,6 @@ import (
 	// Warehouse
 	warehouseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
 	warehouseService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse"
-	warehouseStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/warehouse_storage"
 )
 
 const (
@@ -49,6 +51,7 @@ const (
 
 type ConfigServerChi struct {
 	ServerAddress string
+	DB            *sql.DB
 }
 
 func NewServerChi(cfg *ConfigServerChi) *ServerChi {
@@ -59,18 +62,30 @@ func NewServerChi(cfg *ConfigServerChi) *ServerChi {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
+		if cfg.DB != nil {
+			defaultConfig.DB = cfg.DB
+		}
 	}
 
 	return &ServerChi{
 		serverAddress: defaultConfig.ServerAddress,
+		db:            defaultConfig.DB,
 	}
 }
 
 type ServerChi struct {
 	serverAddress string
+	db            *sql.DB
 }
 
 func (a *ServerChi) Run() (err error) {
+
+	// Set DB connection
+	cfg := config.LoadConfig()
+
+	// Connection
+	dbConn := db.CreateConnectionToDB(cfg)
+	defer dbConn.Close()
 
 	// Sellers
 	sellerStorage := sellerStorage.NewSellerJSONFile(sellerFilePath)
@@ -91,8 +106,7 @@ func (a *ServerChi) Run() (err error) {
 	buyerHandler := handler.NewBuyerHandler(buyerService)
 
 	// Warehouses
-	warehouseStorage := warehouseStorage.NewWareHouseJSONFile(warehouseFilePath)
-	warehouseRepository := warehouseRepository.NewWareHouseRepository(warehouseStorage)
+	warehouseRepository := warehouseRepository.NewWareHouseRepository(dbConn)
 	warehouseService := warehouseService.NewWareHouseService(warehouseRepository)
 	warehouseHandler := handler.NewWareHouseHandler(warehouseService)
 

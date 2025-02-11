@@ -28,7 +28,7 @@ import (
 	//Sections
 	sectionRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	sectionService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
-	sectionStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
+	sectionStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section_storage"
 
 	//Buyer
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"

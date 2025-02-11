@@ -3,7 +3,7 @@ package section
 import (
 	"dario.cat/mergo"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
+	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section_storage"
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 

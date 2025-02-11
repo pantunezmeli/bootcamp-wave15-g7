@@ -1,12 +1,10 @@
 package buyer
 
 import (
-	"errors"
-
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/buyer"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/buyer"
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
@@ -45,21 +43,31 @@ func (repo *BuyerService) GetBuyer(id int) (dto.BuyerResponse, error) {
 
 func (repo *BuyerService) CreateBuyer(entity models.Buyer) (dto.BuyerResponse, error) {
 	buyer, err := repo.repository.Create(entity)
+
 	if err != nil {
-		return dto.BuyerResponse{}, errors.New(err.Error())
+		return dto.BuyerResponse{}, err
 	}
 
 	buyerResponse := dto.GenerateBuyerResponse(buyer)
 	return buyerResponse, nil
 }
 
-func (repo *BuyerService) UpdateBuyer(id int, entity dto.BuyerResponse) (dto.BuyerResponse, error) {
+func (repo *BuyerService) UpdateBuyer(id int, entity dto.BuyerUpdate) (dto.BuyerResponse, error) {
 
 	if id <= 0 {
 		return dto.BuyerResponse{}, errorbase.ErrInvalidId
 	}
 
-	buyerReq := dto.GenerateBuyerRequeste(entity)
+	buyerExist, err2 := repo.GetBuyer(id)
+	if err2 != nil {
+		return dto.BuyerResponse{}, errorbase.ErrNotFound
+	}
+
+	if err3 := dto.ValidateBuyerFields(entity); err3 != nil {
+		return dto.BuyerResponse{}, errorbase.ErrUnprocessable
+	}
+
+	buyerReq := dto.GenerateBuyerRequestUpdate(id, entity, buyerExist)
 
 	buyer, err := repo.repository.Update(id, buyerReq)
 	if err != nil {

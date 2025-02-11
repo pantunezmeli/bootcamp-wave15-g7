@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	//"dario.cat/mergo"
-	"dario.cat/mergo"
+
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	buyerstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
@@ -13,7 +13,6 @@ import (
 )
 
 type BuyerRepository struct {
-	//buyers  map[int]models.Buyer
 	storage buyerstorage.IBuyerLoader
 }
 
@@ -23,7 +22,10 @@ func NewBuyerRepository(storage buyerstorage.IBuyerLoader) *BuyerRepository {
 
 func (buyer *BuyerRepository) GetAll() (map[int]models.Buyer, error) {
 
-	buyers, _ := buyer.storage.Load()
+	buyers, err := buyer.storage.Load()
+	if err != nil {
+		return nil, errorbase.ErrStorageOperationFailed
+	}
 	list := make(map[int]models.Buyer)
 	for key, value := range buyers {
 		list[key] = value
@@ -33,7 +35,10 @@ func (buyer *BuyerRepository) GetAll() (map[int]models.Buyer, error) {
 }
 
 func (buyer *BuyerRepository) GetById(id int) (models.Buyer, error) {
-	buyers, _ := buyer.storage.Load()
+	buyers, err := buyer.storage.Load()
+	if err != nil {
+		return models.Buyer{}, errorbase.ErrStorageOperationFailed
+	}
 
 	byer_founded, ok := buyers[id]
 	if !ok {
@@ -43,20 +48,19 @@ func (buyer *BuyerRepository) GetById(id int) (models.Buyer, error) {
 }
 
 func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) {
-	buyers, _ := buyer.storage.Load()
+	buyers, err := buyer.storage.Load()
+	if err != nil {
+		return models.Buyer{}, errorbase.ErrStorageOperationFailed
+	}
 
-	_, ok := buyers[entity.Id]
-
-	exist := searchCardId(buyers, entity.Card_Number_Id)
-
-	if ok || exist {
+	if exist := searchCardId(buyers, entity.Card_Number_Id); exist {
 		return models.Buyer{}, errorbase.ErrConflict
 	}
 
 	attributes, err := buyer.Validatemodels(entity)
 
 	if err != nil {
-		return models.Buyer{}, err
+		return models.Buyer{}, errorbase.ErrEmptyParameters
 	}
 
 	entity.Card_Number_Id = attributes["CardNumber"].(value_objects.CardNumberId).GetCardNumberId()
@@ -74,19 +78,23 @@ func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) 
 	return entity, nil
 }
 
-func searchCardId(buyers map[int]models.Buyer, id int) bool {
-
+func searchCardId(buyers map[int]models.Buyer, cardID int) bool {
 	var found bool = false
-	var i int = 0
-	for i <= len(buyers) && !found {
-		found = buyers[i].Card_Number_Id == id
-		i++
+
+	for _, value := range buyers {
+		if value.Card_Number_Id == cardID {
+			found = true
+			break
+		}
 	}
 	return found
 }
 
 func (buyer *BuyerRepository) Update(id int, entity models.Buyer) (models.Buyer, error) {
-	buyers, _ := buyer.storage.Load()
+	buyers, err := buyer.storage.Load()
+	if err != nil {
+		return models.Buyer{}, errorbase.ErrStorageOperationFailed
+	}
 
 	element, ok := buyers[id]
 	if !ok {
@@ -106,8 +114,19 @@ func (buyer *BuyerRepository) Update(id int, entity models.Buyer) (models.Buyer,
 		}
 	}
 
-	if err := mergo.Merge(&element, entity, mergo.WithOverride); err != nil {
-		return models.Buyer{}, err
+	cardNumberId, err := value_objects.NewCardNumberId(entity.Card_Number_Id)
+	if err == nil {
+		element.Card_Number_Id = cardNumberId.GetCardNumberId()
+	}
+
+	firstName, err := value_objects.NewFirstName(entity.First_Name)
+	if err == nil {
+		element.First_Name = firstName.GetFirstName()
+	}
+
+	lastName, err := value_objects.NewLastName(entity.Last_Name)
+	if err == nil {
+		element.Last_Name = lastName.GetLastName()
 	}
 
 	buyers[id] = element
@@ -120,7 +139,10 @@ func (buyer *BuyerRepository) Update(id int, entity models.Buyer) (models.Buyer,
 }
 
 func (buyer *BuyerRepository) Delete(id int) error {
-	buyers, _ := buyer.storage.Load()
+	buyers, err := buyer.storage.Load()
+	if err != nil {
+		return errorbase.ErrStorageOperationFailed
+	}
 
 	buyerDelete, err := buyer.GetById(id)
 

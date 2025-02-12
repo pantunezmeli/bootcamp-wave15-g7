@@ -7,7 +7,9 @@ import (
 )
 
 var ErrIdNotFound = errors.New("employee not found")
+var ErrWarehouseIdNotFound = errors.New("warehouse not found")
 var ErrCardNumberNotUnique = errors.New("card number must be unique")
+var ErrInboundOrderFK = errors.New("inbound order has a foreign key to this employee")
 
 type EmployeeRepository interface {
 	// TODO

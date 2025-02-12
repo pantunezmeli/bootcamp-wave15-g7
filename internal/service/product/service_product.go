@@ -3,46 +3,55 @@ package product
 import (
 	"errors"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
+	rp "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
+	errdb "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product/errordb"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product/errsv"
 	product2 "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product"
 )
 
-func NewProductService(rp product.IProductRepository) *ProductService {
+func NewProductService(rp rp.IProductRepository) *ProductService {
 	return &ProductService{rp: rp}
 }
 
 type ProductService struct {
-	rp product.IProductRepository
+	rp rp.IProductRepository
 }
 
 func (p ProductService) UpdateProduct(id int, patch product2.UpdateProductRequest) (productUpdate product2.ProductDTO, err error) {
 	productSearch, errSearch := p.rp.GetByID(id)
 	if errSearch != nil {
-		if errors.Is(errSearch, product.ErrProductNotFound) {
-			err = ErrNotFoundProduct{message: "Product not found"}
+		if errors.Is(errSearch, rp.ErrProductNotFound) {
+			err = errsv.ErrNotFoundProduct{Message: "Product not found"}
 			return
 		}
-		err = ErrProduct{message: "Error searching product"}
+		err = errsv.ErrProduct{Message: "Error searching product"}
 		return
 	}
 
-	if patch.ProductCode != nil {
-		validConflictCode := p.validConflictCode(*patch.ProductCode)
-		if validConflictCode != nil {
-			err = validConflictCode
+	errValidCode := p.rp.ProductCodeExist(*patch.ProductCode)
+	if errValidCode != nil {
+		if errors.Is(errValidCode, rp.ErrProductCodeAlreadyExist) {
+			err = errsv.ErrProductConflict{Message: "Product code already exists"}
 			return
 		}
+		err = errsv.ErrProduct{Message: "Error valid product code"}
+		return
 	}
 
 	errPatch := product2.PatchProduct(patch, &productSearch)
 	if errPatch != nil {
-		err = ErrValidProduct{message: errPatch.Error()}
+		err = errsv.ErrValidProduct{Message: errPatch.Error()}
 		return
 	}
 
-	errSave := p.rp.UpdateProduct(productSearch)
-	if errSave != nil {
-		err = ErrProduct{message: "Error save product"}
+	errUpdate := p.rp.UpdateProduct(productSearch)
+	if errUpdate != nil {
+		if errors.As(errUpdate, &errdb.ErrViolateFK{}) {
+			err = errsv.ErrInvalidRequest{Message: errUpdate.Error()}
+			return
+		}
+
+		err = errsv.ErrProduct{Message: "Error save product"}
 		return
 	}
 
@@ -60,11 +69,11 @@ func (p ProductService) GetAll() ([]product2.ProductDTO, error) {
 func (p ProductService) GetByID(id int) (productDTO product2.ProductDTO, err error) {
 	productSearch, errSearch := p.rp.GetByID(id)
 	if errSearch != nil {
-		if errors.Is(errSearch, product.ErrProductNotFound) {
-			err = ErrNotFoundProduct{message: "Product not found"}
+		if errors.Is(errSearch, rp.ErrProductNotFound) {
+			err = errsv.ErrNotFoundProduct{Message: "Product not found"}
 			return
 		}
-		err = ErrProduct{message: "Error searching product"}
+		err = errsv.ErrProduct{Message: "Error searching product"}
 		return
 	}
 
@@ -77,20 +86,26 @@ func (p ProductService) CreateProduct(product product2.ProductDTO) (productDto p
 	var newProduct models.Product
 	errValid := product2.ValidAndParserDTO(product, &newProduct)
 	if errValid != nil {
-		err = ErrValidProduct{message: errValid.Error()}
+		err = errsv.ErrValidProduct{Message: errValid.Error()}
 		return
 	}
 
-	validConflictCode := p.validConflictCode(newProduct.ProductCode)
-	if validConflictCode != nil {
-		err = validConflictCode
+	errValidCode := p.rp.ProductCodeExist(newProduct.ProductCode)
+	if errValidCode != nil {
+		if errors.Is(errValidCode, rp.ErrProductCodeAlreadyExist) {
+			err = errsv.ErrProductConflict{Message: "Product code already exists"}
+			return
+		}
+		err = errsv.ErrProduct{Message: "Error valid product code"}
 		return
 	}
 
-	newProduct.ID = p.rp.GetLastID()
-
-	if errCreate := p.rp.CreateProduct(newProduct); errCreate != nil {
-		err = ErrProduct{message: "Error creating product"}
+	if errCreate := p.rp.CreateProduct(&newProduct); errCreate != nil {
+		if errors.As(errCreate, &errdb.ErrViolateFK{}) {
+			err = errsv.ErrInvalidRequest{Message: errCreate.Error()}
+			return
+		}
+		err = errsv.ErrProduct{Message: "Error creating product"}
 		return
 	}
 
@@ -99,28 +114,21 @@ func (p ProductService) CreateProduct(product product2.ProductDTO) (productDto p
 }
 
 func (p ProductService) DeleteProduct(id int) (err error) {
+	_, ErrGetEntity := p.GetByID(id)
+	if ErrGetEntity != nil {
+		err = ErrGetEntity
+		return
+	}
+
 	errDelete := p.rp.DeleteProduct(id)
 	if errDelete != nil {
-		if errors.Is(errDelete, product.ErrProductNotFound) {
-			err = ErrNotFoundProduct{message: "Product not found"}
+		if errors.As(errDelete, &errdb.ErrConflict{}) {
+			err = errsv.ErrProductConflict{Message: "It is not possible to delete the product because it is being used"}
 			return
 		}
-		err = ErrProduct{message: "Error deleted product"}
+		err = errsv.ErrProduct{Message: "Error deleted product"}
+		return
 	}
 
 	return
-}
-
-func (p ProductService) validConflictCode(code string) (err error) {
-	valid, errValid := p.rp.ProductCodeExist(code)
-	if errValid != nil {
-		err = ErrProduct{message: "Error valid product code"}
-		return
-	}
-
-	if valid {
-		err = ErrProductConflict{message: "Product code already exists"}
-		return
-	}
-	return nil
 }

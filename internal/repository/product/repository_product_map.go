@@ -3,9 +3,9 @@ package product
 import (
 	"errors"
 	"fmt"
-
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	err2 "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product/errordb"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 )
 
@@ -21,6 +21,7 @@ func (p ProductRepositoryMap) GetAll() (map[int]models.Product, error) {
 	products, err := p.storage.GetDb()
 	if err != nil {
 		fmt.Println(err)
+		err = err2.ErrDB{"Error getting all products"}
 	}
 	return products, err
 }
@@ -40,12 +41,7 @@ func (p ProductRepositoryMap) GetByID(id int) (models.Product, error) {
 }
 
 func (p ProductRepositoryMap) DeleteProduct(id int) error {
-	productSearch, errSearch := p.GetByID(id)
-	if errSearch != nil {
-		return errSearch
-	}
-
-	errDelete := p.storage.RemoveProduct(productSearch.ID.GetId())
+	errDelete := p.storage.RemoveProduct(id)
 	if errDelete != nil {
 		return ErrProductRepository{msg: "Error deleting product"}
 	}
@@ -53,25 +49,26 @@ func (p ProductRepositoryMap) DeleteProduct(id int) error {
 	return nil
 }
 
-func (p ProductRepositoryMap) CreateProduct(product models.Product) error {
-	return p.storage.SaveProduct(product)
+func (p ProductRepositoryMap) CreateProduct(product *models.Product) error {
+	product.ID = p.getLastID()
+	return p.storage.SaveProduct(*product)
 }
 
-func (p ProductRepositoryMap) ProductCodeExist(productCode string) (bool, error) {
+func (p ProductRepositoryMap) ProductCodeExist(productCode string) error {
 	products, errGetAll := p.GetAll()
 	if errGetAll != nil {
-		return false, errGetAll
+		return errGetAll
 	}
 
 	for _, productMap := range products {
 		if productMap.ProductCode == productCode {
-			return true, nil
+			return ErrProductCodeAlreadyExist
 		}
 	}
-	return false, nil
+	return nil
 }
 
-func (p ProductRepositoryMap) GetLastID() value_objects.Id {
+func (p ProductRepositoryMap) getLastID() value_objects.Id {
 	products, _ := p.GetAll()
 	var lastId int
 	for _, productMap := range products {

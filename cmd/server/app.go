@@ -13,7 +13,7 @@ import (
 	//Products
 	productRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	productService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
-	productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
+	//productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 
 	//Sellers
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
@@ -41,12 +41,12 @@ import (
 )
 
 const (
-	productFilePath   = "../docs/db/product_data.json"
-	buyerFilePath     = "../docs/db/buyer_data.json"
-	warehouseFilePath = "../docs/db/warehouse_data.json"
-	employeeFilePath  = "../docs/db/employee_data.json"
-	sellerFilePath    = "../docs/db/seller_data.json"
-	sectionFilePath   = "../docs/db/section_data.json"
+	productFilePath   = "../docs/db/json/product_data.json"
+	buyerFilePath     = "../docs/db/json/buyer_data.json"
+	warehouseFilePath = "../docs/db/json/warehouse_data.json"
+	employeeFilePath  = "../docs/db/json/employee_data.json"
+	sellerFilePath    = "../docs/db/json/seller_data.json"
+	sectionFilePath   = "../docs/db/json/section_data.json"
 )
 
 type ConfigServerChi struct {
@@ -111,8 +111,8 @@ func (a *ServerChi) Run() (err error) {
 	warehouseHandler := handler.NewWareHouseHandler(warehouseService)
 
 	// Product
-	productStorage := productStorage.NewProductJSONFile(productFilePath)
-	productRepository := productRepository.NewProductRepositoryMap(productStorage)
+	//productStorage := productStorage.NewProductJSONFile(productFilePath)
+	productRepository := productRepository.NewProductRepositoryMysql(dbConn)
 	productService := productService.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 

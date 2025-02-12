@@ -3,7 +3,6 @@ package employee
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
@@ -151,7 +150,6 @@ func (r *EmployeeSQL) Edit(id int, employee models.Employee) (updatedEmployee mo
 		return
 	} else {
 		if affectedRows == 0 {
-			fmt.Println("No rows affected")
 			err = ErrIdNotFound
 			return
 		}

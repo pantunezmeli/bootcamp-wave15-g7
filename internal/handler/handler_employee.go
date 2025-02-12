@@ -13,9 +13,11 @@ import (
 )
 
 var (
-	ErrEmployeeNotFound = errors.New("employee not found")
-	ErrCardNumberExists = errors.New("card number already exists")
-	ErrEmptyField       = errors.New("employee data lacks a required field")
+	ErrEmployeeNotFound          = errors.New("employee not found")
+	ErrWarehouseNotFound         = errors.New("warehouse not found")
+	ErrCardNumberExists          = errors.New("card number already exists")
+	ErrEmptyField                = errors.New("employee data lacks a required field")
+	ErrInboundOrderNeedsEmployee = errors.New("inbound order linked to this employee")
 )
 
 func NewDefaultHandler(service sv.EmployeeService) *DefaultHandler {
@@ -93,6 +95,10 @@ func (h *DefaultHandler) Create() http.HandlerFunc {
 				dto.JSONError(w, http.StatusConflict, ErrCardNumberExists.Error())
 				return
 			}
+			if errors.Is(err, sv.ErrWarehouseNotFound) {
+				dto.JSONError(w, http.StatusNotFound, ErrWarehouseNotFound.Error())
+				return
+			}
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
@@ -130,6 +136,10 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 				dto.JSONError(w, http.StatusConflict, ErrCardNumberExists.Error())
 				return
 			}
+			if errors.Is(err, sv.ErrWarehouseNotFound) {
+				dto.JSONError(w, http.StatusNotFound, ErrWarehouseNotFound.Error())
+				return
+			}
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 			return
 		}
@@ -152,6 +162,10 @@ func (h *DefaultHandler) Delete() http.HandlerFunc {
 		// process
 		err = h.sv.DeleteById(id)
 		if err != nil {
+			if errors.Is(err, sv.ErrInboundOrderNeedsEmployee) {
+				dto.JSONError(w, http.StatusConflict, ErrInboundOrderNeedsEmployee.Error())
+				return
+			}
 			if errors.Is(err, sv.ErrEmployeeNotFound) {
 				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
 				return

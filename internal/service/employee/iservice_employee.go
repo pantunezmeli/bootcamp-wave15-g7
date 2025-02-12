@@ -1,8 +1,16 @@
 package employee
 
 import (
+	"errors"
+
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
+
+var ErrEmployeeNotFound = errors.New("employee not found")
+var ErrWarehouseNotFound = errors.New("warehouse not found")
+var ErrEmptyField = errors.New("employee data lacks a required field")
+var ErrCardNumberAlreadyExists = errors.New("employee card number already exists")
+var ErrInboundOrderNeedsEmployee = errors.New("inbound order linked to this employee")
 
 type EmployeeService interface {
 	// TODO

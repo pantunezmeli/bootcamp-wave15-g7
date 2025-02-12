@@ -8,10 +8,6 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 )
 
-var ErrEmployeeNotFound = errors.New("employee not found")
-var ErrEmptyField = errors.New("employee data lacks a required field")
-var ErrCardNumberAlreadyExists = errors.New("employee card number already exists")
-
 func NewDefaultService(repository employee.EmployeeRepository) *DefaultService {
 	return &DefaultService{rp: repository}
 }
@@ -64,6 +60,9 @@ func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.
 		if err == employee.ErrCardNumberNotUnique {
 			err = ErrCardNumberAlreadyExists
 		}
+		if err == employee.ErrWarehouseIdNotFound {
+			err = ErrWarehouseNotFound
+		}
 		return
 	}
 
@@ -86,8 +85,14 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 	}
 	updatedEmployee, err := s.rp.Edit(id, employeeModel)
 	if err != nil {
+		if errors.Is(err, employee.ErrIdNotFound) {
+			err = ErrEmployeeNotFound
+		}
 		if err == employee.ErrCardNumberNotUnique {
 			err = ErrCardNumberAlreadyExists
+		}
+		if err == employee.ErrWarehouseIdNotFound {
+			err = ErrWarehouseNotFound
 		}
 		return
 	}
@@ -106,6 +111,9 @@ func (s *DefaultService) DeleteById(id int) (err error) {
 	}
 
 	err = s.rp.DeleteById(id)
+	if errors.Is(err, employee.ErrInboundOrderFK) {
+		err = ErrInboundOrderNeedsEmployee
+	}
 	if errors.Is(err, employee.ErrIdNotFound) {
 		err = ErrEmployeeNotFound
 	}

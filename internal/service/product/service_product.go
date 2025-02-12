@@ -28,14 +28,16 @@ func (p ProductService) UpdateProduct(id int, patch product2.UpdateProductReques
 		return
 	}
 
-	errValidCode := p.rp.ProductCodeExist(*patch.ProductCode)
-	if errValidCode != nil {
-		if errors.Is(errValidCode, rp.ErrProductCodeAlreadyExist) {
-			err = errsv.ErrProductConflict{Message: "Product code already exists"}
+	if patch.ProductCode != nil {
+		errValidCode := p.rp.ProductCodeExist(*patch.ProductCode)
+		if errValidCode != nil {
+			if errors.Is(errValidCode, rp.ErrProductCodeAlreadyExist) {
+				err = errsv.ErrProductConflict{Message: "Product code already exists"}
+				return
+			}
+			err = errsv.ErrProduct{Message: "Error valid product code"}
 			return
 		}
-		err = errsv.ErrProduct{Message: "Error valid product code"}
-		return
 	}
 
 	errPatch := product2.PatchProduct(patch, &productSearch)
@@ -47,7 +49,7 @@ func (p ProductService) UpdateProduct(id int, patch product2.UpdateProductReques
 	errUpdate := p.rp.UpdateProduct(productSearch)
 	if errUpdate != nil {
 		if errors.As(errUpdate, &errdb.ErrViolateFK{}) {
-			err = errsv.ErrInvalidRequest{Message: errUpdate.Error()}
+			err = errsv.ErrProductConflict{Message: errUpdate.Error()}
 			return
 		}
 
@@ -102,7 +104,7 @@ func (p ProductService) CreateProduct(product product2.ProductDTO) (productDto p
 
 	if errCreate := p.rp.CreateProduct(&newProduct); errCreate != nil {
 		if errors.As(errCreate, &errdb.ErrViolateFK{}) {
-			err = errsv.ErrInvalidRequest{Message: errCreate.Error()}
+			err = errsv.ErrProductConflict{Message: errCreate.Error()}
 			return
 		}
 		err = errsv.ErrProduct{Message: "Error creating product"}

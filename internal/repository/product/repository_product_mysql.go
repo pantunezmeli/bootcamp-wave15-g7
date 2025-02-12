@@ -52,7 +52,7 @@ func (r RepositoryProductMysql) GetByID(id int) (product m.Product, err error) {
 
 	rows, errQuery := r.db.Query(QUERY, id)
 	if errQuery != nil {
-		err = errdb.ErrDB{Message: "Error querying GetById product: " + errors.Unwrap(errQuery).Error()}
+		err = errdb.ErrDB{Message: "Error querying GetById product"}
 		return
 	}
 

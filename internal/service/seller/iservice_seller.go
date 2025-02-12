@@ -11,6 +11,7 @@ const (
 	CidString = "cid"
 	TelephoneString = "telephone"
 	CompanyNameString = "company_name"
+	LocalityIdString = "locality_id"
 )
 type ErrMissingParameters struct {
 	missingParameter string;

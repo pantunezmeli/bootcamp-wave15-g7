@@ -154,6 +154,8 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 				dto.JSONError(w, http.StatusConflict, ErrCidExists.Error())
 			case errors.Is(err, repo.ErrSellerNotFound):
 				dto.JSONError(w, http.StatusNotFound, ErrSellerNotFound.Error())
+			case errors.Is(err, repo.ErrLocalityNotFound):
+				dto.JSONError(w, http.StatusConflict, ErrLocalityNotExist.Error())
 			case errors.As(err, &invalidParamErr):
 				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
 			default:

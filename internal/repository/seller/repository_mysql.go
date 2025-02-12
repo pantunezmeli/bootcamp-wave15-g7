@@ -104,13 +104,56 @@ func (s *SellerMySql) Save(modelWithoutId models.Seller) (seller models.Seller, 
 }
 
 func (s *SellerMySql) Delete(id int) (err error){
+	result, err := s.db.Exec(`DELETE FROM sellers WHERE id = ?`, id)
+	if err != nil {
+		err = ErrConnection
+		return
+	}
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		err = ErrConnection
+		return
+	}
+	if affectedRows == 0 {
+		err = ErrSellerNotFound
+		return
+	}
 	return
-
-
-
 }
 
 func(s *SellerMySql) Update(sellerModel models.Seller) (sellerUpdated models.Seller, err error){
+	result, err := s.db.Exec(`
+	UPDATE sellers SET cid = ?, company_name = ?, address = ?, telephone = ?, locality_id = ? WHERE id = ?`,
+	sellerModel.Cid, sellerModel.CompanyName, sellerModel.Address, sellerModel.Telephone, sellerModel.LocalityId, sellerModel.ID)
+	if err != nil {
+		var sqlError *mysql.MySQLError
+		fmt.Println(err)
+		if errors.As(err, &sqlError){
+			fmt.Println(err)
+			switch sqlError.Number {
+			case 1452:
+				err = ErrLocalityNotFound
+			case 1062:
+				err = ErrCidAlreadyExists
+			default:
+				err = ErrConnection
+			}
+			return
+		}
+		err = ErrConnection
+		return
+	}
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		err = ErrConnection
+		return
+	}
+
+	if affectedRows == 0 {
+		err = ErrSellerNotFound
+		return
+	}
+	sellerUpdated = sellerModel
 	return
 }
 

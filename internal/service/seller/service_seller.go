@@ -5,6 +5,7 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	seller_vo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/seller"
+	locality_vo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/locality"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	seller_dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/seller"
 )
@@ -114,6 +115,10 @@ func (s *SellerDefault) ValidateAllParameters(reqBody seller_dto.SellerRequest) 
 		err = &ErrMissingParameters{CompanyNameString}
 		return
 	}
+	if reqBody.LocalityId == nil {
+		err = &ErrMissingParameters{LocalityIdString}
+		return
+	}
 	return
 }
 
@@ -148,6 +153,14 @@ func modifyAttributes(reqBody seller_dto.SellerRequest, modelToModify *models.Se
 			return &ErrInvalidParameter{err.Error()}
 		}
 		modelToModify.Telephone = telephone
+	}
+
+	if reqBody.LocalityId != nil {
+		locality, err := locality_vo.NewLocalityId(*reqBody.LocalityId)
+		if err != nil {
+			return &ErrInvalidParameter{err.Error()}
+		}
+		modelToModify.LocalityId = locality
 	}
 	return
 }

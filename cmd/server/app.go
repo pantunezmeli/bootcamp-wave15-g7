@@ -94,7 +94,7 @@ func (a *ServerChi) Run() (err error) {
 
 	// Employees
 	employeeRepository := employeeRepository.NewEmployeeSQL(dbConn)
-	employeeService := employeeService.NewDefaultService(employeeRepository)
+	employeeService := employeeService.NewSimpleService(employeeRepository)
 	employeeHandler := handler.NewDefaultHandler(employeeService)
 
 	// Buyers

@@ -38,6 +38,10 @@ import (
 	// Warehouse
 	warehouseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
 	warehouseService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse"
+
+	//Product Batches
+	productBatchRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product_batch"
+	productBatchService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product_batch"
 )
 
 const (
@@ -122,6 +126,11 @@ func (a *ServerChi) Run() (err error) {
 	sectionService := sectionService.NewSectionService(sectionRepository)
 	sectionHandler := handler.NewSectionDefault(sectionService)
 
+	// Product Batches
+	productBatchRepository := productBatchRepository.NewProductBatchRepository(dbConn)
+	productBatchService := productBatchService.NewProductBatchService(productBatchRepository)
+	productBatchHandler := handler.NewProductBatchHandler(productBatchService)
+
 	// router
 	rt := chi.NewRouter()
 
@@ -179,6 +188,10 @@ func (a *ServerChi) Run() (err error) {
 			rt.Post("/", buyerHandler.Create())
 			rt.Patch("/{id}", buyerHandler.Update())
 			rt.Delete("/{id}", buyerHandler.Delete())
+		})
+
+		r.Route("/productBatches", func(rt chi.Router) {
+			rt.Get("/", productBatchHandler.Create)
 		})
 	})
 

@@ -9,15 +9,15 @@ import (
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
-// NewSectionService is a function that returns a new instance of SectionService
-func NewSectionService(rp section.ISectionRepository) *SectionService {
-	return &SectionService{repository: rp}
-}
-
 // SectionService is a struct that represents the SerSectionService service for sections
 type SectionService struct {
 	// repository is the repository that will be used by the service
 	repository section.ISectionRepository
+}
+
+// NewSectionService is a function that returns a new instance of SectionService
+func NewSectionService(rp section.ISectionRepository) *SectionService {
+	return &SectionService{repository: rp}
 }
 
 // ListSections is a method that returns a map of all Sections

@@ -3,13 +3,14 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+	"strconv"
+
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 	product2 "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product"
-	"net/http"
-	"strconv"
 )
 
 func NewProductHandler(sv product.IProductService) *ProductHandle {

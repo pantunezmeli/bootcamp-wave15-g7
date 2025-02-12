@@ -33,6 +33,11 @@ func (handler *BuyerHandler) Get() http.HandlerFunc {
 			return
 		}
 
+		if errors.Is(err, errorbase.ErrDatabaseOperationFailed) {
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
+			return
+		}
+
 		if err != nil {
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
@@ -58,6 +63,9 @@ func (handler *BuyerHandler) GetById() http.HandlerFunc {
 			return
 		case errors.Is(err, errorbase.ErrNotFound):
 			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrNotFound)
+			return
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrRequest)
@@ -87,8 +95,8 @@ func (handler *BuyerHandler) Create() http.HandlerFunc {
 		case errors.Is(err, errorbase.ErrEmptyParameters):
 			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrUnprocessable)
 			return
-		case errors.Is(err, errorbase.ErrStorageOperationFailed):
-			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
 			fmt.Println(err)
@@ -132,8 +140,8 @@ func (handler *BuyerHandler) Update() http.HandlerFunc {
 		case errors.Is(err, errorbase.ErrUnprocessable):
 			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrUnprocessable)
 			return
-		case errors.Is(err, errorbase.ErrStorageOperationFailed):
-			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
@@ -162,8 +170,8 @@ func (handler *BuyerHandler) Delete() http.HandlerFunc {
 		case errors.Is(err, errorbase.ErrNotFound):
 			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrNotFound)
 			return
-		case errors.Is(err, errorbase.ErrStorageOperationFailed):
-			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)

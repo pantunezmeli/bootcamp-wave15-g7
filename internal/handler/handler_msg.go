@@ -13,6 +13,7 @@ var (
 	MSG_ErrJsonFormat             = "invalid JSON format"
 	MSG_ErrRequest                = "invalid request type"
 	MSG_ErrUnprocessable          = "incorrect syntax of the request"
+	MSG_ErrOperationDB            = "operation on the database failed"
 )
 
 // MSG

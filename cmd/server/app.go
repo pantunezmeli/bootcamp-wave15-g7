@@ -33,7 +33,6 @@ import (
 	//Buyer
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 	buyerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
-	buyerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
 
 	// Warehouse
 	warehouseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
@@ -100,8 +99,8 @@ func (a *ServerChi) Run() (err error) {
 	employeeHandler := handler.NewDefaultHandler(employeeService)
 
 	// Buyers
-	buyerStorage := buyerStorage.NewBuyerJSONFile(buyerFilePath)
-	buyerRepository := buyerRepository.NewBuyerRepository(buyerStorage)
+	//buyerStorage := buyerStorage.NewBuyerJSONFile(buyerFilePath)
+	buyerRepository := buyerRepository.NewBuyerRepository(dbConn)
 	buyerService := buyerService.NewBuyerService(buyerRepository)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
 

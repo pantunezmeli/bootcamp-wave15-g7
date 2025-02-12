@@ -22,6 +22,7 @@ var (
 	ErrSellerNotFound = errors.New("seller not found")
 	ErrInvalidBody = errors.New("invalid body")
 	ErrCidExists = errors.New("cid already exists and should be unique")
+	ErrLocalityNotExist = errors.New("locality_id does not exist")
 )
 
 
@@ -89,6 +90,8 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 			switch{
 			case errors.Is(err, repo.ErrCidAlreadyExists):
 				dto.JSONError(w, http.StatusConflict, ErrCidExists.Error())
+			case errors.Is(err, repo.ErrLocalityNotFound):
+				dto.JSONError(w, http.StatusConflict, ErrLocalityNotExist.Error())
 			case errors.As(err, &missingParamErr):
 				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
 			case errors.As(err, &invalidParamErr):

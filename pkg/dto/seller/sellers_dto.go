@@ -2,7 +2,9 @@ package seller_dto
 
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	seller_vo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/seller"
+	locality_vo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/locality"
+
 )
 
 type SellerRequest struct {
@@ -10,14 +12,17 @@ type SellerRequest struct {
 	CompanyName *string `json:"company_name"`
 	Address *string `json:"address"`
 	Telephone *string `json:"telephone"`
+	LocalityId *int `json:"locality_id"`
 }
 
 type SellerDoc struct {
-	ID  value_objects.SellerId `json:"id"`
-	Cid value_objects.Cid `json:"cid"`
-	CompanyName value_objects.CompanyName `json:"company_name"`
-	Address value_objects.SellerAddress `json:"address"`
-	Telephone value_objects.SellerTelephone `json:"telephone"`
+	ID  seller_vo.SellerId `json:"id"`
+	Cid seller_vo.Cid `json:"cid"`
+	CompanyName seller_vo.CompanyName `json:"company_name"`
+	Address seller_vo.SellerAddress `json:"address"`
+	Telephone seller_vo.SellerTelephone `json:"telephone"`
+	LocalityId locality_vo.LocalityId `json:"locality_id"`
+
 }
 
 
@@ -28,24 +33,29 @@ func ParseModelToResponse(sellerModel models.Seller) (sellerDto SellerDoc){
 			CompanyName: sellerModel.CompanyName,
 			Address: sellerModel.Address,
 			Telephone: sellerModel.Telephone,
+			LocalityId: sellerModel.LocalityId,
 		}
 	return
 }
 
 func ParseRequestToModel(sellerDto SellerRequest) (sellerModel models.Seller, err error){
-	cid, err := value_objects.NewCid(*sellerDto.Cid)
+	cid, err := seller_vo.NewCid(*sellerDto.Cid)
 	if err != nil{
 		return
 	}
-	companyName, err := value_objects.NewCompanyName(*sellerDto.CompanyName)
+	companyName, err := seller_vo.NewCompanyName(*sellerDto.CompanyName)
 	if err != nil {
 		return
 	}
-	address, err := value_objects.NewSellerAddress(*sellerDto.Address)
+	address, err := seller_vo.NewSellerAddress(*sellerDto.Address)
 	if err != nil{
 		return
 	}
-	telephone, err := value_objects.NewSellerTelephone(*sellerDto.Telephone)
+	telephone, err := seller_vo.NewSellerTelephone(*sellerDto.Telephone)
+	if err != nil {
+		return
+	}
+	locality, err := locality_vo.NewLocalityId(*sellerDto.LocalityId)
 	if err != nil {
 		return
 	}
@@ -57,6 +67,7 @@ func ParseRequestToModel(sellerDto SellerRequest) (sellerModel models.Seller, er
 			Address: address,
 			Telephone: telephone,
 		},
+		LocalityId: locality,
 	}
 	return
 }

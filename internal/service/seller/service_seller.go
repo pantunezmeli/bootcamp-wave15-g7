@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	seller_vo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	seller_dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/seller"
 )
@@ -119,7 +119,7 @@ func (s *SellerDefault) ValidateAllParameters(reqBody seller_dto.SellerRequest) 
 
 func modifyAttributes(reqBody seller_dto.SellerRequest, modelToModify *models.Seller) (err error) {
 	if reqBody.Cid != nil {
-		cid, err := value_objects.NewCid(*reqBody.Cid)
+		cid, err := seller_vo.NewCid(*reqBody.Cid)
 		if err != nil {
 			return &ErrInvalidParameter{err.Error()}
 		}
@@ -127,7 +127,7 @@ func modifyAttributes(reqBody seller_dto.SellerRequest, modelToModify *models.Se
 	}
 
 	if reqBody.CompanyName != nil {
-		companyName, err := value_objects.NewCompanyName(*reqBody.CompanyName)
+		companyName, err := seller_vo.NewCompanyName(*reqBody.CompanyName)
 		if err != nil {
 			return &ErrInvalidParameter{err.Error()}
 		}
@@ -135,7 +135,7 @@ func modifyAttributes(reqBody seller_dto.SellerRequest, modelToModify *models.Se
 	}
 
 	if reqBody.Address != nil {
-		address, err := value_objects.NewSellerAddress(*reqBody.Address)
+		address, err := seller_vo.NewSellerAddress(*reqBody.Address)
 		if err != nil {
 			return &ErrInvalidParameter{err.Error()}
 		}
@@ -143,7 +143,7 @@ func modifyAttributes(reqBody seller_dto.SellerRequest, modelToModify *models.Se
 	}
 
 	if reqBody.Telephone != nil {
-		telephone, err := value_objects.NewSellerTelephone(*reqBody.Telephone)
+		telephone, err := seller_vo.NewSellerTelephone(*reqBody.Telephone)
 		if err != nil {
 			return &ErrInvalidParameter{err.Error()}
 		}

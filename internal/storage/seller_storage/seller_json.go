@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	seller_vo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/seller"
 	seller_dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/seller"
 )
 
@@ -40,23 +40,23 @@ func (l *SellerJSONFile) Load() (sellerMap map[int]models.Seller, err error) {
 
 	sellerMap = make(map[int]models.Seller)
 	for _, s := range sellersJSON {
-		Id, err :=value_objects.NewSellerId(int(s.ID))
+		Id, err :=seller_vo.NewSellerId(int(s.ID))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Cid, err :=value_objects.NewCid(string(s.Cid))
+		Cid, err :=seller_vo.NewCid(string(s.Cid))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		CompanyName, err :=value_objects.NewCompanyName(string(s.CompanyName))
+		CompanyName, err :=seller_vo.NewCompanyName(string(s.CompanyName))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Address, err :=value_objects.NewSellerAddress(string(s.Address))
+		Address, err :=seller_vo.NewSellerAddress(string(s.Address))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Telephone, err :=value_objects.NewSellerTelephone(string(s.Telephone))
+		Telephone, err :=seller_vo.NewSellerTelephone(string(s.Telephone))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}

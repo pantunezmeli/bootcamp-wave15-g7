@@ -14,7 +14,6 @@ import (
 	productRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	productService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 
 	//Sellers
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
@@ -87,11 +86,8 @@ func (a *ServerChi) Run() (err error) {
 	dbConn := db.CreateConnectionToDB(cfg)
 	defer dbConn.Close()
 
-	//storage
-	sellerStorage := seller_storage.NewSellerJSONFile("./docs/db/json/seller_data.json")
-
 	// Sellers
-	sellerRepository := sellerRepository.NewSellerStorage(*sellerStorage)
+	sellerRepository := sellerRepository.NewSellerMySql(dbConn)
 	sellerService := sellerService.NewSellerDefault(sellerRepository)
 	sellerHandler := handler.NewSellerDefault(sellerService)
 

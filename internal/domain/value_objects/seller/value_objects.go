@@ -1,4 +1,4 @@
-package value_objects
+package seller
 
 import (
 	"errors"
@@ -40,6 +40,9 @@ func NewSellerId(value int) (id SellerId, err error) {
 type Cid string
 
 func NewCid(value string) (cid Cid, err error) {
+	if len(value) <= 1 {
+		err = ErrInvalidCid
+	}
 	cid = Cid(value)
 	return
 }
@@ -95,7 +98,8 @@ func validateLength(value string, min, max int, errMin, errMax error) error {
 func validateTelephone(value string) error {
 	validTelephone := regexp.MustCompile(validTelephoneRegex)
 	if !validTelephone.MatchString(value) {
-		return ErrInvalidTelephone
+		return ErrSellerInvalidTelephone
 	}
 	return nil
 }
+

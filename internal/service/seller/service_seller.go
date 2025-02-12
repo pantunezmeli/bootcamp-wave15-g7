@@ -1,6 +1,8 @@
 package seller
 
 import (
+	"fmt"
+
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
@@ -18,10 +20,11 @@ func NewSellerDefault(rp seller.SellerRepository) *SellerDefault {
 func (s *SellerDefault) GetAll() (sellers []seller_dto.SellerDoc, err error) {
 	sellersModel, err := s.rp.GetAll()
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	for _, sellerModel := range sellersModel{
-		sellerDto := seller_dto.ParseModelToDto(sellerModel)
+		sellerDto := seller_dto.ParseModelToResponse(sellerModel)
 		sellers = append(sellers, sellerDto)
 	}
 	return
@@ -33,19 +36,19 @@ func (s *SellerDefault) GetById(id int) (seller seller_dto.SellerDoc, err error)
 		return
 	}
 
-	seller = seller_dto.ParseModelToDto(sellerModel)
+	seller = seller_dto.ParseModelToResponse(sellerModel)
 	return
 
 
 }
 
 
-func (s *SellerDefault) Save(reqBody seller_dto.SellerDoc) (seller seller_dto.SellerDoc, err error){
+func (s *SellerDefault) Save(reqBody seller_dto.SellerRequest) (seller seller_dto.SellerDoc, err error){
 	if err = s.ValidateAllParameters(reqBody); err != nil {
 		return
 	}
 
-	model, err := seller_dto.ParseDtoToModel(reqBody)
+	model, err := seller_dto.ParseRequestToModel(reqBody)
 	if err != nil{
 		err = &ErrInvalidParameter{err.Error()}
 		return
@@ -56,7 +59,7 @@ func (s *SellerDefault) Save(reqBody seller_dto.SellerDoc) (seller seller_dto.Se
 		return 
 	}
 
-	seller = seller_dto.ParseModelToDto(resModel)
+	seller = seller_dto.ParseModelToResponse(resModel)
 
 	return
 
@@ -70,8 +73,8 @@ func (s *SellerDefault) Delete(id int) (err error) {
 }
 
 
-func (s *SellerDefault) Update(reqBody seller_dto.SellerDoc) (seller seller_dto.SellerDoc, err error){
-	sellerModel, err := s.rp.GetById(*reqBody.ID)
+func (s *SellerDefault) Update(reqBody seller_dto.SellerRequest, id int) (seller seller_dto.SellerDoc, err error){
+	sellerModel, err := s.rp.GetById(id)
 	if err != nil {
 		return
 	}
@@ -87,14 +90,14 @@ func (s *SellerDefault) Update(reqBody seller_dto.SellerDoc) (seller seller_dto.
 		return
 	}
 
-	seller = seller_dto.ParseModelToDto(sellerModel)
+	seller = seller_dto.ParseModelToResponse(sellerModel)
 	return
 
 
 }
 
 
-func (s *SellerDefault) ValidateAllParameters(reqBody seller_dto.SellerDoc) (err error) {
+func (s *SellerDefault) ValidateAllParameters(reqBody seller_dto.SellerRequest) (err error) {
 	if reqBody.Address == nil {
 		err = &ErrMissingParameters{AddressString}
 		return
@@ -114,7 +117,7 @@ func (s *SellerDefault) ValidateAllParameters(reqBody seller_dto.SellerDoc) (err
 	return
 }
 
-func modifyAttributes(reqBody seller_dto.SellerDoc, modelToModify *models.Seller) (err error) {
+func modifyAttributes(reqBody seller_dto.SellerRequest, modelToModify *models.Seller) (err error) {
 	if reqBody.Cid != nil {
 		cid, err := value_objects.NewCid(*reqBody.Cid)
 		if err != nil {

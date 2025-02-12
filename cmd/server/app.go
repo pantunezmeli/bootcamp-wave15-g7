@@ -14,11 +14,11 @@ import (
 	productRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	productService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 
 	//Sellers
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	sellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
-	sellerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 
 	// Employees
 	employeeRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
@@ -87,8 +87,10 @@ func (a *ServerChi) Run() (err error) {
 	dbConn := db.CreateConnectionToDB(cfg)
 	defer dbConn.Close()
 
+	//storage
+	sellerStorage := seller_storage.NewSellerJSONFile("./docs/db/json/seller_data.json")
+
 	// Sellers
-	sellerStorage := sellerStorage.NewSellerJSONFile(sellerFilePath)
 	sellerRepository := sellerRepository.NewSellerStorage(*sellerStorage)
 	sellerService := sellerService.NewSellerDefault(sellerRepository)
 	sellerHandler := handler.NewSellerDefault(sellerService)

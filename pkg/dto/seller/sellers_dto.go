@@ -5,27 +5,34 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 )
 
-type SellerDoc struct {
-	ID  *int `json:"id"`
-	Cid *int `json:"cid"`
+type SellerRequest struct {
+	Cid *string `json:"cid"`
 	CompanyName *string `json:"company_name"`
 	Address *string `json:"address"`
 	Telephone *string `json:"telephone"`
 }
 
+type SellerDoc struct {
+	ID  value_objects.SellerId `json:"id"`
+	Cid value_objects.Cid `json:"cid"`
+	CompanyName value_objects.CompanyName `json:"company_name"`
+	Address value_objects.SellerAddress `json:"address"`
+	Telephone value_objects.SellerTelephone `json:"telephone"`
+}
 
-func ParseModelToDto(sellerModel models.Seller) (sellerDto SellerDoc){
+
+func ParseModelToResponse(sellerModel models.Seller) (sellerDto SellerDoc){
 	sellerDto = SellerDoc{
-			ID: sellerModel.ID.Value(),
-			Cid: sellerModel.Cid.Value(),
-			CompanyName: sellerModel.CompanyName.Value(),
-			Address: sellerModel.Address.Value(),
-			Telephone: sellerModel.Telephone.Value(),
+			ID: sellerModel.ID,
+			Cid: sellerModel.Cid,
+			CompanyName: sellerModel.CompanyName,
+			Address: sellerModel.Address,
+			Telephone: sellerModel.Telephone,
 		}
 	return
 }
 
-func ParseDtoToModel(sellerDto SellerDoc) (sellerModel models.Seller, err error){
+func ParseRequestToModel(sellerDto SellerRequest) (sellerModel models.Seller, err error){
 	cid, err := value_objects.NewCid(*sellerDto.Cid)
 	if err != nil{
 		return

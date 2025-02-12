@@ -40,27 +40,27 @@ func (l *SellerJSONFile) Load() (sellerMap map[int]models.Seller, err error) {
 
 	sellerMap = make(map[int]models.Seller)
 	for _, s := range sellersJSON {
-		Id, err :=value_objects.NewSellerId(*s.ID)
+		Id, err :=value_objects.NewSellerId(int(s.ID))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Cid, err :=value_objects.NewCid(*s.Cid)
+		Cid, err :=value_objects.NewCid(string(s.Cid))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		CompanyName, err :=value_objects.NewCompanyName(*s.CompanyName)
+		CompanyName, err :=value_objects.NewCompanyName(string(s.CompanyName))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Address, err :=value_objects.NewSellerAddress(*s.Address)
+		Address, err :=value_objects.NewSellerAddress(string(s.Address))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		Telephone, err :=value_objects.NewSellerTelephone(*s.Telephone)
+		Telephone, err :=value_objects.NewSellerTelephone(string(s.Telephone))
 		if err != nil{
 			return make(map[int]models.Seller), err
 		}
-		sellerMap[*s.ID] = models.Seller{
+		sellerMap[int(s.ID)] = models.Seller{
 			ID: Id,
 			SellerAttributes: models.SellerAttributes{
 				Cid: Cid,
@@ -83,11 +83,11 @@ func (l *SellerJSONFile) Save(bd map[int]models.Seller) (err error) {
     sellers := make([]seller_dto.SellerDoc, 0, len(bd))
     for _, seller := range bd {
         sellerParsed :=seller_dto.SellerDoc{
-			ID: seller.ID.Value(),
-			Cid: seller.Cid.Value(),
-			CompanyName: seller.CompanyName.Value(),
-			Address: seller.Address.Value(),
-			Telephone: seller.Telephone.Value(),
+			ID: seller.ID,
+			Cid: seller.Cid,
+			CompanyName: seller.CompanyName,
+			Address: seller.Address,
+			Telephone: seller.Telephone,
 		}
 		sellers = append(sellers, sellerParsed)
     }

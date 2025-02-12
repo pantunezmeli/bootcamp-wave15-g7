@@ -82,7 +82,7 @@ func (s *SellerStorage) Delete(id int) (err error){
 
 func (s *SellerStorage) CheckCid(sellerModel models.Seller, sellersMap map[int]models.Seller) (err error){
 	for _, seller := range sellersMap{
-		if *seller.Cid.Value() == *sellerModel.Cid.Value() && *sellerModel.ID.Value() != *seller.ID.Value() {
+		if seller.Cid == sellerModel.Cid && sellerModel.ID != seller.ID {
 			err = ErrCidAlreadyExists
 			return
 		}
@@ -100,7 +100,7 @@ func(s *SellerStorage) Update(sellerModel models.Seller) (sellerUpdated models.S
 	}
 	
 	sellerUpdated = sellerModel
-	sellersMap[*sellerModel.ID.Value()] = sellerUpdated
+	sellersMap[int(sellerModel.ID)] = sellerUpdated
 	err = s.storage.Save(sellersMap)
 	return
 }

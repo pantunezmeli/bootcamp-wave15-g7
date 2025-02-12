@@ -39,6 +39,7 @@ func (h *SellerDefault) Get() http.HandlerFunc {
 		res, err := h.sv.GetAll()
 		if err != nil {
 			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+			return
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
@@ -75,7 +76,7 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 
 func (h *SellerDefault) Create() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		var reqBody seller_dto.SellerDoc
+		var reqBody seller_dto.SellerRequest
 		if err := request.JSON(r, &reqBody); err != nil{
 			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
@@ -136,14 +137,13 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 			return
 		}
 
-		var reqBody seller_dto.SellerDoc
+		var reqBody seller_dto.SellerRequest
 		if err := request.JSON(r, &reqBody); err != nil{
 			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
 		}
-		reqBody.ID = &idParsed
 
-		res, err := h.sv.Update(reqBody)
+		res, err := h.sv.Update(reqBody, idParsed)
 		if err != nil {
 			var invalidParamErr *seller.ErrInvalidParameter
 			switch{

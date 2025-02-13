@@ -25,10 +25,10 @@ func (p ProductRecordsService) GetProductRecord(productID *int) (recordsDto []dt
 	recordsData, errGet := p.rp.GetRecordsDataOptionalId(productID)
 	if errGet != nil {
 		if errors.Is(errGet, rp.ErrRecordsNotFound) {
-			err = errsv.ErrNotFoundProduct{Message: "Records not found"}
+			err = errsv.ErrNotFoundEntity{Message: "Records not found"}
 			return
 		}
-		err = errsv.ErrProduct{Message: "Error searching Records Product"}
+		err = errsv.ErrService{Message: "Error searching Records Product"}
 		return
 	}
 

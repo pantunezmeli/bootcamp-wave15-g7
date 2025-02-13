@@ -2,35 +2,35 @@ package errsv
 
 // ErrService is an interface
 
-type ErrProduct struct {
+type ErrService struct {
 	Message string
 }
 
-func (e ErrProduct) Error() string {
+func (e ErrService) Error() string {
 	return e.Message
 }
 
-type ErrValidProduct struct {
+type ErrValidEntity struct {
 	Message string
 }
 
-func (e ErrValidProduct) Error() string {
+func (e ErrValidEntity) Error() string {
 	return e.Message
 }
 
-type ErrNotFoundProduct struct {
+type ErrNotFoundEntity struct {
 	Message string
 }
 
-func (e ErrNotFoundProduct) Error() string {
+func (e ErrNotFoundEntity) Error() string {
 	return e.Message
 }
 
-type ErrProductConflict struct {
+type ErrConflict struct {
 	Message string
 }
 
-func (e ErrProductConflict) Error() string {
+func (e ErrConflict) Error() string {
 	return e.Message
 }
 

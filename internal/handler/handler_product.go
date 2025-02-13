@@ -121,15 +121,15 @@ func (h ProductHandle) Update() http.HandlerFunc {
 func validErrorResponse(w http.ResponseWriter, err error) {
 
 	switch {
-	case errors.As(err, &errsv.ErrNotFoundProduct{}):
+	case errors.As(err, &errsv.ErrNotFoundEntity{}):
 		dto.JSONError(w, http.StatusNotFound, err.Error())
 		log.Println(err.Error())
 
-	case errors.As(err, &errsv.ErrValidProduct{}):
+	case errors.As(err, &errsv.ErrValidEntity{}):
 		dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
 		log.Println(err.Error())
 
-	case errors.As(err, &errsv.ErrProductConflict{}):
+	case errors.As(err, &errsv.ErrConflict{}):
 		dto.JSONError(w, http.StatusConflict, err.Error())
 		log.Println(err.Error())
 

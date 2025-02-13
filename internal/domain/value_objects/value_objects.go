@@ -15,9 +15,36 @@ var (
 
 // * ##################### Id ######################
 // Estructura
+
+type ProductId int
+type ProductRecordsId int
+type ProductTypeId int
+
+func NewProductTypeId(value int) (id ProductTypeId, err error) {
+	if value <= 0 {
+		return 0, ErrInvalidId
+	}
+	return ProductTypeId(value), nil
+}
+
+func NewProductId(value int) (id ProductId, err error) {
+	if value <= 0 {
+		return 0, ErrInvalidId
+	}
+	return ProductId(value), nil
+}
+
+func NewProductRecordsId(value int) (id ProductRecordsId, err error) {
+	if value <= 0 {
+		return 0, ErrInvalidId
+	}
+	return ProductRecordsId(value), nil
+}
+
 type Id struct {
 	value int
 }
+
 type CardNumber struct {
 	value string
 }

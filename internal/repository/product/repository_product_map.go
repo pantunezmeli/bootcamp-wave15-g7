@@ -68,15 +68,15 @@ func (p ProductRepositoryMap) ProductCodeExist(productCode string) error {
 	return nil
 }
 
-func (p ProductRepositoryMap) getLastID() value_objects.Id {
+func (p ProductRepositoryMap) getLastID() value_objects.ProductId {
 	products, _ := p.GetAll()
 	var lastId int
 	for _, productMap := range products {
-		if lastId < productMap.ID.GetId() {
-			lastId = productMap.ID.GetId()
+		if lastId < int(productMap.ID) {
+			lastId = int(productMap.ID)
 		}
 	}
-	id, _ := value_objects.NewId(lastId + 1)
+	id, _ := value_objects.NewProductId(lastId + 1)
 	return id
 }
 

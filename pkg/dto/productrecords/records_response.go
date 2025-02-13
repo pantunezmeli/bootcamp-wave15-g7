@@ -11,7 +11,7 @@ type RecordsResponse struct {
 func ParserRecordsDataToDto(records []m.RecordsData) (recordsResponse []RecordsResponse) {
 	for _, record := range records {
 		recordsResponse = append(recordsResponse, RecordsResponse{
-			ProductId:    record.ProductId.GetId(),
+			ProductId:    int(record.ProductId),
 			Description:  record.Description,
 			RecordsCount: record.RecordsCount,
 		})

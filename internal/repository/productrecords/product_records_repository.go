@@ -23,7 +23,7 @@ func NewProductRecordsRepository(db *sql.DB) *ProductRecordsRepository {
 func (r ProductRecordsRepository) CreateProductRecord(newRecord *m.ProductRecords) (err error) {
 
 	result, errQuery := r.db.Exec(`insert into product_records (last_update_date, purchase_price, sale_price, product_id) values (?, ?, ?, ?)`,
-		newRecord.LastUpdateDate, newRecord.PurchasePrice, newRecord.SalePrice, newRecord.ProductId.GetId())
+		newRecord.LastUpdateDate, newRecord.PurchasePrice, newRecord.SalePrice, newRecord.ProductId)
 	if errQuery != nil {
 		err = errQuery
 		r.errorMysql(&err, "Error creating Product Record")
@@ -35,7 +35,7 @@ func (r ProductRecordsRepository) CreateProductRecord(newRecord *m.ProductRecord
 		err = errdb.ErrDB{Message: "Error getting last insert id"}
 		return
 	}
-	newRecord.Id, err = value_objects.NewId(int(id))
+	newRecord.Id, err = value_objects.NewProductRecordsId(int(id))
 	if err != nil {
 		return
 	}
@@ -103,7 +103,7 @@ func (r ProductRecordsRepository) getEntity(rows *sql.Rows, record *m.RecordsDat
 		return
 	}
 
-	record.ProductId, err = value_objects.NewId(idProduct)
+	record.ProductId, err = value_objects.NewProductId(idProduct)
 	return
 }
 

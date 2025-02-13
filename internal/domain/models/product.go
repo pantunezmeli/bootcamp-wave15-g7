@@ -2,13 +2,12 @@ package models
 
 import "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 
-
 type Product struct {
-	ID            value_objects.Id
+	ID            value_objects.ProductId
 	ProductCode   string
 	Description   string
-	ProductTypeID value_objects.Id
-	SellerID      value_objects.Id
+	ProductTypeID value_objects.ProductTypeId
+	SellerID      value_objects.SellerId
 	Dimensions
 	FreezingInfo
 }

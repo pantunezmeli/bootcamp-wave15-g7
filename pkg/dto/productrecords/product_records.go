@@ -21,7 +21,7 @@ type ProductRecordsDto struct {
 }
 
 func ValidAndParserDTO(dto ProductRecordsDto, record *m.ProductRecords) error {
-	id, err := vo.NewId(dto.ProductID)
+	id, err := vo.NewProductId(dto.ProductID)
 	if err != nil {
 		return errsv.ErrValidEntity{Message: "Invalid product id"}
 	}
@@ -52,6 +52,6 @@ func ParserRecordsToDto(record m.ProductRecords) ProductRecordsDto {
 		LastUpdateDate: record.LastUpdateDate.Format("2006-01-02"),
 		PurchasePrice:  record.PurchasePrice,
 		SalePrice:      record.SalePrice,
-		ProductID:      record.ProductId.GetId(),
+		ProductID:      int(record.ProductId),
 	}
 }

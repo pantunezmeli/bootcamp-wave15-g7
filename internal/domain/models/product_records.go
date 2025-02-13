@@ -6,9 +6,9 @@ import (
 )
 
 type ProductRecords struct {
-	Id             vo.Id
+	Id             vo.ProductRecordsId
 	LastUpdateDate time.Time
 	PurchasePrice  float64
 	SalePrice      float64
-	ProductId      vo.Id
+	ProductId      vo.ProductId
 }

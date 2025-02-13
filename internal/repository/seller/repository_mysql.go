@@ -55,11 +55,6 @@ func  (s *SellerMySql) GetById(id int) (seller models.Seller, err error) {
 		where id = ?
 		`, id)
 
-	if err = row.Err(); err != nil {
-		err = ErrConnection
-		return
-	}
-
 	if err = row.Scan(&seller.ID, &seller.Cid, &seller.CompanyName, &seller.Address, &seller.Telephone, &seller.LocalityId); err != nil{
 		if errors.Is(err, sql.ErrNoRows){
 			err = ErrSellerNotFound
@@ -112,23 +107,25 @@ func (s *SellerMySql) Delete(id int) (err error){
 }
 
 func(s *SellerMySql) Update(sellerModel models.Seller) (sellerUpdated models.Seller, err error){
-	result, err := s.db.Exec(`
+	var exists bool
+	err = s.db.QueryRow("SELECT 1 FROM sellers WHERE id = ?", sellerModel.ID).Scan(&exists)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = ErrSellerNotFound
+		} else {
+			err = ErrConnection
+		}
+		return
+	}
+
+	_, err = s.db.Exec(`
 	UPDATE sellers SET cid = ?, company_name = ?, address = ?, telephone = ?, locality_id = ? WHERE id = ?`,
 	sellerModel.Cid, sellerModel.CompanyName, sellerModel.Address, sellerModel.Telephone, sellerModel.LocalityId, sellerModel.ID)
 	if err != nil {
 		err = mapMySQLError(err)
 		return
 	}
-	affectedRows, err := result.RowsAffected()
-	if err != nil {
-		err = ErrConnection
-		return
-	}
 
-	if affectedRows == 0 {
-		err = ErrSellerNotFound
-		return
-	}
 	sellerUpdated = sellerModel
 	return
 }

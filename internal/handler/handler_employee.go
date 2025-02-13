@@ -16,7 +16,7 @@ var (
 	ErrEmployeeNotFound          = errors.New("employee not found")
 	ErrWarehouseNotFound         = errors.New("warehouse not found")
 	ErrCardNumberExists          = errors.New("card number already exists")
-	ErrEmptyField                = errors.New("employee data lacks a required field")
+	ErrEmptyField                = errors.New("data lacks a required field")
 	ErrInboundOrderNeedsEmployee = errors.New("inbound order linked to this employee")
 )
 

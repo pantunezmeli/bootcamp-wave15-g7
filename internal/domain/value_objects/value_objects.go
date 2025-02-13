@@ -11,6 +11,8 @@ var (
 	ErrInvalidAddress         = errors.New("invalid address")
 	ErrInvalidName            = errors.New("invalid name")
 	ErrInvalidCardNumber      = errors.New("invalid card number")
+	ErrInvalidOrderNumber     = errors.New("invalid order number")
+	ErrInvalidDate            = errors.New("invalid date")
 )
 
 // * ##################### Id ######################
@@ -21,7 +23,13 @@ type Id struct {
 type CardNumber struct {
 	value string
 }
+type OrderNumber struct {
+	value string
+}
 type Name struct {
+	value string
+}
+type ValidatedDate struct {
 	value string
 }
 
@@ -38,11 +46,23 @@ func NewCardNumber(value string) (cardNumber CardNumber, err error) {
 	}
 	return CardNumber{value: value}, nil
 }
+func NewOrderNumber(value string) (orderNumber OrderNumber, err error) {
+	if value == "" {
+		return OrderNumber{}, ErrInvalidOrderNumber
+	}
+	return OrderNumber{value: value}, nil
+}
 func NewName(value string) (name Name, err error) {
 	if value == "" {
 		return Name{}, ErrInvalidName
 	}
 	return Name{value: value}, nil
+}
+func NewDate(value string) (date ValidatedDate, err error) {
+	if value == "" {
+		return ValidatedDate{}, ErrInvalidDate
+	}
+	return ValidatedDate{value: value}, nil
 }
 
 // Seteo sin validación
@@ -63,8 +83,14 @@ func (id Id) GetId() int {
 func (cardNumber CardNumber) GetCardNumber() string {
 	return cardNumber.value
 }
+func (orderNumber OrderNumber) GetOrderNumber() string {
+	return orderNumber.value
+}
 func (name Name) GetName() string {
 	return name.value
+}
+func (date ValidatedDate) GetDate() string {
+	return date.value
 }
 
 // * ##################### WareHouse_Code ######################

@@ -24,6 +24,10 @@ import (
 	employeeRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	employeeService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 
+	// Inbound orders
+	inboundOrderRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/inboundorder"
+	inboundOrderService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/inboundorder"
+
 	//Sections
 	sectionRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	sectionService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
@@ -97,6 +101,11 @@ func (a *ServerChi) Run() (err error) {
 	employeeService := employeeService.NewSimpleService(employeeRepository)
 	employeeHandler := handler.NewDefaultHandler(employeeService)
 
+	// Inbound orders
+	inboundOrderRepository := inboundOrderRepository.NewInboundOrderSQL(dbConn)
+	inboundOrderService := inboundOrderService.NewDefaultService(inboundOrderRepository)
+	inboundOrderHandler := handler.NewInboundOrderHandler(inboundOrderService)
+
 	// Buyers
 	buyerStorage := buyerStorage.NewBuyerJSONFile(buyerFilePath)
 	buyerRepository := buyerRepository.NewBuyerRepository(buyerStorage)
@@ -169,6 +178,10 @@ func (a *ServerChi) Run() (err error) {
 			rt.Post("/", employeeHandler.Create())
 			rt.Patch("/{id}", employeeHandler.Update())
 			rt.Delete("/{id}", employeeHandler.Delete())
+		})
+
+		r.Route("/inboundOrders", func(rt chi.Router) {
+			rt.Post("/", inboundOrderHandler.Create())
 		})
 
 		r.Route("/buyers", func(rt chi.Router) {

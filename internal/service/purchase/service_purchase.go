@@ -3,6 +3,7 @@ package purchase
 import (
 	"errors"
 
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/purchase"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/purchase"
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
@@ -16,7 +17,7 @@ func NewBuyerService(rp purchase.IRepositoryPurchase) *PurchaseService {
 	return &PurchaseService{repository: rp}
 }
 
-func (service *PurchaseService) GetReport() ([]dto.ReportPurchaseOrders, error) {
+func (service *PurchaseService) GetReport() ([]models.ReportPurchaseOrders, error) {
 
 	list, err := service.repository.GetReportPurchaseOrders()
 	if errors.Is(err, errorbase.ErrDatabaseOperationFailed) {
@@ -28,15 +29,15 @@ func (service *PurchaseService) GetReport() ([]dto.ReportPurchaseOrders, error) 
 	return list, nil
 }
 
-func (service *PurchaseService) GetReportById(id int) (dto.ReportPurchaseOrders, error) {
+func (service *PurchaseService) GetReportById(id int) (models.ReportPurchaseOrders, error) {
 	if id <= 0 {
-		return dto.ReportPurchaseOrders{}, errorbase.ErrInvalidId
+		return models.ReportPurchaseOrders{}, errorbase.ErrInvalidId
 	}
 	reportPurchase, err := service.repository.GetReportPurchaseOrdersById(id)
 	if errors.Is(err, errorbase.ErrNotFound) {
-		return dto.ReportPurchaseOrders{}, errorbase.ErrNotFound
+		return models.ReportPurchaseOrders{}, errorbase.ErrNotFound
 	} else if err != nil {
-		return dto.ReportPurchaseOrders{}, errorbase.ErrDatabaseOperationFailed
+		return models.ReportPurchaseOrders{}, errorbase.ErrDatabaseOperationFailed
 	}
 	return reportPurchase, nil
 }

@@ -5,7 +5,6 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
-	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/purchase"
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/querys"
 )
@@ -18,16 +17,16 @@ func NewBuyerRepository(db *sql.DB) *PurchaseRepository {
 	return &PurchaseRepository{db: db}
 }
 
-func (repo *PurchaseRepository) GetReportPurchaseOrders() ([]dto.ReportPurchaseOrders, error) {
+func (repo *PurchaseRepository) GetReportPurchaseOrders() ([]models.ReportPurchaseOrders, error) {
 	rows, err := repo.db.Query(querys.GetReportPurchaseOrders)
 	if err != nil {
 		return nil, errorbase.ErrDatabaseOperationFailed
 	}
 	defer rows.Close()
 
-	var purchases []dto.ReportPurchaseOrders
+	var purchases []models.ReportPurchaseOrders
 	for rows.Next() {
-		var purchase dto.ReportPurchaseOrders
+		var purchase models.ReportPurchaseOrders
 		err := rows.Scan(&purchase.ID, &purchase.CardNumberID, &purchase.FirstName, &purchase.LastName, &purchase.PurchaseOrdersCount)
 		if err != nil {
 			return nil, errorbase.ErrDatabaseOperationFailed
@@ -41,17 +40,17 @@ func (repo *PurchaseRepository) GetReportPurchaseOrders() ([]dto.ReportPurchaseO
 	return purchases, nil
 }
 
-func (repo *PurchaseRepository) GetReportPurchaseOrdersById(id int) (dto.ReportPurchaseOrders, error) {
+func (repo *PurchaseRepository) GetReportPurchaseOrdersById(id int) (models.ReportPurchaseOrders, error) {
 	if exist := repo.buyerExist(id); !exist {
-		return dto.ReportPurchaseOrders{}, errorbase.ErrNotFound
+		return models.ReportPurchaseOrders{}, errorbase.ErrNotFound
 	}
 	row := repo.db.QueryRow(querys.GetReportPurchaseOrdersById, id)
-	var purchase dto.ReportPurchaseOrders
+	var purchase models.ReportPurchaseOrders
 
 	err := row.Scan(&purchase.ID, &purchase.CardNumberID, &purchase.FirstName, &purchase.LastName, &purchase.PurchaseOrdersCount)
 
 	if err != nil {
-		return dto.ReportPurchaseOrders{}, errorbase.ErrDatabaseOperationFailed
+		return models.ReportPurchaseOrders{}, errorbase.ErrDatabaseOperationFailed
 	}
 
 	return purchase, nil

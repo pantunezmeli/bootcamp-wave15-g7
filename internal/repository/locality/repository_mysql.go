@@ -7,6 +7,8 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	locality_vo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/locality"
+	locality_dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/locality"
+
 )
 
 type LocalityMySql struct {
@@ -66,4 +68,43 @@ func (r *LocalityMySql) GetById(id int) (locality models.Locality, err error) {
 		err = ErrConnection
 	}
 	return
+}
+
+func (r *LocalityMySql) GetReportSellers(id *int) (reports []locality_dto.SellerReport, err error) {
+	var rows *sql.Rows
+	if id != nil {
+		rows, err = r.db.Query(`
+		SELECT l.id, l.locality_name, count(1)
+		FROM localities l INNER JOIN sellers s ON s.locality_id=l.id
+		WHERE l.id = ?
+		GROUP BY l.id
+		`, &id)
+	} else {
+		rows, err = r.db.Query(`
+		SELECT l.id, l.locality_name, count(1)
+		FROM localities l INNER JOIN sellers s ON s.locality_id=l.id
+		GROUP BY l.id
+		`)
+	}
+	if err != nil {
+		err = ErrConnection
+		return
+	}
+
+	for rows.Next(){
+		var report locality_dto.SellerReport
+
+		if err = rows.Scan(&report.LocalityId, &report.LocalityName, &report.SellersCount); err != nil {
+			err = ErrConnection
+			return
+		}
+
+		reports = append(reports, report)
+	}
+
+	if err = rows.Err(); err != nil {
+		err = ErrConnection
+	}
+	return
+
 }

@@ -17,6 +17,12 @@ type LocalityDoc struct {
 	ProvinceId province_vo.ProvinceId
 }
 
+type SellerReport struct {
+	LocalityId int `json:"locality_id"`
+	LocalityName string `json:"locality_name"`
+	SellersCount int `json:"sellers_count"`
+}
+
 func ParseRequestToModel(localityRequest LocalityRequest) (localityModel models.Locality, err error){
 	name, err := locality_vo.NewLocalityName(*localityRequest.Name)
 	if err != nil {

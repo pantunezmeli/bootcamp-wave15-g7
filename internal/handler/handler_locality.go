@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/bootcamp-go/web/request"
 	"github.com/bootcamp-go/web/response"
@@ -75,5 +76,32 @@ func (h *LocalityDefault) GetById() http.HandlerFunc {
 		})
 
 
+	}
+}
+
+func (h *LocalityDefault) GetReportSellers() http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		var id *int
+		idStr := r.URL.Query().Get("id")
+		if idStr != "" {
+			parsedID, err := strconv.Atoi(idStr)
+			if err != nil{
+				dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
+				return
+			}
+			id = &parsedID
+		}
+
+		res, err := h.sv.GetReportSellers(id)
+
+		if err != nil {
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+		}
+
+		response.JSON(w, http.StatusOK, map[string]any{
+			"data": res,
+		})
+
+		
 	}
 }

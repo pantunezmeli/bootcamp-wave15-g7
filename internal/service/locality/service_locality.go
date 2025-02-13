@@ -48,6 +48,12 @@ func (s *LocalityDefault) GetById(id int) (localityDto locality_dto.LocalityDoc,
 }
 
 
+func (s *LocalityDefault) GetReportSellers(id *int) (reports []locality_dto.SellerReport, err error){
+	reports, err = s.rp.GetReportSellers(id)
+	return
+
+}
+
 func (s *LocalityDefault) ValidateAllParameters(reqBody locality_dto.LocalityRequest) (err error) {
 	if reqBody.Name == nil {
 		err = &ErrMissingParameters{NameString}
@@ -60,3 +66,4 @@ func (s *LocalityDefault) ValidateAllParameters(reqBody locality_dto.LocalityReq
 	}
 	return
 }
+

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	locality_dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/locality"
 )
 
 var (
@@ -15,4 +16,6 @@ var (
 type LocalityRepository interface {
 	Save(models.Locality) (modelSaved models.Locality, err error)
 	GetById(id int) (locality models.Locality, err error)
+	GetReportSellers(id *int) (reports []locality_dto.SellerReport, err error)
+	
 }

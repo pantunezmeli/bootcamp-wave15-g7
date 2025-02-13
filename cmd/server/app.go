@@ -15,6 +15,10 @@ import (
 	productService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	//productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 
+	//ProductRecords
+	productRecordsRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/productrecords"
+	productRecordsService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product_records"
+
 	//Sellers
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	sellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
@@ -116,6 +120,11 @@ func (a *ServerChi) Run() (err error) {
 	productService := productService.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
+	//ProductRecords
+	productRecordsRepository := productRecordsRepository.NewProductRecordsRepository(dbConn)
+	productRecordsService := productRecordsService.NewProductRecordsService(productRecordsRepository)
+	productRecordsHandler := handler.NewHandlerProductRecords(productRecordsService)
+
 	// Sections
 	sectionStorage := sectionStorage.NewSectionJSONFile(sectionFilePath)
 	sectionRepository := sectionRepository.NewStRepository(sectionStorage)
@@ -163,6 +172,11 @@ func (a *ServerChi) Run() (err error) {
 			rt.Post("/", productHandler.Create())
 			rt.Patch("/{id}", productHandler.Update())
 			rt.Delete("/{id}", productHandler.Delete())
+			rt.Get("/reportRecords", productRecordsHandler.GetRecords())
+		})
+
+		r.Route("/productRecords", func(rt chi.Router) {
+			rt.Post("/", productRecordsHandler.Create())
 		})
 
 		r.Route("/employees", func(rt chi.Router) {

@@ -20,9 +20,9 @@ func (p ProductRecordsService) CreateProductRecord(newProductRecord dto.ProductR
 	panic("implement me")
 }
 
-func (p ProductRecordsService) GetProductRecord(productID int) (recordsDto []dto.RecordsResponse, err error) {
+func (p ProductRecordsService) GetProductRecord(productID *int) (recordsDto []dto.RecordsResponse, err error) {
 
-	recordsData, errGet := p.rp.GetRecordsDataOptionalId(&productID)
+	recordsData, errGet := p.rp.GetRecordsDataOptionalId(productID)
 	if errGet != nil {
 		if errors.Is(errGet, rp.ErrRecordsNotFound) {
 			err = errsv.ErrNotFoundProduct{Message: "Records not found"}

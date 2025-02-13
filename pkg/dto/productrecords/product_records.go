@@ -9,7 +9,7 @@ import (
 
 const LAYOUT_DATE = "2006-01-02"
 
-type Data struct {
+type RequestNewRecord struct {
 	Data ProductRecordsDto
 }
 

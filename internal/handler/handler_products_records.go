@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"encoding/json"
 	"github.com/bootcamp-go/web/response"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product_records"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/productrecords"
 	"net/http"
 	"strconv"
 )
@@ -18,9 +20,22 @@ func NewHandlerProductRecords(sv product_records.IProductRecordsService) *Handle
 
 func (h HandlerProductRecords) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//TODO implement me
-		panic("implement me")
+
+		var request productrecords.RequestNewRecord
+		if errDecode := json.NewDecoder(r.Body).Decode(&request); errDecode != nil {
+			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
+			return
+		}
+
+		newProduct, errCreate := h.sv.CreateProductRecord(request.Data)
+		if errCreate != nil {
+			validErrorResponse(w, errCreate)
+			return
+		}
+
+		response.JSON(w, http.StatusCreated, dto.GenericResponse{Data: newProduct})
 	}
+
 }
 
 func (h HandlerProductRecords) GetRecords() http.HandlerFunc {

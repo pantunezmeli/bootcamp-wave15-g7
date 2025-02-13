@@ -59,6 +59,7 @@ func (r *LocalityMySql) GetById(id int) (locality models.Locality, err error) {
 		err = ErrConnection
 		return
 	}
+	
 
 	if err = row.Scan(&locality.Id, &locality.Name, &locality.ProvinceId); err != nil{
 		if errors.Is(err, sql.ErrNoRows){
@@ -72,6 +73,7 @@ func (r *LocalityMySql) GetById(id int) (locality models.Locality, err error) {
 
 func (r *LocalityMySql) GetReportSellers(id *int) (reports []locality_dto.SellerReport, err error) {
 	var rows *sql.Rows
+	
 	if id != nil {
 		rows, err = r.db.Query(`
 		SELECT l.id, l.locality_name, count(s.id)
@@ -86,6 +88,7 @@ func (r *LocalityMySql) GetReportSellers(id *int) (reports []locality_dto.Seller
 		GROUP BY l.id
 		`)
 	}
+	defer rows.Close()
 	if err != nil {
 		err = ErrConnection
 		return
@@ -113,3 +116,4 @@ func (r *LocalityMySql) GetReportSellers(id *int) (reports []locality_dto.Seller
 	return
 
 }
+

@@ -28,6 +28,8 @@ func (s *SellerMySql) GetAll() (sellers []models.Seller, err error) {
 		err = ErrConnection
 		return
 	}
+	defer rows.Close()
+
 
 	for rows.Next(){
 		var seller models.Seller
@@ -52,6 +54,7 @@ func  (s *SellerMySql) GetById(id int) (seller models.Seller, err error) {
 		from sellers
 		where id = ?
 		`, id)
+
 	if err = row.Err(); err != nil {
 		err = ErrConnection
 		return
@@ -73,20 +76,7 @@ func (s *SellerMySql) Save(modelWithoutId models.Seller) (seller models.Seller, 
 	INSERT INTO sellers (cid, company_name, address, telephone, locality_id) VALUES
 	(?,?,?,?,?)`, modelWithoutId.Cid, modelWithoutId.CompanyName, modelWithoutId.Address, modelWithoutId.Telephone, modelWithoutId.LocalityId)
 	if err != nil {
-		var sqlError *mysql.MySQLError
-		fmt.Println(err)
-		if errors.As(err, &sqlError){
-			switch sqlError.Number {
-			case 1452:
-				err = ErrLocalityNotFound
-			case 1062:
-				err = ErrCidAlreadyExists
-			default:
-				err = ErrConnection
-			}
-			return
-		}
-		err = ErrConnection
+		err = mapMySQLError(err)
 		return
 	}
 
@@ -126,21 +116,7 @@ func(s *SellerMySql) Update(sellerModel models.Seller) (sellerUpdated models.Sel
 	UPDATE sellers SET cid = ?, company_name = ?, address = ?, telephone = ?, locality_id = ? WHERE id = ?`,
 	sellerModel.Cid, sellerModel.CompanyName, sellerModel.Address, sellerModel.Telephone, sellerModel.LocalityId, sellerModel.ID)
 	if err != nil {
-		var sqlError *mysql.MySQLError
-		fmt.Println(err)
-		if errors.As(err, &sqlError){
-			fmt.Println(err)
-			switch sqlError.Number {
-			case 1452:
-				err = ErrLocalityNotFound
-			case 1062:
-				err = ErrCidAlreadyExists
-			default:
-				err = ErrConnection
-			}
-			return
-		}
-		err = ErrConnection
+		err = mapMySQLError(err)
 		return
 	}
 	affectedRows, err := result.RowsAffected()
@@ -157,3 +133,15 @@ func(s *SellerMySql) Update(sellerModel models.Seller) (sellerUpdated models.Sel
 	return
 }
 
+func mapMySQLError(err error) error {
+    var sqlError *mysql.MySQLError
+    if errors.As(err, &sqlError) {
+        switch sqlError.Number {
+        case 1452:
+            return ErrLocalityNotFound
+        case 1062:
+            return ErrCidAlreadyExists
+        }
+    }
+    return ErrConnection
+}

@@ -25,17 +25,16 @@ func (h HandlerProductRecords) Create() http.HandlerFunc {
 
 func (h HandlerProductRecords) GetRecords() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var idParam *int
 		idPath := r.URL.Query().Get("id")
+		var idParam *int
+
 		if idPath != "" {
-			idInt, err := strconv.Atoi(idPath)
-			if err != nil {
+			if idInt, err := strconv.Atoi(idPath); err == nil {
+				idParam = &idInt
+			} else {
 				dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
 				return
 			}
-			idParam = &idInt
-		} else {
-			idParam = nil
 		}
 
 		productSearch, errSearch := h.sv.GetProductRecord(idParam)

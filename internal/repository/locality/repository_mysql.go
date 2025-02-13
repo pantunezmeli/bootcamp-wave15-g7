@@ -74,15 +74,15 @@ func (r *LocalityMySql) GetReportSellers(id *int) (reports []locality_dto.Seller
 	var rows *sql.Rows
 	if id != nil {
 		rows, err = r.db.Query(`
-		SELECT l.id, l.locality_name, count(1)
-		FROM localities l INNER JOIN sellers s ON s.locality_id=l.id
+		SELECT l.id, l.locality_name, count(s.id)
+		FROM localities l LEFT JOIN sellers s ON s.locality_id=l.id
 		WHERE l.id = ?
 		GROUP BY l.id
 		`, &id)
 	} else {
 		rows, err = r.db.Query(`
-		SELECT l.id, l.locality_name, count(1)
-		FROM localities l INNER JOIN sellers s ON s.locality_id=l.id
+		SELECT l.id, l.locality_name, count(s.id)
+		FROM localities l LEFT JOIN sellers s ON s.locality_id=l.id
 		GROUP BY l.id
 		`)
 	}
@@ -104,6 +104,11 @@ func (r *LocalityMySql) GetReportSellers(id *int) (reports []locality_dto.Seller
 
 	if err = rows.Err(); err != nil {
 		err = ErrConnection
+	}
+
+	if len(reports) == 0 {
+		err = ErrLocalityNotFound
+		return
 	}
 	return
 

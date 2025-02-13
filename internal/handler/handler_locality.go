@@ -95,7 +95,13 @@ func (h *LocalityDefault) GetReportSellers() http.HandlerFunc{
 		res, err := h.sv.GetReportSellers(id)
 
 		if err != nil {
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+			switch {
+			case errors.Is(err, repository.ErrLocalityNotFound):
+				dto.JSONError(w, http.StatusNotFound, ErrLocalityNotExist.Error())
+			default:
+				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+			}
+			return
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{

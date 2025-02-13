@@ -10,5 +10,5 @@ type Country struct {
 }
 
 type CountryAttributes struct {
-	CountryName country_vo.CountryName
+	Name country_vo.CountryName
 }

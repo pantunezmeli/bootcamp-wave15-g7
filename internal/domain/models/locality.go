@@ -12,5 +12,5 @@ type Locality struct {
 }
 
 type LocalityAttributes struct {
-	LocalityName locality_vo.LocalityName
+	Name locality_vo.LocalityName
 }

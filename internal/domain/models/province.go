@@ -13,5 +13,5 @@ type Province struct {
 }
 
 type ProvinceAttributes struct {
-	ProvinceName province_vo.ProvinceName
+	Name province_vo.ProvinceName
 }

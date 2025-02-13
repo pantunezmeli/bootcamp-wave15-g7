@@ -19,6 +19,11 @@ import (
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	sellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
 
+	//Localities
+	localityRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/locality"
+	localityService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/locality"
+
+
 	// Employees
 	employeeRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
 	employeeService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
@@ -91,6 +96,11 @@ func (a *ServerChi) Run() (err error) {
 	sellerService := sellerService.NewSellerDefault(sellerRepository)
 	sellerHandler := handler.NewSellerDefault(sellerService)
 
+	// Localities
+	localityRepository := localityRepository.NewLocalityMySql(dbConn)
+	localityService := localityService.NewLocalityDefault(localityRepository)
+	localityHandler := handler.NewLocalityDefault(localityService)
+
 	// Employees
 	employeeStorage := employeeStorage.NewEmployeeJSONFile(employeeFilePath)
 	employeeRepository := employeeRepository.NewEmployeeMap(*employeeStorage)
@@ -137,6 +147,10 @@ func (a *ServerChi) Run() (err error) {
 			r.Delete("/{id}", sellerHandler.Delete())
 			r.Patch("/{id}", sellerHandler.Update())
 
+		})
+
+		r.Route("/localities", func(r chi.Router) {
+			r.Post("/", localityHandler.Create())
 		})
 
 		r.Route("/warehouses", func(rt chi.Router) {

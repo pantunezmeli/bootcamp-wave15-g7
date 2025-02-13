@@ -10,5 +10,5 @@ type ProductRecords struct {
 	LastUpdateDate time.Time
 	PurchasePrice  float64
 	SalePrice      float64
-	ProductID      vo.Id
+	ProductId      vo.Id
 }

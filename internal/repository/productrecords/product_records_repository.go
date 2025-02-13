@@ -26,7 +26,7 @@ func (r ProductRecordsRepository) CreateProductRecord(newRecord *m.ProductRecord
 		newRecord.LastUpdateDate, newRecord.PurchasePrice, newRecord.SalePrice, newRecord.ProductId.GetId())
 	if errQuery != nil {
 		err = errQuery
-		r.errorMysql(&err, "Error creating product")
+		r.errorMysql(&err, "Error creating Product Record")
 		return
 	}
 

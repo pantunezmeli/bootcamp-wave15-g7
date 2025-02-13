@@ -40,3 +40,29 @@ func (service *PurchaseService) GetReportById(id int) (dto.ReportPurchaseOrders,
 	}
 	return reportPurchase, nil
 }
+
+func (service *PurchaseService) CreatePurchase(entity dto.PurchaseOrderResponse) (dto.PurchaseOrderResponse, error) {
+
+	orderNumberExist := service.repository.OrderNumberExist(entity.OrderNumber)
+	if orderNumberExist {
+		return dto.PurchaseOrderResponse{}, errorbase.ErrOrderNumberExist
+	}
+
+	trackingCode := service.repository.TrackingCodeExist(entity.TrackingCode)
+	if trackingCode {
+		return dto.PurchaseOrderResponse{}, errorbase.ErrTrackingCodeExist
+	}
+
+	entityModel, err := dto.GeneratePurchaseResponseToEntity(entity)
+	if err != nil {
+		return dto.PurchaseOrderResponse{}, err
+	}
+
+	purchase, err := service.repository.CreatePurchaseOrder(entityModel)
+	if err != nil {
+		return dto.PurchaseOrderResponse{}, err
+	}
+
+	purchaseResponse := dto.GeneratePurchaseResponse(purchase)
+	return purchaseResponse, nil
+}

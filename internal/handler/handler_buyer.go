@@ -3,11 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
@@ -99,7 +97,6 @@ func (handler *BuyerHandler) Create() http.HandlerFunc {
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
-			fmt.Println(err)
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
 		}
@@ -179,10 +176,4 @@ func (handler *BuyerHandler) Delete() http.HandlerFunc {
 		}
 		jsonResponse(writer, http.StatusNoContent, nil)
 	}
-}
-
-func jsonResponse(writer http.ResponseWriter, statusCode int, data any) {
-	response.JSON(writer, statusCode, map[string]any{
-		"data": data,
-	})
 }

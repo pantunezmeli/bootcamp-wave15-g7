@@ -1,5 +1,11 @@
 package handler
 
+import (
+	"net/http"
+
+	"github.com/bootcamp-go/web/response"
+)
+
 // Errors
 var (
 	MSG_ErrInvalidId              = "invalid Id parameters"
@@ -14,6 +20,14 @@ var (
 	MSG_ErrRequest                = "invalid request type"
 	MSG_ErrUnprocessable          = "incorrect syntax of the request"
 	MSG_ErrOperationDB            = "operation on the database failed"
+	MSG_ErrOrderNumberExist       = "cannot repeat the order number in the system"
+	MSG_ErrTrackingCodeExist      = "cannot repeat the tracking code in the system"
+
+	// Errors FK
+	MSG_ErrBuyerFKNotExist       = "The associated buyer does not exist in the system"
+	MSG_ErrCarrierFKNotExist     = "The associated carrier does not exist in the system"
+	MSG_ErrOrderStatusFKNotExist = "The associated order status does not exist in the system"
+	MSG_ErrWareHouseFKNotExist   = "The associated warehouse does not exist in the system"
 )
 
 // MSG
@@ -22,3 +36,9 @@ var (
 	MsgCreated = "element created successfully"
 	MsgUpdated = "element uptaded successfully"
 )
+
+func jsonResponse(writer http.ResponseWriter, statusCode int, data any) {
+	response.JSON(writer, statusCode, map[string]any{
+		"data": data,
+	})
+}

@@ -7,4 +7,5 @@ import (
 type IServicePurchase interface {
 	GetReport() ([]dto.ReportPurchaseOrders, error)
 	GetReportById(id int) (dto.ReportPurchaseOrders, error)
+	CreatePurchase(entity dto.PurchaseOrderResponse) (dto.PurchaseOrderResponse, error)
 }

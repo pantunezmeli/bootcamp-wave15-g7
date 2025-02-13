@@ -192,6 +192,8 @@ func (a *ServerChi) Run() (err error) {
 		r.Route("/reportPurchaseOrders", func(rt chi.Router) {
 			rt.Get("/", purchaseHandler.Get())
 			rt.Get("/{id}", purchaseHandler.GetById())
+			rt.Post("/", purchaseHandler.Create())
+
 		})
 
 	})

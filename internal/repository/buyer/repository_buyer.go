@@ -80,13 +80,11 @@ func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) 
 
 	result, err := buyer.db.Exec(querys.InsertBuyer, entity.Card_Number_Id, entity.First_Name, entity.Last_Name)
 	if err != nil {
-		fmt.Println("1")
 		return models.Buyer{}, errorbase.ErrDatabaseOperationFailed
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		fmt.Println("2")
 		return models.Buyer{}, errorbase.ErrDatabaseOperationFailed
 	}
 

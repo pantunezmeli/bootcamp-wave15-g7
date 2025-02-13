@@ -47,8 +47,33 @@ func (h *LocalityDefault) Create() http.HandlerFunc{
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any {
-			"message": "locality created",
 			"data": res,
 		})
+	}
+}
+
+func (h *LocalityDefault) GetById() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idParsed, isInvalid := validateId(r, w)
+		if isInvalid {
+			return
+		}
+
+		res, err := h.sv.GetById(idParsed)
+		if err != nil {
+			switch {
+			case errors.Is(err, repository.ErrLocalityNotFound):
+				dto.JSONError(w, http.StatusNotFound, ErrLocalityNotExist.Error())
+			default:
+				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+			}
+			return
+		}
+
+		response.JSON(w, http.StatusOK, map[string]any{
+			"data": res,
+		})
+
+
 	}
 }

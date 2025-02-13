@@ -45,3 +45,25 @@ func(r *LocalityMySql) Save(modelToSave models.Locality) (modelSaved models.Loca
 	modelSaved.Id = locality_vo.LocalityId(id)
 	return
 }
+
+func (r *LocalityMySql) GetById(id int) (locality models.Locality, err error) {
+	row := r.db.QueryRow(
+		`
+		SELECT id, locality_name, province_id
+		from localities
+		where id = ?
+		`, id)
+	if err = row.Err(); err != nil {
+		err = ErrConnection
+		return
+	}
+
+	if err = row.Scan(&locality.Id, &locality.Name, &locality.ProvinceId); err != nil{
+		if errors.Is(err, sql.ErrNoRows){
+			err = ErrLocalityNotFound
+			return
+		}
+		err = ErrConnection
+	}
+	return
+}

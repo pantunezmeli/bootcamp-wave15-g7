@@ -150,6 +150,7 @@ func (a *ServerChi) Run() (err error) {
 		})
 
 		r.Route("/localities", func(r chi.Router) {
+			r.Get("/{id}", localityHandler.GetById())
 			r.Post("/", localityHandler.Create())
 		})
 

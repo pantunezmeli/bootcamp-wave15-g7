@@ -30,5 +30,6 @@ func(e *ErrInvalidParameter) Error() string {
 
 type LocalityService interface {
 	Save(locality_dto.LocalityRequest) (localityDto locality_dto.LocalityDoc, err error)
+	GetById(id int) (localityDto locality_dto.LocalityDoc, err error)
 }
 

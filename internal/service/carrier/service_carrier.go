@@ -8,6 +8,10 @@ import (
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/carrier"
 )
 
+var (
+	ErrLocalityNotExists = errors.New("error locality does not exists")
+)
+
 type CarrierService struct {
 	rp repository.ICarrierRepository
 }
@@ -16,6 +20,7 @@ func NewCarrierService(rp repository.ICarrierRepository) *CarrierService {
 	return &CarrierService{rp: rp}
 }
 
+// ! 1)
 func (s *CarrierService) AddCarrier(req dto.CarrierDoc) (c dto.CarrierDoc, err error) {
 
 	carrierModel, err := req.ConvertToModel(req)
@@ -47,4 +52,22 @@ func (s *CarrierService) AddCarrier(req dto.CarrierDoc) (c dto.CarrierDoc, err e
 	}
 
 	return carrierDTO, nil
+}
+
+// ! 2)
+func (s *CarrierService) GetCarriesAmount(id int) (result dto.CarrierByLocalityID, err error) {
+	carriesAmount, err := s.rp.GetCarriesAmountByLocalityID(id)
+	if err != nil {
+		if errors.Is(err, repository.ErrLocalityNotFound) {
+			return dto.CarrierByLocalityID{}, ErrLocalityNotExists
+		}
+		return dto.CarrierByLocalityID{}, ErrDatabase{Err: fmt.Errorf("unexpected error: %w", err)}
+	}
+
+	carriesAmountDTO, err := dto.CarrierByLocalityID{}.ConvertToDTO(carriesAmount)
+	if err != nil {
+		return dto.CarrierByLocalityID{}, ErrConvertion{Err: err}
+	}
+
+	return carriesAmountDTO, nil
 }

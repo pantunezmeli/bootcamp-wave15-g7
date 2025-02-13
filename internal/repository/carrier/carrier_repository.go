@@ -16,6 +16,7 @@ var (
 	ErrForeignKeyViolation = errors.New("error invalid foreign key")
 	ErrDuplicateEntry      = errors.New("error cid already exists")
 	ErrDBGenericError      = errors.New("error database failed")
+	ErrLocalityNotFound    = errors.New("locality does not exists")
 )
 
 type CarrierRepository struct {
@@ -26,6 +27,12 @@ func NewCarrierRepository(db *sql.DB) *CarrierRepository {
 	return &CarrierRepository{
 		db: db,
 	}
+}
+
+type CarrierByLocality struct {
+	LocalityID    int
+	LocalityName  string
+	CarriesAmount int
 }
 
 // ! 1)
@@ -67,5 +74,30 @@ func (r *CarrierRepository) AddCarrierToDB(carrier models.Carrier) (models.Carri
 	carrier.Id = newIdObj
 
 	return carrier, nil
+
+}
+
+// ! 2)
+func (r *CarrierRepository) GetCarriesAmountByLocalityID(id int) (CarrierByLocality, error) {
+	query := `SELECT COALESCE(COUNT(c.id),0),l.locality_name, l.id
+			FROM carriers c 
+			RIGHT JOIN localities l ON c.locality_id = l.id 
+			WHERE l.id = ?
+			GROUP BY l.id, l.locality_name`
+
+	var result CarrierByLocality
+
+	err := r.db.QueryRow(query, id).Scan(
+		&result.CarriesAmount,
+		&result.LocalityName,
+		&result.LocalityID,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return CarrierByLocality{}, ErrLocalityNotFound
+		}
+		return CarrierByLocality{}, err
+	}
+	return result, nil
 
 }

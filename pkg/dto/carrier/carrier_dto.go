@@ -5,6 +5,7 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	repository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/carrier"
 )
 
 type CarrierDoc struct {
@@ -14,6 +15,12 @@ type CarrierDoc struct {
 	Address     string `json:"address"`
 	Telephone   string `json:"telephone"`
 	LocalityId  int    `json:"locality_id"`
+}
+
+type CarrierByLocalityID struct {
+	LocalityID    int    `json:"locality_id"`
+	LocalityName  string `json:"locality_name"`
+	CarriesAmount int    `json:"carries_count"`
 }
 
 func (w CarrierDoc) ConvertToModel(req CarrierDoc) (models.Carrier, error) {
@@ -79,5 +86,22 @@ func (w CarrierDoc) ConvertToDTO(req models.Carrier) (c CarrierDoc, err error) {
 		Address:     value_objects.Address.GetAddress(req.Address),
 		Telephone:   value_objects.Telephone.GetTelephone(req.Telephone),
 		LocalityId:  value_objects.LocalityId.GetLocalityId(req.LocalityId),
+	}, nil
+}
+
+func (w CarrierByLocalityID) ConvertToDTO(req repository.CarrierByLocality) (c CarrierByLocalityID, err error) {
+	if req.LocalityID <= 0 {
+		return CarrierByLocalityID{}, fmt.Errorf("invalid Locality ID")
+	}
+	if len(req.LocalityName) <= 0 {
+		return CarrierByLocalityID{}, fmt.Errorf("invalid Locality Name")
+	}
+	if req.CarriesAmount < 0 {
+		return CarrierByLocalityID{}, fmt.Errorf("invalid carries amount")
+	}
+	return CarrierByLocalityID{
+		LocalityID:    req.LocalityID,
+		LocalityName:  req.LocalityName,
+		CarriesAmount: req.CarriesAmount,
 	}, nil
 }

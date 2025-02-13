@@ -192,6 +192,7 @@ func (a *ServerChi) Run() (err error) {
 
 		r.Route("/carriers", func(rt chi.Router) {
 			rt.Post("/", carrierHandler.Create())
+			rt.Get("/reportCarries", carrierHandler.GetCarriesAmount())
 		})
 	})
 

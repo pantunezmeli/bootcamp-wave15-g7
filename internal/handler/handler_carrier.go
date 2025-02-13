@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/bootcamp-go/web/response"
 	service "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/carrier"
@@ -36,7 +37,6 @@ func (h *CarrierHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		fmt.Println("Llegué hasta la creación")
 		carrier, err := h.sv.AddCarrier(req)
 		if err != nil {
 			var errFK service.ErrForeignKey
@@ -68,5 +68,44 @@ func (h *CarrierHandler) Create() http.HandlerFunc {
 		}
 
 		response.JSON(w, http.StatusCreated, carrier)
+	}
+}
+
+// ! 2)
+func (h *CarrierHandler) GetCarriesAmount() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			e.JSONError(w, http.StatusBadRequest, "missing locality ID")
+			return
+		}
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			e.JSONError(w, http.StatusBadRequest, "invalid id parameter")
+			return
+		}
+
+		res, err := h.sv.GetCarriesAmount(id)
+		if err != nil {
+			var errDB service.ErrDatabase
+			var errDTO service.ErrConvertion
+			switch {
+			case errors.As(err, &errDB):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			case errors.As(err, &errDTO):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			case errors.Is(err, service.ErrLocalityNotExists):
+				e.JSONError(w, http.StatusNotFound, "locality not found")
+				return
+			default:
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			}
+		}
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"data": res,
+		})
 	}
 }

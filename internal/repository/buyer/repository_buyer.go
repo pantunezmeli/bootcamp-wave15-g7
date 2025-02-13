@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 
 	//"dario.cat/mergo"
@@ -38,8 +37,7 @@ func (buyer *BuyerRepository) GetAll() ([]models.Buyer, error) {
 		var buyer models.Buyer
 		err := rows.Scan(&buyer.Id, &buyer.Card_Number_Id, &buyer.First_Name, &buyer.Last_Name)
 		if err != nil {
-			log.Println(err)
-			continue
+			return nil, errorbase.ErrDatabaseOperationFailed
 		}
 		buyers = append(buyers, buyer)
 	}
@@ -66,7 +64,7 @@ func (buyer *BuyerRepository) GetById(id int) (models.Buyer, error) {
 
 func (buyer *BuyerRepository) Create(entity models.Buyer) (models.Buyer, error) {
 
-	if exist := buyer.cardIdExist(entity.Card_Number_Id); exist {
+	if exist := buyer.cardIdExist(0, entity.Card_Number_Id); exist {
 		return models.Buyer{}, errorbase.ErrConflict
 	}
 
@@ -101,7 +99,7 @@ func (buyer *BuyerRepository) Update(id int, entity models.Buyer) (models.Buyer,
 
 	cardId := strings.TrimSpace(entity.Card_Number_Id)
 	if cardId != "" {
-		if exist := buyer.cardIdExist(entity.Card_Number_Id); exist {
+		if exist := buyer.cardIdExist(id, entity.Card_Number_Id); exist {
 			return models.Buyer{}, errorbase.ErrConflict
 		}
 	}
@@ -189,11 +187,28 @@ func (buyer *BuyerRepository) buyerExist(id int) bool {
 	return exist
 }
 
-func (buyer *BuyerRepository) cardIdExist(cardID string) bool {
+func (buyer *BuyerRepository) cardIdExist(id int, cardID string) bool {
 	var exist bool
-	err := buyer.db.QueryRow(querys.ExistCardID, cardID).Scan(&exist)
-	if err != nil {
-		return false
+	if id > 0 {
+
+		row := buyer.db.QueryRow(querys.SameBuyer, id)
+		var buyer_model models.Buyer
+		row.Scan(&buyer_model.Card_Number_Id)
+
+		if cardID != buyer_model.Card_Number_Id {
+			err := buyer.db.QueryRow(querys.ExistCardID, cardID).Scan(&exist)
+			if err != nil {
+				return false
+			}
+		} else {
+			return false
+		}
+
+	} else {
+		err := buyer.db.QueryRow(querys.ExistCardID, cardID).Scan(&exist)
+		if err != nil {
+			return false
+		}
 	}
 	return exist
 }

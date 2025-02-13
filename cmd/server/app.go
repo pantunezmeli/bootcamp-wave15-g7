@@ -34,6 +34,10 @@ import (
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 	buyerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
 
+	// Purchase
+	purchaseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/purchase"
+	purchaseService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/purchase"
+
 	// Warehouse
 	warehouseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
 	warehouseService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse"
@@ -103,6 +107,11 @@ func (a *ServerChi) Run() (err error) {
 	buyerRepository := buyerRepository.NewBuyerRepository(dbConn)
 	buyerService := buyerService.NewBuyerService(buyerRepository)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
+
+	// Purchases
+	purchaseRepository := purchaseRepository.NewBuyerRepository(dbConn)
+	purchaseService := purchaseService.NewBuyerService(purchaseRepository)
+	purchaseHandler := handler.NewPurchaseHandler(purchaseService)
 
 	// Warehouses
 	warehouseRepository := warehouseRepository.NewWareHouseRepository(dbConn)
@@ -179,6 +188,12 @@ func (a *ServerChi) Run() (err error) {
 			rt.Patch("/{id}", buyerHandler.Update())
 			rt.Delete("/{id}", buyerHandler.Delete())
 		})
+
+		r.Route("/reportPurchaseOrders", func(rt chi.Router) {
+			rt.Get("/", purchaseHandler.Get())
+			rt.Get("/{id}", purchaseHandler.GetById())
+		})
+
 	})
 
 	// run server

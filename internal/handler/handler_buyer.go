@@ -53,7 +53,7 @@ func (handler *BuyerHandler) GetById() http.HandlerFunc {
 		id, err2 := strconv.Atoi(idParam)
 
 		if err2 != nil {
-			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrRequest)
+			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrRequest)
 			return
 		}
 		buyer, err := handler.service.GetBuyer(id)

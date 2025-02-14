@@ -22,8 +22,9 @@ type ProductDTO struct {
 	SellerID                       int     `json:"seller_id,omitempty"`
 }
 
-func ParseDTOProduct(productTypeID, sellerID value_objects.Id, product ProductDTO) models.Product {
-	id, _ := value_objects.NewId(product.ID)
+func ParseDTOProduct(productTypeID value_objects.ProductTypeId, sellerID value_objects.SellerId, product ProductDTO) models.Product {
+	id, _ := value_objects.NewProductId(product.ID)
+
 	return models.Product{
 		ID:            id,
 		Description:   product.Description,
@@ -57,7 +58,7 @@ func ParserMapProductToListDTO(p map[int]models.Product) []ProductDTO {
 
 func ParserProductToDTO(p models.Product) ProductDTO {
 	return ProductDTO{
-		ID:                             p.ID.GetId(),
+		ID:                             int(p.ID),
 		Description:                    p.Description,
 		ExpirationRate:                 p.ExpirationRate,
 		FreezingRate:                   p.FreezingRate,
@@ -67,7 +68,7 @@ func ParserProductToDTO(p models.Product) ProductDTO {
 		ProductCode:                    p.ProductCode,
 		RecommendedFreezingTemperature: p.RecommendedFreezingTemperature,
 		Width:                          p.Width,
-		ProductTypeID:                  p.ProductTypeID.GetId(),
-		SellerID:                       p.SellerID.GetId(),
+		ProductTypeID:                  int(p.ProductTypeID),
+		SellerID:                       *p.SellerID.Value(),
 	}
 }

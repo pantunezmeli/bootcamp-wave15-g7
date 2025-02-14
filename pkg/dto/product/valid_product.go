@@ -20,12 +20,12 @@ func ValidAndParserDTO(dto ProductDTO, productToParser *models.Product) error {
 		return errors.New("description Can't be empty")
 	}
 
-	productTypeId, errID := value_objects.NewId(dto.ProductTypeID)
+	productTypeId, errID := value_objects.NewProductTypeId(dto.ProductTypeID)
 	if errID != nil {
 		return errID
 	}
 
-	sellerId, errID := value_objects.NewId(dto.SellerID)
+	sellerId, errID := value_objects.NewSellerId(dto.SellerID)
 	if errID != nil {
 		return errID
 	}

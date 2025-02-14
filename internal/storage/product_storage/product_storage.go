@@ -43,8 +43,8 @@ func (l *ProductJSONFile) SaveProduct(newProduct models.Product) error {
 	if err != nil {
 		return err
 	}
-
-	products[newProduct.ID.GetId()] = newProduct
+	key := int(newProduct.ID)
+	products[key] = newProduct
 
 	return l.saveToSlice(products)
 }

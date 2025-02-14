@@ -3,8 +3,8 @@ package value_objects
 import "errors"
 
 var (
-	ErrInvalidId              = errors.New("invalid id")
-	ErrInvalidWareHouseCode   = errors.New("invalid warehouse code")
+	ErrInvalidId = errors.New("invalid id")
+	//ErrInvalidWareHouseCode   = errors.New("invalid warehouse code")
 	ErrInvalidTelephone       = errors.New("invalid telephone")
 	ErrInvalidMinimunCapacity = errors.New("invalid minimun capacity")
 	ErrMinimunTemperature     = errors.New("invalid minimun temperature")
@@ -17,9 +17,36 @@ var (
 
 // * ##################### Id ######################
 // Estructura
+
+type ProductId int
+type ProductRecordsId int
+type ProductTypeId int
+
+func NewProductTypeId(value int) (id ProductTypeId, err error) {
+	if value <= 0 {
+		return 0, ErrInvalidId
+	}
+	return ProductTypeId(value), nil
+}
+
+func NewProductId(value int) (id ProductId, err error) {
+	if value <= 0 {
+		return 0, ErrInvalidId
+	}
+	return ProductId(value), nil
+}
+
+func NewProductRecordsId(value int) (id ProductRecordsId, err error) {
+	if value <= 0 {
+		return 0, ErrInvalidId
+	}
+	return ProductRecordsId(value), nil
+}
+
 type Id struct {
 	value int
 }
+
 type CardNumber struct {
 	value string
 }
@@ -91,23 +118,6 @@ func (name Name) GetName() string {
 }
 func (date ValidatedDate) GetDate() string {
 	return date.value
-}
-
-// * ##################### WareHouse_Code ######################
-
-type WareHouseCode struct {
-	value string
-}
-
-func NewWareHouseCode(value string) (code WareHouseCode, err error) {
-	if len(value) < 3 {
-		return WareHouseCode{}, ErrInvalidWareHouseCode
-	}
-	return WareHouseCode{value: value}, nil
-}
-
-func (code WareHouseCode) GetWareHouseCode() string {
-	return code.value
 }
 
 // * ##################### Address ######################

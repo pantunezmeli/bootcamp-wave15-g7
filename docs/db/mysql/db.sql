@@ -3,6 +3,18 @@ create database bootcamp_db;
 
 use bootcamp_db;
 
+DROP TABLE IF EXISTS `employees`;
+DROP TABLE IF EXISTS `sections`;
+DROP TABLE IF EXISTS `warehouses`;
+DROP TABLE IF EXISTS `purchase_orders`;
+DROP TABLE IF EXISTS `carriers`;
+DROP TABLE IF EXISTS `product_records`;
+DROP TABLE IF EXISTS `inbound_orders`;
+DROP TABLE IF EXISTS `product_batches`;
+DROP TABLE IF EXISTS `products`;
+DROP TABLE IF EXISTS `sellers`;
+DROP TABLE IF EXISTS `localities`;
+DROP TABLE IF EXISTS `provinces`;
 DROP TABLE IF EXISTS `countries`;
 
 create table `countries` (
@@ -10,7 +22,6 @@ create table `countries` (
     `country_name` varchar(255) UNIQUE NOT NULL 
 );
 
-DROP TABLE IF EXISTS `provinces`;
 create table `provinces` (
 	`id` int primary key auto_increment,
     `province_name` varchar(255) NOT NULL,
@@ -18,7 +29,6 @@ create table `provinces` (
     FOREIGN KEY (`country_id`) REFERENCES `countries`(`id`)
 );
 
-DROP TABLE IF EXISTS `localities`;
 create table `localities` (
 	`id` int primary key auto_increment,
     `locality_name` varchar(255) NOT NULL,
@@ -41,7 +51,6 @@ create table `buyers` (
 	`last_name` varchar(255) NOT NULL
 );
 
-DROP TABLE IF EXISTS `sellers`;
 create table `sellers` (
 	`id` int primary key auto_increment,
     `cid` varchar(255) UNIQUE NOT NULL,
@@ -52,7 +61,6 @@ create table `sellers` (
 	FOREIGN KEY (`locality_id`) REFERENCES `localities`(`id`)
 );
 
-DROP TABLE IF EXISTS `carriers`;
 create table `carriers` (
 	`id` int primary key auto_increment,
     `cid` varchar(255) UNIQUE NOT NULL,
@@ -63,7 +71,6 @@ create table `carriers` (
 	FOREIGN KEY (`locality_id`) REFERENCES `localities`(`id`)
 );
 
-DROP TABLE IF EXISTS `warehouses`;
 create table `warehouses` (
 	`id` int primary key auto_increment,
     `warehouse_code` varchar(255) UNIQUE NOT NULL,
@@ -79,7 +86,6 @@ create table `products_types` (
     `description` varchar(255) UNIQUE NOT NULL  
 );
 
-DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
    `id` INT PRIMARY KEY auto_increment,
    `description` VARCHAR(255),
@@ -97,7 +103,6 @@ CREATE TABLE `products` (
    FOREIGN KEY (`seller_id`) REFERENCES sellers(`id`)
 );
 
-DROP TABLE IF EXISTS `sections`;
 create table `sections` (
 	`id` int primary key auto_increment,
     `section_number` varchar(255) UNIQUE NOT NULL,
@@ -112,7 +117,6 @@ create table `sections` (
     FOREIGN KEY (`warehouse_id`) REFERENCES warehouses(`id`)
 );
 
-DROP TABLE IF EXISTS `employees`;
 create table `employees` (
 	`id` int primary key auto_increment,
     `id_card_number` varchar(255) UNIQUE NOT NULL,
@@ -122,7 +126,6 @@ create table `employees` (
     FOREIGN KEY (`warehouse_id`) REFERENCES warehouses(`id`)
 );
 
-DROP TABLE IF EXISTS `purchase_orders`;
 create table `purchase_orders` (
 	`id` int primary key auto_increment,
     `order_number` varchar(255) UNIQUE NOT NULL,
@@ -137,7 +140,6 @@ create table `purchase_orders` (
     FOREIGN KEY (`order_status_id`) REFERENCES order_status(`id`),
     FOREIGN KEY (`warehouse_id`) REFERENCES warehouses(`id`)
 );
-DROP TABLE IF EXISTS `product_batches`;
 CREATE TABLE product_batches (
    `id` INT PRIMARY KEY auto_increment,
    `batch_number` VARCHAR(255) unique not null,
@@ -154,7 +156,6 @@ CREATE TABLE product_batches (
    FOREIGN KEY (`section_id`) REFERENCES sections(`id`)
 );
 
-DROP TABLE IF EXISTS `inbound_orders`;
 CREATE TABLE inbound_orders (
    `id` INT PRIMARY KEY auto_increment,
    `order_date` DATETIME(6),
@@ -169,7 +170,6 @@ CREATE TABLE inbound_orders (
 
 
 
-DROP TABLE IF EXISTS `product_records`;
 CREATE TABLE `product_records` (
    `id` INT PRIMARY KEY auto_increment,
    `last_update_date` DATETIME(6) not null,
@@ -563,26 +563,26 @@ INSERT INTO `products_types` (`description`) VALUES
 ('Alimentos para bebés');
 
 INSERT INTO `products` (`description`, `expiration_rate`, `freezing_rate`, `height`, `length`, `net_weight`, `product_code`, `recommended_freezing_temperature`, `width`, `product_type_id`, `seller_id`) VALUES
-('Manzanas Rojas', 10.50, 0.00, 12.50, 15.00, 1.20, 'P001', -1.00, 10.00, 1, 1),
-('Bananas', 8.30, 0.00, 20.00, 25.00, 1.80, 'P002', -2.00, 15.00, 1, 2),
+('Manzanas Rojas', 10.50, 1.00, 12.50, 15.00, 1.20, 'P001', -1.00, 10.00, 1, 1),
+('Bananas', 8.30, 1.00, 20.00, 25.00, 1.80, 'P002', -2.00, 15.00, 1, 2),
 ('Leche Entera', 7.00, 5.00, 25.00, 10.00, 2.00, 'P003', 4.00, 10.00, 3, 3),
 ('Queso Fresco', 15.00, 3.00, 10.00, 10.00, 0.50, 'P004', 2.00, 8.00, 3, 4),
 ('Carne de Res', 20.00, 10.00, 30.00, 40.00, 5.00, 'P005', -18.00, 25.00, 4, 5),
 ('Salmón Fresco', 12.00, 8.00, 20.00, 30.00, 3.50, 'P006', -20.00, 15.00, 5, 6),
-('Pan Integral', 5.00, 0.00, 10.00, 20.00, 1.00, 'P007', 0.00, 10.00, 6, 7),
-('Jugo de Naranja', 30.00, 0.00, 15.00, 10.00, 1.50, 'P008', 2.00, 10.00, 7, 8),
-('Arroz Blanco', 360.00, 0.00, 20.00, 10.00, 2.00, 'P009', 0.00, 15.00, 8, 9),
-('Pimienta Negra', 540.00, 0.00, 5.00, 5.00, 0.10, 'P010', 0.00, 5.00, 9, 10),
-('Dulce de Leche', 60.00, 0.00, 12.00, 15.00, 1.00, 'P011', 2.00, 10.00, 10, 11),
-('Aceite de Oliva', 180.00, 0.00, 25.00, 8.00, 0.75, 'P012', 0.00, 8.00, 11, 12),
-('Atún enlatado', 720.00, 0.00, 10.00, 10.00, 0.25, 'P013', 0.00, 10.00, 12, 13),
+('Pan Integral', 5.00, 3.00, 10.00, 20.00, 1.00, 'P007', 0.00, 10.00, 6, 7),
+('Jugo de Naranja', 30.00, 3.00, 15.00, 10.00, 1.50, 'P008', 2.00, 10.00, 7, 8),
+('Arroz Blanco', 360.00, 3.00, 20.00, 10.00, 2.00, 'P009', 0.00, 15.00, 8, 9),
+('Pimienta Negra', 540.00, 3.00, 5.00, 5.00, 0.10, 'P010', 0.00, 5.00, 9, 10),
+('Dulce de Leche', 60.00, 3.00, 12.00, 15.00, 1.00, 'P011', 2.00, 10.00, 10, 11),
+('Aceite de Oliva', 180.00, 3.00, 25.00, 8.00, 0.75, 'P012', 0.00, 8.00, 11, 12),
+('Atún enlatado', 720.00, 3.00, 10.00, 10.00, 0.25, 'P013', 0.00, 10.00, 12, 13),
 ('Papas Congeladas', 12.00, 15.00, 30.00, 20.00, 2.50, 'P014', -18.00, 15.00, 13, 14),
-('Chips de Papa', 120.00, 0.00, 15.00, 10.00, 0.50, 'P015', 0.00, 8.00, 14, 15),
-('Galletas Dulces', 180.00, 0.00, 10.00, 15.00, 0.75, 'P016', 0.00, 10.00, 15, 16),
-('Huevos Orgánicos', 30.00, 0.00, 8.00, 12.00, 0.60, 'P017', 5.00, 10.00, 16, 17),
-('Harina de Trigo', 360.00, 0.00, 20.00, 15.00, 2.00, 'P018', 0.00, 15.00, 17, 18),
+('Chips de Papa', 120.00, 3.00, 15.00, 10.00, 0.50, 'P015', 0.00, 8.00, 14, 15),
+('Galletas Dulces', 180.00, 3.00, 10.00, 15.00, 0.75, 'P016', 0.00, 10.00, 15, 16),
+('Huevos Orgánicos', 30.00, 3.00, 8.00, 12.00, 0.60, 'P017', 5.00, 10.00, 16, 17),
+('Harina de Trigo', 360.00, 3.00, 20.00, 15.00, 2.00, 'P018', 0.00, 15.00, 17, 18),
 ('Tofu', 15.00, 5.00, 10.00, 10.00, 0.30, 'P019', 2.00, 10.00, 18, 19),
-('Papilla para Bebés', 90.00, 0.00, 12.00, 8.00, 0.50, 'P020', 4.00, 8.00, 19, 20);
+('Papilla para Bebés', 90.00, 3.00, 12.00, 8.00, 0.50, 'P020', 4.00, 8.00, 19, 20);
 
 INSERT INTO `sections` (`section_number`, `current_capacity`, `current_temperature`, `maximum_capacity`, `minimum_capacity`, `minimum_temperature`, `product_type_id`, `warehouse_id`) VALUES
 ('S001', 100, 4.00, 150, 50, 0.00, 1, 1),
@@ -699,25 +699,25 @@ INSERT INTO `inbound_orders` (`order_date`, `order_number`, `employee_id`, `prod
 
 INSERT INTO `product_records` (`last_update_date`, `purchase_price`, `sale_price`, `product_id`) VALUES
 ('2024-02-01 08:00:00.000000', 50.00, 75.00, 1),
-('2024-02-02 09:15:00.000000', 30.00, 45.00, 2),
-('2024-02-03 10:30:00.000000', 60.00, 90.00, 3),
-('2024-02-04 11:45:00.000000', 20.00, 35.00, 4),
-('2024-02-05 13:00:00.000000', 100.00, 150.00, 5),
-('2024-02-06 14:15:00.000000', 40.00, 60.00, 6),
-('2024-02-07 15:30:00.000000', 25.00, 38.00, 7),
-('2024-02-08 16:45:00.000000', 80.00, 120.00, 8),
-('2024-02-09 18:00:00.000000', 90.00, 135.00, 9),
-('2024-02-10 19:15:00.000000', 15.00, 25.00, 10),
-('2024-02-11 20:30:00.000000', 55.00, 82.00, 11),
-('2024-02-12 21:45:00.000000', 70.00, 105.00, 12),
-('2024-02-13 08:00:00.000000', 65.00, 98.00, 13),
-('2024-02-14 09:15:00.000000', 110.00, 165.00, 14),
-('2024-02-15 10:30:00.000000', 45.00, 68.00, 15),
-('2024-02-16 11:45:00.000000', 95.00, 145.00, 16),
-('2024-02-17 13:00:00.000000', 35.00, 55.00, 17),
-('2024-02-18 14:15:00.000000', 120.00, 180.00, 18),
-('2024-02-19 15:30:00.000000', 85.00, 130.00, 19),
-('2024-02-20 16:45:00.000000', 50.00, 75.00, 20);
+('2024-02-02 09:15:00.000000', 30.00, 45.00, 1),
+('2024-02-03 10:30:00.000000', 60.00, 90.00, 1),
+('2024-02-04 11:45:00.000000', 20.00, 35.00, 1),
+('2024-02-05 13:00:00.000000', 100.00, 150.00, 2),
+('2024-02-06 14:15:00.000000', 40.00, 60.00, 2),
+('2024-02-07 15:30:00.000000', 25.00, 38.00, 2),
+('2024-02-08 16:45:00.000000', 80.00, 120.00, 2),
+('2024-02-09 18:00:00.000000', 90.00, 135.00, 2),
+('2024-02-10 19:15:00.000000', 15.00, 25.00, 3),
+('2024-02-11 20:30:00.000000', 55.00, 82.00, 3),
+('2024-02-12 21:45:00.000000', 70.00, 105.00, 3),
+('2024-02-13 08:00:00.000000', 65.00, 98.00, 3),
+('2024-02-14 09:15:00.000000', 110.00, 165.00, 3),
+('2024-02-15 10:30:00.000000', 45.00, 68.00, 3),
+('2024-02-16 11:45:00.000000', 95.00, 145.00, 4),
+('2024-02-17 13:00:00.000000', 35.00, 55.00, 4),
+('2024-02-18 14:15:00.000000', 120.00, 180.00, 4),
+('2024-02-19 15:30:00.000000', 85.00, 130.00, 4),
+('2024-02-20 16:45:00.000000', 50.00, 75.00, 4);
 
 
 

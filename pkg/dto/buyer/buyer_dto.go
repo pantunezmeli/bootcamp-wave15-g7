@@ -2,7 +2,6 @@ package dto
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 	"strings"
 
@@ -95,11 +94,17 @@ func GenerateBuyerResponse(buyer models.Buyer) BuyerResponse {
 }
 
 func GenerateBuyerRequestUpdate(id int, buyerUpdate BuyerUpdate, buyerExist models.Buyer) models.Buyer {
-	fmt.Println(*buyerUpdate.CardNumberID)
+	var cardId string
+	if buyerUpdate.CardNumberID == nil || *buyerUpdate.CardNumberID == "" {
+		cardId = buyerExist.Card_Number_Id
+	} else {
+		cardId = *buyerUpdate.CardNumberID
+	}
+
 	buyerResponse := models.Buyer{
 		Id: id,
 		PersonAtributes: models.PersonAtributes{
-			Card_Number_Id: *buyerUpdate.CardNumberID,
+			Card_Number_Id: cardId,
 			First_Name:     getStringFieldOrDefault(buyerUpdate.FirstName, buyerExist.First_Name),
 			Last_Name:      getStringFieldOrDefault(buyerUpdate.LastName, buyerExist.Last_Name),
 		},

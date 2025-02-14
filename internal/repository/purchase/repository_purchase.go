@@ -2,6 +2,7 @@ package purchase
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
@@ -41,7 +42,7 @@ func (repo *PurchaseRepository) GetReportPurchaseOrders() ([]models.ReportPurcha
 }
 
 func (repo *PurchaseRepository) GetReportPurchaseOrdersById(id int) (models.ReportPurchaseOrders, error) {
-	if exist := repo.buyerExist(id); !exist {
+	if exist := repo.FkExist(id, querys.BuyerExist); !exist {
 		return models.ReportPurchaseOrders{}, errorbase.ErrNotFound
 	}
 	row := repo.db.QueryRow(querys.GetReportPurchaseOrdersById, id)
@@ -72,15 +73,26 @@ func (repo *PurchaseRepository) CreatePurchaseOrder(entity models.PurchaseOrder)
 	warehouseId := attributes["Warehouse_ID"].(value_objects.WarehouseID).GetWarehouseID()
 
 	validationChecks := map[bool]error{
-		!repo.buyerExist(entity.Buyer_ID):              errorbase.ErrBuyerFKNotExist,
-		!repo.carrierExist(entity.Carrier_ID):          errorbase.ErrCarrierFKNotExist,
-		!repo.orderStatusExist(entity.Order_Status_ID): errorbase.ErrOrderStatusFKNotExist,
-		!repo.warehouseExist(entity.Warehouse_ID):      errorbase.ErrWareHouseFKNotExist,
+		!repo.FkExist(entity.Buyer_ID, querys.BuyerExist):              errorbase.ErrBuyerFKNotExist,
+		!repo.FkExist(entity.Carrier_ID, querys.CarrierExist):          errorbase.ErrCarrierFKNotExist,
+		!repo.FkExist(entity.Order_Status_ID, querys.OrderStatusExist): errorbase.ErrOrderStatusFKNotExist,
+		!repo.FkExist(entity.Warehouse_ID, querys.WarehouseExist):      errorbase.ErrWareHouseFKNotExist,
 	}
+	errorFk := &errorbase.ErrorFKNotExist{}
 
 	for condition, err := range validationChecks {
 		if condition {
-			return models.PurchaseOrder{}, err
+			switch {
+			case errors.Is(err, errorbase.ErrBuyerFKNotExist):
+				errorFk.AddFK("buyer does not exist")
+			case errors.Is(err, errorbase.ErrCarrierFKNotExist):
+				errorFk.AddFK("carrier does not exist")
+			case errors.Is(err, errorbase.ErrOrderStatusFKNotExist):
+				errorFk.AddFK("order status does not exist")
+			case errors.Is(err, errorbase.ErrWareHouseFKNotExist):
+				errorFk.AddFK("warehouse does not exist")
+			}
+			return models.PurchaseOrder{}, errorFk
 		}
 	}
 
@@ -102,6 +114,8 @@ func (repo *PurchaseRepository) CreatePurchaseOrder(entity models.PurchaseOrder)
 
 func (*PurchaseRepository) validateModel(entity models.PurchaseOrder) (map[string]any, error) {
 
+	errorFk := &errorbase.ErrorFKNotExist{}
+
 	order_number, err := value_objects.NewOrderNumber(entity.Order_number)
 	if err != nil {
 		return nil, err
@@ -119,22 +133,26 @@ func (*PurchaseRepository) validateModel(entity models.PurchaseOrder) (map[strin
 
 	buyerId, err := value_objects.NewBuyerID(entity.Buyer_ID)
 	if err != nil {
-		return nil, err
+		errorFk.AddFK("buyer id")
 	}
 
 	carrierId, err := value_objects.NewCarrierID(entity.Carrier_ID)
 	if err != nil {
-		return nil, err
+		errorFk.AddFK("carrier id")
 	}
 
 	order_status_id, err := value_objects.NewOrderStatusID(entity.Order_Status_ID)
 	if err != nil {
-		return nil, err
+		errorFk.AddFK("order status id")
 	}
 
 	warehouseId, err := value_objects.NewWarehouseID(entity.Warehouse_ID)
 	if err != nil {
-		return nil, err
+		errorFk.AddFK("warehouse id")
+	}
+
+	if errorFk.HasErrors() {
+		return nil, errorFk
 	}
 
 	return map[string]any{
@@ -148,53 +166,19 @@ func (*PurchaseRepository) validateModel(entity models.PurchaseOrder) (map[strin
 	}, nil
 }
 
-func (repo *PurchaseRepository) buyerExist(id int) bool {
-	var exist bool
-	err := repo.db.QueryRow(querys.ExistsBuyer, id).Scan(&exist)
-	if err != nil {
-		return false
-	}
-	return exist
-}
-
-func (repo *PurchaseRepository) carrierExist(id int) bool {
-	var exist bool
-	err := repo.db.QueryRow(querys.CarrierExist, id).Scan(&exist)
-	if err != nil {
-		return false
-	}
-	return exist
-}
-
-func (repo *PurchaseRepository) orderStatusExist(id int) bool {
-	var exist bool
-	err := repo.db.QueryRow(querys.OrderStatusExist, id).Scan(&exist)
-	if err != nil {
-		return false
-	}
-	return exist
-}
-func (repo *PurchaseRepository) warehouseExist(id int) bool {
-	var exist bool
-	err := repo.db.QueryRow(querys.Warehouse, id).Scan(&exist)
-	if err != nil {
-		return false
-	}
-	return exist
-}
-
 // BL validation
-func (repo *PurchaseRepository) OrderNumberExist(order string) bool {
+func (repo *PurchaseRepository) FkExist(id int, query string) bool {
 	var exist bool
-	err := repo.db.QueryRow(querys.OrderNumberExist, order).Scan(&exist)
+	err := repo.db.QueryRow(query, id).Scan(&exist)
 	if err != nil {
 		return false
 	}
 	return exist
 }
-func (repo *PurchaseRepository) TrackingCodeExist(code string) bool {
+
+func (repo *PurchaseRepository) ElementExist(number string, query string) bool {
 	var exist bool
-	err := repo.db.QueryRow(querys.TrackingCodeExist, code).Scan(&exist)
+	err := repo.db.QueryRow(query, number).Scan(&exist)
 	if err != nil {
 		return false
 	}

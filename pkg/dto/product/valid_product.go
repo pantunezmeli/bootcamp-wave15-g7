@@ -5,6 +5,7 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	sellerVo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/seller"
 )
 
 var (
@@ -25,7 +26,7 @@ func ValidAndParserDTO(dto ProductDTO, productToParser *models.Product) error {
 		return errID
 	}
 
-	sellerId, errID := value_objects.NewSellerId(dto.SellerID)
+	sellerId, errID := sellerVo.NewSellerId(dto.SellerID)
 	if errID != nil {
 		return errID
 	}

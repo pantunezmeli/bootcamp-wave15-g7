@@ -9,6 +9,8 @@ import (
 var (
 	ErrSellerNotFound = errors.New("seller not found")
 	ErrCidAlreadyExists = errors.New("cid already exists")
+	ErrConnection = errors.New("connection error")
+	ErrLocalityNotFound = errors.New("locality with id does not exist")
 )
 
 

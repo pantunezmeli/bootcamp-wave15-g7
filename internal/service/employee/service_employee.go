@@ -119,3 +119,25 @@ func (s *DefaultService) DeleteById(id int) (err error) {
 	}
 	return
 }
+
+func (s *DefaultService) ReportInboundOrders(id string) (reportsInboundOrders []dto.ReportInboundOrdersDoc, err error) {
+	employees, inboundOrdersPerEmployee, err := s.rp.ReportInboundOrders(id)
+	if errors.Is(err, employee.ErrIdNotFound) {
+		err = ErrEmployeeNotFound
+	}
+
+	for _, value := range employees {
+		var reportInboundOrders dto.ReportInboundOrdersDoc
+
+		reportInboundOrders.Id = value.Id.GetId()
+		reportInboundOrders.CardNumber = value.CardNumber.GetCardNumber()
+		reportInboundOrders.FirstName = value.FirstName.GetName()
+		reportInboundOrders.LastName = value.LastName.GetName()
+		reportInboundOrders.WarehouseId = value.WarehouseId.GetId()
+
+		reportInboundOrders.InboundOrders = inboundOrdersPerEmployee[reportInboundOrders.Id]
+
+		reportsInboundOrders = append(reportsInboundOrders, reportInboundOrders)
+	}
+	return
+}

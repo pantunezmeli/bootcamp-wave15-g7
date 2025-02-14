@@ -3,6 +3,7 @@ package employee
 import (
 	"database/sql"
 	"errors"
+	"strconv"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
@@ -182,4 +183,90 @@ func (r *EmployeeSQL) DeleteById(id int) (err error) {
 	}
 
 	return
+}
+
+func (r *EmployeeSQL) ReportInboundOrders(id string) (employees map[int]models.Employee, inboundOrdersPerEmployee map[int]int, err error) {
+	employees = make(map[int]models.Employee)
+	inboundOrdersPerEmployee = make(map[int]int)
+
+	query := "SELECT e.id, e.id_card_number, e.first_name, e.last_name, e.warehouse_id, COUNT(o.id) FROM employees AS e LEFT JOIN inbound_orders AS o ON e.id=employee_id"
+
+	// with query param
+	if id != "" {
+		query += " WHERE e.id = ? GROUP BY e.id"
+
+		employeeId, errId := strconv.Atoi(id)
+		if errId != nil {
+			return
+		}
+		row := r.db.QueryRow(query, employeeId)
+
+		var employee models.Employee
+
+		var id int
+		var cardNumber string
+		var firstName string
+		var lastName string
+		var warehouseId int
+
+		var inboundOrders int
+
+		errRow := row.Scan(&id, &cardNumber, &firstName, &lastName, &warehouseId, &inboundOrders)
+		if errors.Is(errRow, sql.ErrNoRows) {
+			err = ErrIdNotFound
+			return
+		}
+
+		employee.Id = value_objects.NewOptionalId(id)
+		employee.CardNumber = value_objects.NewOptionalCardNumber(cardNumber)
+		employee.FirstName = value_objects.NewOptionalName(firstName)
+		employee.LastName = value_objects.NewOptionalName(lastName)
+		employee.WarehouseId = value_objects.NewOptionalId(warehouseId)
+
+		employees[employeeId] = employee
+		inboundOrdersPerEmployee[employeeId] = inboundOrders
+
+		return
+
+		// without query param
+	} else {
+		query += " GROUP BY e.id"
+
+		rows, errQuery := r.db.Query(query)
+		if errQuery != nil {
+			return
+		}
+		defer rows.Close()
+
+		var key int
+		for rows.Next() {
+			var employee models.Employee
+
+			var employeeId int
+			var cardNumber string
+			var firstName string
+			var lastName string
+			var warehouseId int
+
+			var inboundOrders int
+
+			err = rows.Scan(&employeeId, &cardNumber, &firstName, &lastName, &warehouseId, &inboundOrders)
+			if err != nil {
+				return
+			}
+
+			inboundOrdersPerEmployee[employeeId] = inboundOrders
+			employee.Id = value_objects.NewOptionalId(employeeId)
+			employee.CardNumber = value_objects.NewOptionalCardNumber(cardNumber)
+			employee.FirstName = value_objects.NewOptionalName(firstName)
+			employee.LastName = value_objects.NewOptionalName(lastName)
+			employee.WarehouseId = value_objects.NewOptionalId(warehouseId)
+
+			employees[key] = employee
+			key++
+
+			inboundOrdersPerEmployee[employeeId] = inboundOrders
+		}
+		return
+	}
 }

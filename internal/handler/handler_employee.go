@@ -18,6 +18,7 @@ var (
 	ErrCardNumberExists          = errors.New("card number already exists")
 	ErrEmptyField                = errors.New("data lacks a required field")
 	ErrInboundOrderNeedsEmployee = errors.New("inbound order linked to this employee")
+	ErrNotImplemented            = errors.New("not implemented")
 )
 
 func NewDefaultHandler(service sv.EmployeeService) *DefaultHandler {
@@ -176,5 +177,28 @@ func (h *DefaultHandler) Delete() http.HandlerFunc {
 
 		// response
 		response.JSON(w, http.StatusNoContent, nil)
+	}
+}
+
+func (h *DefaultHandler) ReportInboundOrders() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// request
+		id := r.URL.Query().Get("id")
+
+		// process
+		employee, err := h.sv.ReportInboundOrders(id)
+		if err != nil {
+			if errors.Is(err, sv.ErrEmployeeNotFound) {
+				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
+				return
+			}
+			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+			return
+		}
+
+		// response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"data": employee,
+		})
 	}
 }

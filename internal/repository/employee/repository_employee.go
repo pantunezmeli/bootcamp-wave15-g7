@@ -123,3 +123,8 @@ func (r *EmployeeMap) DeleteById(id int) (err error) {
 	err = ErrIdNotFound
 	return
 }
+
+func (r *EmployeeMap) ReportInboundOrders(id string) (employees map[int]models.Employee, inboundOrders map[int]int, err error) {
+	err = ErrNotImplemented
+	return
+}

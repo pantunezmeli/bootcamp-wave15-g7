@@ -11,6 +11,7 @@ var ErrWarehouseNotFound = errors.New("warehouse not found")
 var ErrEmptyField = errors.New("employee data lacks a required field")
 var ErrCardNumberAlreadyExists = errors.New("employee card number already exists")
 var ErrInboundOrderNeedsEmployee = errors.New("inbound order linked to this employee")
+var ErrNotImplemented = errors.New("not implemented")
 
 type EmployeeService interface {
 	// TODO
@@ -19,4 +20,5 @@ type EmployeeService interface {
 	New(employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error)
 	Edit(id int, employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error)
 	DeleteById(id int) (err error)
+	ReportInboundOrders(id string) (inboundOrders []dto.ReportInboundOrdersDoc, err error)
 }

@@ -13,6 +13,15 @@ type EmployeeDoc struct {
 	WarehouseId int    `json:"warehouse_id"`
 }
 
+type ReportInboundOrdersDoc struct {
+	Id            int    `json:"id"`
+	CardNumber    string `json:"id_card_number"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
+	WarehouseId   int    `json:"warehouse_id"`
+	InboundOrders int    `json:"inbound_orders"`
+}
+
 func EmployeeDtoToModel(dto EmployeeDoc) (employee models.Employee, err error) {
 	newId, errValidation := value_objects.NewId(dto.Id)
 	if errValidation != nil {

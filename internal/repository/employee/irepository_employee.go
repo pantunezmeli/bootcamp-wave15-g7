@@ -10,6 +10,7 @@ var ErrIdNotFound = errors.New("employee not found")
 var ErrWarehouseIdNotFound = errors.New("warehouse not found")
 var ErrCardNumberNotUnique = errors.New("card number must be unique")
 var ErrInboundOrderFK = errors.New("inbound order has a foreign key to this employee")
+var ErrNotImplemented = errors.New("not implemented")
 
 type EmployeeRepository interface {
 	// TODO
@@ -18,4 +19,5 @@ type EmployeeRepository interface {
 	New(employee models.Employee) (newEmployee models.Employee, err error)
 	Edit(id int, employee models.Employee) (updatedEmployee models.Employee, err error)
 	DeleteById(id int) (err error)
+	ReportInboundOrders(id string) (employees map[int]models.Employee, inboundOrders map[int]int, err error)
 }

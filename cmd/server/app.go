@@ -178,6 +178,7 @@ func (a *ServerChi) Run() (err error) {
 			rt.Post("/", employeeHandler.Create())
 			rt.Patch("/{id}", employeeHandler.Update())
 			rt.Delete("/{id}", employeeHandler.Delete())
+			rt.Get("/reportInboundOrders", employeeHandler.ReportInboundOrders())
 		})
 
 		r.Route("/inboundOrders", func(rt chi.Router) {

@@ -8,5 +8,5 @@ type ICarrierRepository interface {
 	AddCarrierToDB(carrier models.Carrier) (c models.Carrier, err error)
 
 	//! 2)
-	GetCarriesAmountByLocalityID(id int) (CarrierByLocality, error)
+	GetCarriesAmountByLocalityID(id *int) ([]CarrierByLocality, error)
 }

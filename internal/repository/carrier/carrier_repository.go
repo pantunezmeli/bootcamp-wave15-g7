@@ -7,16 +7,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
-)
-
-var (
-	ErrInsertingData       = errors.New("error inserting data on database")
-	ErrGettingLastID       = errors.New("error getting last insert ID")
-	ErrConvertingID        = errors.New("error parsing ID")
-	ErrForeignKeyViolation = errors.New("error invalid foreign key")
-	ErrDuplicateEntry      = errors.New("error cid already exists")
-	ErrDBGenericError      = errors.New("error database failed")
-	ErrLocalityNotFound    = errors.New("locality does not exists")
+	customErrors "github.com/pantunezmeli/bootcamp-wave15-g7/internal/errors"
 )
 
 type CarrierRepository struct {
@@ -51,24 +42,24 @@ func (r *CarrierRepository) AddCarrierToDB(carrier models.Carrier) (models.Carri
 		if errors.As(err, &mysqlErr) {
 			switch mysqlErr.Number {
 			case 1452:
-				return models.Carrier{}, ErrForeignKeyViolation
+				return models.Carrier{}, customErrors.ErrForeignKeyViolation
 			case 1062:
-				return models.Carrier{}, ErrDuplicateEntry
+				return models.Carrier{}, customErrors.ErrDuplicateEntry
 			default:
-				return models.Carrier{}, ErrDBGenericError
+				return models.Carrier{}, customErrors.ErrDBGenericError
 			}
 		}
-		return models.Carrier{}, ErrInsertingData
+		return models.Carrier{}, customErrors.ErrInsertingData
 	}
 
 	lasInsertID, err := result.LastInsertId()
 	if err != nil {
-		return models.Carrier{}, ErrGettingLastID
+		return models.Carrier{}, customErrors.ErrGettingLastID
 	}
 
 	newIdObj, err := value_objects.NewId(int(lasInsertID))
 	if err != nil {
-		return models.Carrier{}, ErrConvertingID
+		return models.Carrier{}, customErrors.ErrConvertingID
 	}
 
 	carrier.Id = newIdObj
@@ -78,26 +69,36 @@ func (r *CarrierRepository) AddCarrierToDB(carrier models.Carrier) (models.Carri
 }
 
 // ! 2)
-func (r *CarrierRepository) GetCarriesAmountByLocalityID(id int) (CarrierByLocality, error) {
-	query := `SELECT COALESCE(COUNT(c.id),0),l.locality_name, l.id
-			FROM carriers c 
-			RIGHT JOIN localities l ON c.locality_id = l.id 
-			WHERE l.id = ?
-			GROUP BY l.id, l.locality_name`
+func (r *CarrierRepository) GetCarriesAmountByLocalityID(id *int) ([]CarrierByLocality, error) {
+	query := `	SELECT 
+					l.id AS locality_id,
+					l.locality_name,
+					COALESCE(COUNT(c.id), 0) AS carrier_count
+				FROM localities l
+				LEFT JOIN carriers c ON c.locality_id = l.id
+				WHERE (? IS NULL OR l.id = ?)
+				GROUP BY l.id, l.locality_name;`
 
-	var result CarrierByLocality
-
-	err := r.db.QueryRow(query, id).Scan(
-		&result.CarriesAmount,
-		&result.LocalityName,
-		&result.LocalityID,
-	)
+	rows, err := r.db.Query(query, id, id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return CarrierByLocality{}, ErrLocalityNotFound
-		}
-		return CarrierByLocality{}, err
+		return nil, customErrors.ErrDBGenericError
 	}
-	return result, nil
+	defer rows.Close()
 
+	var results []CarrierByLocality
+
+	for rows.Next() {
+		var result CarrierByLocality
+		err := rows.Scan(&result.LocalityID, &result.LocalityName, &result.CarriesAmount)
+		if err != nil {
+			return nil, customErrors.ErrMappingData
+		}
+		results = append(results, result)
+	}
+
+	if len(results) == 0 {
+		return nil, customErrors.ErrLocalityNotFound
+	}
+
+	return results, nil
 }

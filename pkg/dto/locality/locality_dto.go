@@ -12,9 +12,9 @@ type LocalityRequest struct {
 }
 
 type LocalityDoc struct {
-	Id locality_vo.LocalityId
-	Name locality_vo.LocalityName
-	ProvinceId province_vo.ProvinceId
+	Id locality_vo.LocalityId `json:"id"`
+	Name locality_vo.LocalityName `json:"locality_name"`
+	ProvinceId province_vo.ProvinceId `json:"province_id"`
 }
 
 type SellerReport struct {

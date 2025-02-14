@@ -49,23 +49,16 @@ func (h *CarrierHandler) Create() http.HandlerFunc {
 			switch {
 			case errors.As(err, &errValidation):
 				e.JSONError(w, http.StatusBadRequest, "some values are not valid")
-				return
 			case errors.As(err, &errFK):
 				e.JSONError(w, http.StatusNotFound, "locality does not exists")
-				return
 			case errors.As(err, &errDuplicate):
 				e.JSONError(w, http.StatusConflict, fmt.Sprintf("carrier with %s cid already exists", req.Cid))
-				return
-			case errors.As(err, &errDB):
+			case errors.As(err, &errDB), errors.As(err, &errDTO):
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
-			case errors.As(err, &errDTO):
-				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
 			default:
 				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
-				return
 			}
+			return
 		}
 
 		response.JSON(w, http.StatusCreated, carrier)
@@ -95,20 +88,14 @@ func (h *CarrierHandler) GetCarriesAmount() http.HandlerFunc {
 			switch {
 			case errors.As(err, &errNotFound):
 				e.JSONError(w, http.StatusNotFound, "locality not found")
-				return
-			case errors.As(err, &errDB):
+			case errors.As(err, &errDB), errors.As(err, &errDTO):
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
-			case errors.As(err, &errDTO):
-				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
 			case errors.Is(err, service.ErrLocalityNotExists):
 				e.JSONError(w, http.StatusNotFound, "locality not found")
-				return
 			default:
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
 			}
+			return
 		}
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": res,

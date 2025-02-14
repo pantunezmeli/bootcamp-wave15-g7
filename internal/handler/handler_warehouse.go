@@ -33,16 +33,12 @@ func (h *WareHouseHandler) Get() http.HandlerFunc {
 			var errDB customErrors.ErrDatabase
 
 			switch {
-			case errors.As(err, &errMap):
+			case errors.As(err, &errMap), errors.As(err, &errDB):
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
-			case errors.As(err, &errDB):
-				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
 			default:
 				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
-				return
 			}
+			return
 		}
 
 		var whList []dto.WareHouseDoc
@@ -77,17 +73,12 @@ func (h *WareHouseHandler) GetById() http.HandlerFunc {
 			switch {
 			case errors.As(err, &errNotFound):
 				e.JSONError(w, http.StatusNotFound, fmt.Sprintf("warehouse with id %d not found", id))
-				return
-			case errors.As(err, &errMap):
+			case errors.As(err, &errMap), errors.As(err, &errDB):
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
-			case errors.As(err, &errDB):
-				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
 			default:
 				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
-				return
 			}
+			return
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
@@ -125,23 +116,16 @@ func (h *WareHouseHandler) Create() http.HandlerFunc {
 			switch {
 			case errors.As(err, &errValidation):
 				e.JSONError(w, http.StatusBadRequest, "some values are not valid")
-				return
 			case errors.As(err, &errFK):
 				e.JSONError(w, http.StatusNotFound, "locality does not exists")
-				return
 			case errors.As(err, &errDuplicate):
 				e.JSONError(w, http.StatusConflict, fmt.Sprintf("warehouse with warehouse code %s already exists", req.WareHouseCode))
-				return
-			case errors.As(err, &errDB):
+			case errors.As(err, &errDB), errors.As(err, &errDTO):
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
-			case errors.As(err, &errDTO):
-				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
 			default:
 				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
-				return
 			}
+			return
 		}
 
 		response.JSON(w, http.StatusCreated, map[string]any{
@@ -183,23 +167,16 @@ func (h *WareHouseHandler) Update() http.HandlerFunc {
 			switch {
 			case errors.As(err, &errNotFound):
 				e.JSONError(w, http.StatusNotFound, "warehouse not found")
-				return
 			case errors.As(err, &errFK):
 				e.JSONError(w, http.StatusConflict, "locality does not exists")
-				return
 			case errors.As(err, &errDuplicate):
 				e.JSONError(w, http.StatusConflict, fmt.Sprintf("warehouse with warehouse code %s already exists", req.WareHouseCode))
-				return
-			case errors.As(err, &errDB):
+			case errors.As(err, &errDB), errors.As(err, &errDTO):
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
-			case errors.As(err, &errDTO):
-				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
 			default:
 				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
-				return
 			}
+			return
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
@@ -230,14 +207,12 @@ func (h *WareHouseHandler) Delete() http.HandlerFunc {
 			switch {
 			case errors.As(err, &errNotFound):
 				e.JSONError(w, http.StatusNotFound, "warehouse not found")
-				return
 			case errors.As(err, &errDB):
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
-				return
 			default:
 				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
-				return
 			}
+			return
 		}
 
 		response.JSON(w, http.StatusNoContent, nil)

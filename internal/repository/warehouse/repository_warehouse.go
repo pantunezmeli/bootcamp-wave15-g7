@@ -80,7 +80,6 @@ func (r *WareHouseRepository) GetWareHouseById(id int) (models.WareHouse, error)
 }
 
 // ! 3)
-
 func (r *WareHouseRepository) CreateNewWareHouse(warehouse models.WareHouse) (models.WareHouse, error) {
 
 	query := "INSERT INTO warehouses (warehouse_code, address, telephone, locality_id) VALUES (?, ?, ?, ?)"
@@ -157,10 +156,9 @@ func (r *WareHouseRepository) UpdateWarehouse(warehouse models.WareHouse) error 
 func (r *WareHouseRepository) DeleteWarehouse(id int) (err error) {
 	query := "DELETE FROM warehouses WHERE id = ?"
 
-	_, err = r.db.Exec(query,
-		id)
+	_, err = r.db.Exec(query, id)
 	if err != nil {
-		return err
+		return customErrors.ErrDBGenericError
 	}
 
 	return nil

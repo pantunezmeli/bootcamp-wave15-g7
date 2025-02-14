@@ -224,12 +224,20 @@ func (h *WareHouseHandler) Delete() http.HandlerFunc {
 		err = h.sv.DeleteWarehouse(id)
 
 		if err != nil {
-			if errors.Is(err, service.ErrWareHouseNotFound) {
+			var errNotFound customErrors.ErrNotFound
+			var errDB customErrors.ErrDatabase
+
+			switch {
+			case errors.As(err, &errNotFound):
 				e.JSONError(w, http.StatusNotFound, "warehouse not found")
 				return
+			case errors.As(err, &errDB):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			default:
+				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
+				return
 			}
-			e.JSONError(w, http.StatusInternalServerError, "please try again later")
-			return
 		}
 
 		response.JSON(w, http.StatusNoContent, nil)

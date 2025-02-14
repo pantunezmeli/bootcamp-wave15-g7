@@ -138,12 +138,12 @@ func (s *WarehouseService) DeleteWarehouse(id int) error {
 
 	_, err := s.rp.GetWareHouseById(id)
 	if err != nil {
-		return ErrWareHouseNotFound
+		return customErrors.ErrNotFound{Err: err}
 	}
 
 	err = s.rp.DeleteWarehouse(id)
 	if err != nil {
-		return err
+		return customErrors.ErrDatabase{}
 	}
 
 	return nil

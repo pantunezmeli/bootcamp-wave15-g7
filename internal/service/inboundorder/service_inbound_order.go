@@ -14,8 +14,7 @@ type DefaultService struct {
 }
 
 func (s *DefaultService) New(inboundOrderData dto.InboundOrderDoc) (newInboundOrderData dto.InboundOrderDoc, err error) {
-	if inboundOrderData.OrderNumber == "" || inboundOrderData.OrderDate == "" || inboundOrderData.EmployeeId == 0 || inboundOrderData.ProductBatchId == 0 || inboundOrderData.WareHouseId == 0 {
-		err = ErrEmptyField
+	if err = validateFields(inboundOrderData); err != nil {
 		return
 	}
 

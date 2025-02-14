@@ -46,8 +46,7 @@ func (s *SimpleService) FindById(id int) (employeeData dto.EmployeeDoc, err erro
 }
 
 func (s *SimpleService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error) {
-	if employeeData.CardNumber == "" || employeeData.FirstName == "" || employeeData.LastName == "" || employeeData.WarehouseId == 0 {
-		err = ErrEmptyField
+	if err = validateFields(employeeData); err != nil {
 		return
 	}
 

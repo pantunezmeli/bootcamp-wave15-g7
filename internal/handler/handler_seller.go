@@ -58,12 +58,7 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 
 		res, err := h.sv.GetById(idParsed)
 		if err != nil {
-			switch {
-			case errors.Is(err, repo.ErrSellerNotFound):
-				dto.JSONError(w, http.StatusNotFound, ErrSellerNotFound.Error())
-			default:
-				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			}
+			handleError(w, err)
 			return
 		}
 
@@ -85,20 +80,7 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 
 		res, err := h.sv.Save(reqBody)
 		if err != nil {
-			var missingParamErr *seller.ErrMissingParameters
-			var invalidParamErr *seller.ErrInvalidParameter
-			switch{
-			case errors.Is(err, repo.ErrCidAlreadyExists):
-				dto.JSONError(w, http.StatusConflict, ErrCidExists.Error())
-			case errors.Is(err, repo.ErrLocalityNotFound):
-				dto.JSONError(w, http.StatusConflict, ErrLocalityNotExist.Error())
-			case errors.As(err, &missingParamErr):
-				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
-			case errors.As(err, &invalidParamErr):
-				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
-			default:
-				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			}
+			handleError(w, err)
 			return
 		}
 
@@ -118,12 +100,7 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 
 		err := h.sv.Delete(idParsed)
 		if err != nil {
-			switch {
-			case errors.Is(err, repo.ErrSellerNotFound):
-				dto.JSONError(w, http.StatusNotFound, ErrSellerNotFound.Error())
-			default:
-				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			}
+			handleError(w, err)
 			return
 		}
 
@@ -148,19 +125,7 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 
 		res, err := h.sv.Update(reqBody, idParsed)
 		if err != nil {
-			var invalidParamErr *seller.ErrInvalidParameter
-			switch{
-			case errors.Is(err, repo.ErrCidAlreadyExists):
-				dto.JSONError(w, http.StatusConflict, ErrCidExists.Error())
-			case errors.Is(err, repo.ErrSellerNotFound):
-				dto.JSONError(w, http.StatusNotFound, ErrSellerNotFound.Error())
-			case errors.Is(err, repo.ErrLocalityNotFound):
-				dto.JSONError(w, http.StatusConflict, ErrLocalityNotExist.Error())
-			case errors.As(err, &invalidParamErr):
-				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
-			default:
-				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			}
+			handleError(w, err)
 			return
 		}
 
@@ -181,4 +146,23 @@ func validateId(r *http.Request, w http.ResponseWriter) (int, bool) {
 		return 0, true
 	}
 	return idParsed, false
+}
+
+func handleError(w http.ResponseWriter, err error) {
+	var missingParamErr *seller.ErrMissingParameters
+	var invalidParamErr *seller.ErrInvalidParameter
+	switch {
+	case errors.Is(err, repo.ErrSellerNotFound):
+		dto.JSONError(w, http.StatusNotFound, ErrSellerNotFound.Error())
+	case errors.Is(err, repo.ErrCidAlreadyExists):
+		dto.JSONError(w, http.StatusConflict, ErrCidExists.Error())
+	case errors.Is(err, repo.ErrLocalityNotFound):
+		dto.JSONError(w, http.StatusConflict, ErrLocalityNotExist.Error())
+	case errors.As(err, &missingParamErr):
+		dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
+	case errors.As(err, &invalidParamErr):
+		dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
+	default:
+		dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+	}
 }

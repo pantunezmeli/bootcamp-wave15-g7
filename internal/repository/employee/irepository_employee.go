@@ -6,6 +6,7 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 )
 
+var ErrDatabase = errors.New("database error")
 var ErrIdNotFound = errors.New("employee not found")
 var ErrWarehouseIdNotFound = errors.New("warehouse not found")
 var ErrCardNumberNotUnique = errors.New("card number must be unique")

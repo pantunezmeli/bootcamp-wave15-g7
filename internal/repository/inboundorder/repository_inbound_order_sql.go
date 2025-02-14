@@ -40,12 +40,14 @@ func (r *InboundOrderSQL) New(inboundOrder models.InboundOrder) (newInboundOrder
 				return
 			}
 		}
+		err = ErrDatabase
 		return
 	}
 
 	newInboundOrder = inboundOrder
 	id64, err := result.LastInsertId()
 	if err != nil {
+		err = ErrDatabase
 		return
 	}
 	newInboundOrder.Id = value_objects.NewOptionalId(int(id64))

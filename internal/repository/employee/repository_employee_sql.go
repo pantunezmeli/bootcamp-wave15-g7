@@ -21,6 +21,7 @@ type EmployeeSQL struct {
 func (r *EmployeeSQL) FindAll() (employees map[int]models.Employee, err error) {
 	rows, err := r.db.Query("SELECT `id`, `id_card_number`, `first_name`, `last_name`, `warehouse_id` FROM employees")
 	if err != nil {
+		err = ErrDatabase
 		return
 	}
 	defer rows.Close()
@@ -38,6 +39,7 @@ func (r *EmployeeSQL) FindAll() (employees map[int]models.Employee, err error) {
 
 		err = rows.Scan(&id, &cardNumber, &firstName, &lastName, &warehouseId)
 		if err != nil {
+			err = ErrDatabase
 			return
 		}
 
@@ -58,6 +60,7 @@ func (r *EmployeeSQL) FindAll() (employees map[int]models.Employee, err error) {
 func (r *EmployeeSQL) FindById(id int) (employee models.Employee, err error) {
 	row := r.db.QueryRow("SELECT * FROM employees WHERE id = ?", id)
 	if err = row.Err(); err != nil {
+		err = ErrDatabase
 		return
 	}
 
@@ -94,12 +97,14 @@ func (r *EmployeeSQL) New(employee models.Employee) (newEmployee models.Employee
 				return
 			}
 		}
+		err = ErrDatabase
 		return
 	}
 
 	newEmployee = employee
 	id64, err := result.LastInsertId()
 	if err != nil {
+		err = ErrDatabase
 		return
 	}
 	newEmployee.Id = value_objects.NewOptionalId(int(id64))
@@ -143,11 +148,12 @@ func (r *EmployeeSQL) Edit(id int, employee models.Employee) (updatedEmployee mo
 				return
 			}
 		}
+		err = ErrDatabase
 		return
 	}
 
 	if affectedRows, errRows := result.RowsAffected(); errRows != nil {
-		err = errRows
+		err = ErrDatabase
 		return
 	} else {
 		if affectedRows == 0 {
@@ -170,10 +176,12 @@ func (r *EmployeeSQL) DeleteById(id int) (err error) {
 				return
 			}
 		}
+		err = ErrDatabase
 		return
 	}
 
 	if affectedRows, errRows := result.RowsAffected(); errRows != nil {
+		err = ErrDatabase
 		return
 	} else {
 		if affectedRows == 0 {
@@ -200,6 +208,10 @@ func (r *EmployeeSQL) ReportInboundOrders(id string) (employees map[int]models.E
 			return
 		}
 		row := r.db.QueryRow(query, employeeId)
+		if err = row.Err(); err != nil {
+			err = ErrDatabase
+			return
+		}
 
 		var employee models.Employee
 
@@ -234,6 +246,7 @@ func (r *EmployeeSQL) ReportInboundOrders(id string) (employees map[int]models.E
 
 		rows, errQuery := r.db.Query(query)
 		if errQuery != nil {
+			err = ErrDatabase
 			return
 		}
 		defer rows.Close()

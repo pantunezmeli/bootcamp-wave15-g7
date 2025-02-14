@@ -1,19 +1,21 @@
 package models
 
 import (
+	"time"
+
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
 )
 
 // ProductBatch is a struct that represents a product batch
 type ProductBatch struct {
-	Id                 value_objects.Id
+	Id                 value_objects.ProductBatchId
 	BatchNumber        value_objects.BatchNumber
 	CurrentQuantity    value_objects.CurrentQuantity
 	CurrentTemperature value_objects.CurrentTemperature
-	DueDate            value_objects.DueDate
+	DueDate            time.Time
 	InitialQuantity    value_objects.InitialQuantity
-	ManufacturingDate  value_objects.ManufacturingDate
-	ManufacturingHour  value_objects.ManufacturingHour
+	ManufacturingDate  time.Time
+	ManufacturingHour  time.Time
 	MinimumTemperature value_objects.MinimumTemperature
 	ProductID          value_objects.Id
 	SectionID          value_objects.Id

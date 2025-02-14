@@ -22,6 +22,14 @@ type WarehouseId int
 
 type ProductTypeId int
 
+func (currentTemperature CurrentTemperature) Value() float64 {
+	return float64(currentTemperature)
+}
+
+func (minimumTemperature MinimumTemperature) Value() float64 {
+	return float64(minimumTemperature)
+}
+
 func NewSectionId(sectionId int) (SectionId, error) {
 	if sectionId <= 0 {
 		return 0, errorbase.ErrInvalidId
@@ -37,14 +45,14 @@ func NewSectionNumber(sectionNumber int) (SectionNumber, error) {
 }
 
 func NewCurrentTemperature(currentTemperature float64) (CurrentTemperature, error) {
-	if currentTemperature <= 0 {
+	if currentTemperature <= -51 {
 		return 0, errorbase.ErrInvalidNumber
 	}
 	return CurrentTemperature(currentTemperature), nil
 }
 
-func NewMinimumTemperature(minimumTemperature int) (MinimumTemperature, error) {
-	if minimumTemperature <= 0 {
+func NewMinimumTemperature(minimumTemperature float64) (MinimumTemperature, error) {
+	if minimumTemperature < -50 {
 		return 0, errorbase.ErrInvalidNumber
 	}
 	return MinimumTemperature(minimumTemperature), nil

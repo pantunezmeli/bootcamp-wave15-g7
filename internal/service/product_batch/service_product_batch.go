@@ -1,7 +1,6 @@
 package productbatch
 
 import (
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	productbatch "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product_batch"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product_batch"
 )
@@ -17,6 +16,18 @@ func NewProductBatchService(repo productbatch.IProductBatchRepository) *ProductB
 }
 
 // Create is a method that creates a new ProductBatch
-func (s *ProductBatchService) CreateProductBatch(productBatch models.ProductBatch) (dto.ProductBatchResponse, error) {
-	return s.repository.Store(&productBatch)
+func (s *ProductBatchService) CreateProductBatch(productBatchRequest dto.ProductBatchResponse) (dto.ProductBatchResponse, error) {
+
+	productBatch, err := dto.GenerateProductBatchDtoToModel(productBatchRequest)
+	if err != nil {
+		return dto.ProductBatchResponse{}, err
+	}
+
+	batchStored, err := s.repository.Store(productBatch)
+	if err != nil {
+		return dto.ProductBatchResponse{}, err
+
+	}
+
+	return dto.GenerateProductBatchModelToDto(batchStored), nil
 }

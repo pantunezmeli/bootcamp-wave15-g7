@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	"github.com/bootcamp-go/web/response"
 	productbatch "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product_batch"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product_batch"
 )
 
 // ProductBatchHandler is a struct that represents a ProductBatch handler
@@ -21,19 +22,22 @@ func NewProductBatchHandler(sv productbatch.IProductBatchService) *ProductBatchH
 // Create is a method that creates a new ProductBatch
 func (h *ProductBatchHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var productBatch models.ProductBatch
-		err := json.NewDecoder(r.Body).Decode(&productBatch)
+		var productBatchDto dto.ProductBatchResponse
+		err := json.NewDecoder(r.Body).Decode(&productBatchDto)
 		if err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		productBatchResponse, err := h.service.CreateProductBatch(productBatch)
+
+		productBatchResponse, err := h.service.CreateProductBatch(productBatchDto)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		json.NewEncoder(w).Encode(productBatchResponse)
-		json.NewEncoder(w).Encode(productBatch)
+		// Response
+		response.JSON(w, http.StatusOK, map[string]any{
+			"data": productBatchResponse,
+		})
 	}
 }

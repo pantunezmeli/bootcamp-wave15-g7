@@ -8,19 +8,21 @@ import (
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/employee"
 )
 
-func NewDefaultService(repository employee.EmployeeRepository) *DefaultService {
-	return &DefaultService{rp: repository}
+// Unlike DefaultService, SimpleService calls repository just once in all its methods (existence of id is repository's responsability)
+func NewSimpleService(repository employee.EmployeeRepository) *SimpleService {
+	return &SimpleService{rp: repository}
 }
 
-type DefaultService struct {
+type SimpleService struct {
 	rp employee.EmployeeRepository
 }
 
-func (s *DefaultService) FindAll() (employeesData []dto.EmployeeDoc, err error) {
+func (s *SimpleService) FindAll() (employeesData []dto.EmployeeDoc, err error) {
 	employeesFound, err := s.rp.FindAll()
 	if err != nil {
 		return
 	}
+
 	employeesData = make([]dto.EmployeeDoc, 0, len(employeesFound))
 	for _, value := range employeesFound {
 		employeesData = append(employeesData, dto.EmployeeModelToDto(value))
@@ -31,7 +33,7 @@ func (s *DefaultService) FindAll() (employeesData []dto.EmployeeDoc, err error) 
 	return
 }
 
-func (s *DefaultService) FindById(id int) (employeeData dto.EmployeeDoc, err error) {
+func (s *SimpleService) FindById(id int) (employeeData dto.EmployeeDoc, err error) {
 	employeeFound, errId := s.rp.FindById(id)
 	if errId != nil {
 		if errors.Is(errId, employee.ErrIdNotFound) {
@@ -43,9 +45,8 @@ func (s *DefaultService) FindById(id int) (employeeData dto.EmployeeDoc, err err
 	return
 }
 
-func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error) {
-	if employeeData.CardNumber == "" || employeeData.FirstName == "" || employeeData.LastName == "" || employeeData.WarehouseId == 0 {
-		err = ErrEmptyField
+func (s *SimpleService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error) {
+	if err = validateFields(employeeData); err != nil {
 		return
 	}
 
@@ -70,15 +71,7 @@ func (s *DefaultService) New(employeeData dto.EmployeeDoc) (newEmployeeData dto.
 	return
 }
 
-func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error) {
-	_, errId := s.rp.FindById(id)
-	if errId != nil {
-		if errors.Is(errId, employee.ErrIdNotFound) {
-			err = ErrEmployeeNotFound
-		}
-		return
-	}
-
+func (s *SimpleService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployeeData dto.EmployeeDoc, err error) {
 	employeeModel, err := dto.EmployeeDtoToModelWithoutValidation(employeeData)
 	if err != nil {
 		return
@@ -101,15 +94,7 @@ func (s *DefaultService) Edit(id int, employeeData dto.EmployeeDoc) (newEmployee
 	return
 }
 
-func (s *DefaultService) DeleteById(id int) (err error) {
-	_, errId := s.rp.FindById(id)
-	if errId != nil {
-		if errors.Is(errId, employee.ErrIdNotFound) {
-			err = ErrEmployeeNotFound
-		}
-		return
-	}
-
+func (s *SimpleService) DeleteById(id int) (err error) {
 	err = s.rp.DeleteById(id)
 	if errors.Is(err, employee.ErrInboundOrderFK) {
 		err = ErrInboundOrderNeedsEmployee
@@ -120,7 +105,7 @@ func (s *DefaultService) DeleteById(id int) (err error) {
 	return
 }
 
-func (s *DefaultService) ReportInboundOrders(id string) (reportsInboundOrders []dto.ReportInboundOrdersDoc, err error) {
+func (s *SimpleService) ReportInboundOrders(id string) (reportsInboundOrders []dto.ReportInboundOrdersDoc, err error) {
 	employees, inboundOrdersPerEmployee, err := s.rp.ReportInboundOrders(id)
 	if errors.Is(err, employee.ErrIdNotFound) {
 		err = ErrEmployeeNotFound
@@ -139,5 +124,8 @@ func (s *DefaultService) ReportInboundOrders(id string) (reportsInboundOrders []
 
 		reportsInboundOrders = append(reportsInboundOrders, reportInboundOrders)
 	}
+	sort.Slice(reportsInboundOrders, func(i, j int) bool {
+		return reportsInboundOrders[i].Id < reportsInboundOrders[j].Id
+	})
 	return
 }

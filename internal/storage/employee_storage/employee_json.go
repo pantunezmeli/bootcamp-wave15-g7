@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/employee"
 )
 
 var ErrCardNumberExists = errors.New("card number already exists")
@@ -108,20 +108,6 @@ func (s *EmployeeJSONFile) GetLastId() (id int, err error) {
 		return
 	}
 	id = s.lastId
-	return
-}
-
-func (s *EmployeeJSONFile) GetCardNumberById(id int) (cardNumber string, err error) {
-	employees, err := s.Load()
-	if err != nil {
-		return
-	}
-	for _, value := range employees {
-		if value.Id.GetId() == id {
-			cardNumber = value.CardNumber.GetCardNumber()
-			return
-		}
-	}
 	return
 }
 

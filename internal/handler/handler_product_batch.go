@@ -19,19 +19,21 @@ func NewProductBatchHandler(sv productbatch.IProductBatchService) *ProductBatchH
 }
 
 // Create is a method that creates a new ProductBatch
-func (h *ProductBatchHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var productBatch models.ProductBatch
-	err := json.NewDecoder(r.Body).Decode(&productBatch)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-	productBatchResponse, err := h.service.CreateProductBatch(productBatch)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (h *ProductBatchHandler) Create() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var productBatch models.ProductBatch
+		err := json.NewDecoder(r.Body).Decode(&productBatch)
+		if err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+		productBatchResponse, err := h.service.CreateProductBatch(productBatch)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	json.NewEncoder(w).Encode(productBatchResponse)
-	json.NewEncoder(w).Encode(productBatch)
+		json.NewEncoder(w).Encode(productBatchResponse)
+		json.NewEncoder(w).Encode(productBatch)
+	}
 }

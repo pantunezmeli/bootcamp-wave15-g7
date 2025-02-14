@@ -1,89 +1,95 @@
 package value_objects
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
-type BatchNumber struct {
-	batch_number string
+type BatchNumber string
+
+type CurrentQuantity int
+
+type DueDate time.Time
+
+func (d DueDate) Value() (driver.Value, error) {
+	return time.Time(d), nil
 }
 
-type CurrentQuantity struct {
-	current_quantity int
+func (d *DueDate) Scan(value interface{}) error {
+	if value == nil {
+		*d = DueDate(time.Time{})
+		return nil
+	}
+	switch v := value.(type) {
+	case time.Time:
+		*d = DueDate(v)
+		return nil
+	default:
+		return fmt.Errorf("cannot scan type %T into DueDate", value)
+	}
 }
 
-type DueDate struct {
-	due_date time.Time
+type InitialQuantity int
+
+type ManufacturingDate time.Time
+
+func (d ManufacturingDate) Value() (driver.Value, error) {
+	return time.Time(d), nil
 }
 
-type InitialQuantity struct {
-	initial_quantity int
+func (d *ManufacturingDate) Scan(value interface{}) error {
+	if value == nil {
+		*d = ManufacturingDate(time.Time{})
+		return nil
+	}
+	switch v := value.(type) {
+	case time.Time:
+		*d = ManufacturingDate(v)
+		return nil
+	default:
+		return fmt.Errorf("cannot scan type %T into ManufacturingDate", value)
+	}
 }
 
-type ManufacturingDate struct {
-	manufacturing_date time.Time
+type ManufacturingHour time.Time
+
+func (d ManufacturingHour) Value() (driver.Value, error) {
+	return time.Time(d), nil
 }
 
-type ManufacturingHour struct {
-	manufacturing_hour time.Time
-}
-
-type MinumumTemperature struct {
-	minumum_temperature float64
-}
-
-// GetBatchNumber is a function that returns the batch number of a product batch
-func (b BatchNumber) GetBatchNumber() string {
-	return b.batch_number
-}
-
-// GetCurrentQuantity is a function that returns the current quantity of a product batch
-func (c CurrentQuantity) GetCurrentQuantity() int {
-	return c.current_quantity
-}
-
-func (d DueDate) GetDueDate() time.Time {
-	return d.due_date
-}
-
-func (i InitialQuantity) GetInitialQuantity() int {
-	return i.initial_quantity
-}
-
-func (m ManufacturingDate) GetManufacturingDate() time.Time {
-	return m.manufacturing_date
-}
-
-func (m ManufacturingHour) GetManufacturingHour() time.Time {
-	return m.manufacturing_hour
-}
-
-func (m MinumumTemperature) GetMinumumTemperature() float64 {
-	return m.minumum_temperature
+func (d *ManufacturingHour) Scan(value interface{}) error {
+	if value == nil {
+		*d = ManufacturingHour(time.Time{})
+		return nil
+	}
+	switch v := value.(type) {
+	case time.Time:
+		*d = ManufacturingHour(v)
+		return nil
+	default:
+		return fmt.Errorf("cannot scan type %T into ManufacturingHour", value)
+	}
 }
 
 // NewBatchNumber is a function that creates a new batch number
 func NewBatchNumber(batch_number string) (BatchNumber, error) {
 	if batch_number == "" {
-		return BatchNumber{}, errorbase.ErrInvalidBatchNumber
+		return "", errorbase.ErrInvalidBatchNumber
 	}
 
-	return BatchNumber{
-		batch_number: batch_number,
-	}, nil
+	return BatchNumber(batch_number), nil
 }
 
 // NewCurrentQuantity is a function that creates a new current quantity
 func NewCurrentQuantity(current_quantity int) (CurrentQuantity, error) {
 	if current_quantity == 0 {
-		return CurrentQuantity{}, errorbase.ErrInvalidCurrentQuantity
+		return 0, errorbase.ErrInvalidCurrentQuantity
 	}
 
-	return CurrentQuantity{
-		current_quantity: current_quantity,
-	}, nil
+	return CurrentQuantity(current_quantity), nil
 }
 
 // NewDueDate is a function that creates a new due date
@@ -92,20 +98,16 @@ func NewDueDate(due_date time.Time) (DueDate, error) {
 		return DueDate{}, errorbase.ErrInvalidDueDate
 	}
 
-	return DueDate{
-		due_date: due_date,
-	}, nil
+	return DueDate(due_date), nil
 }
 
 // NewInitialQuantity is a function that creates a new initial quantity
 func NewInitialQuantity(initial_quantity int) (InitialQuantity, error) {
 	if initial_quantity == 0 {
-		return InitialQuantity{}, errorbase.ErrInvalidInitialQuantity
+		return 0, errorbase.ErrInvalidInitialQuantity
 	}
 
-	return InitialQuantity{
-		initial_quantity: initial_quantity,
-	}, nil
+	return InitialQuantity(initial_quantity), nil
 }
 
 // NewManufacturingDate is a function that creates a new manufacturing date
@@ -114,9 +116,7 @@ func NewManufacturingDate(manufacturing_date time.Time) (ManufacturingDate, erro
 		return ManufacturingDate{}, errorbase.ErrInvalidManufacturingDate
 	}
 
-	return ManufacturingDate{
-		manufacturing_date: manufacturing_date,
-	}, nil
+	return ManufacturingDate(manufacturing_date), nil
 }
 
 // NewManufacturingHour is a function that creates a new manufacturing hour
@@ -125,18 +125,5 @@ func NewManufacturingHour(manufacturing_hour time.Time) (ManufacturingHour, erro
 		return ManufacturingHour{}, errorbase.ErrInvalidManufacturingHour
 	}
 
-	return ManufacturingHour{
-		manufacturing_hour: manufacturing_hour,
-	}, nil
-}
-
-// NewMinumumTemperature is a function that creates a new minumum temperature
-func NewMinumumTemperature(minumum_temperature float64) (MinumumTemperature, error) {
-	if minumum_temperature == 0 {
-		return MinumumTemperature{}, errorbase.ErrInvalidMinumumTemperature
-	}
-
-	return MinumumTemperature{
-		minumum_temperature: minumum_temperature,
-	}, nil
+	return ManufacturingHour(manufacturing_hour), nil
 }

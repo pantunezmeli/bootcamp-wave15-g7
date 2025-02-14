@@ -1,142 +1,158 @@
 package section
 
 import (
-	"dario.cat/mergo"
+	"database/sql"
+	"fmt"
+	"log"
+
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	sectionstorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section_storage"
-	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
-// StRepository is a struct that represents a Section repository
-type StRepository struct {
-	// storage is anRepository of Sections
-	storage sectionstorage.ISectionLoader
+type SectionRepository struct {
+	db *sql.DB // Contiene una base de datos
 }
 
-// NewStRepository is a function that returns a new instance of StRepository
-func NewStRepository(storage sectionstorage.ISectionLoader) *StRepository {
-	// default storage
-
-	return &StRepository{storage: storage}
+// Inyección de la base de datos
+func NewSectionRepository(db *sql.DB) *SectionRepository {
+	return &SectionRepository{
+		db: db,
+	}
 }
 
 // FindAll is a method that returns anRepository of all Sections
-func (r *StRepository) FindAll() (map[int]models.Section, error) {
-	sections, err := r.storage.Load()
+func (r *SectionRepository) FindAll() ([]models.Section, error) {
+
+	log.Println("Llego al repo")
+
+	query := "SELECT id, section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id FROM sections"
+	rows, err := r.db.Query(query)
 	if err != nil {
+		log.Println("Tiro error")
 		return nil, err
 	}
+	defer rows.Close()
 
-	list := make(map[int]models.Section)
-	for key, value := range sections {
-		list[key] = value
+	log.Println("Llego al repo 2")
+
+	var sections []models.Section
+
+	log.Println("llego al repo 3")
+
+	// Iteración sobre los resultados
+	for rows.Next() {
+		var section models.Section
+
+		err := rows.Scan(
+			&section.Id,
+			&section.Section_Number,
+			&section.Current_Capacity,
+			&section.Current_Temperature,
+			&section.Maximum_Capacity,
+			&section.Minimum_Capacity,
+			&section.Minimum_Temperature,
+			&section.Product_Type_Id,
+			&section.Warehouse_Id,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		log.Println(section)
+
+		sections = append(sections, section)
+
+		log.Println(sections)
 	}
-
-	return list, nil
+	return sections, nil
 }
 
 // FinstorageyID is a method that returns a Section by its ID
-func (r *StRepository) FindByID(id int) (entity models.Section, err error) {
-	data, err := r.storage.Load()
-	if err != nil {
-		return models.Section{}, errorbase.ErrStorageOperationFailed
-	}
+func (r *SectionRepository) FindByID(id int) (entity models.Section, err error) {
+	var section models.Section
+	query := "SELECT id, section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id FROM sections WHERE id = ?"
+	row := r.db.QueryRow(query, id)
 
-	entity, exists := data[id]
-	if !exists {
-		return models.Section{}, errorbase.ErrNotFound
+	err = row.Scan(
+		&section.Id,
+		&section.Section_Number,
+		&section.Current_Capacity,
+		&section.Current_Temperature,
+		&section.Maximum_Capacity,
+		&section.Minimum_Capacity,
+		&section.Minimum_Temperature,
+		&section.Product_Type_Id,
+		&section.Warehouse_Id,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.Section{}, fmt.Errorf("section with id %d not found", id)
+		}
+		return models.Section{}, err
 	}
-	return entity, nil
+	return section, nil
 }
 
 // Create is a method that creates a new Section
-func (r *StRepository) Create(entity models.Section) (models.Section, error) {
+func (r *SectionRepository) Create(section models.Section) (models.Section, error) {
+	query := "INSERT INTO sections (section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 
-	// Load all sections
-	sections, err := r.storage.Load()
+	result, err := r.db.Exec(query,
+		section.Section_Number,
+		section.Current_Capacity,
+		section.Current_Temperature,
+		section.Maximum_Capacity,
+		section.Minimum_Capacity,
+		section.Minimum_Temperature,
+		section.Product_Type_Id,
+		section.Warehouse_Id,
+	)
+
 	if err != nil {
-		return models.Section{}, errorbase.ErrStorageOperationFailed
+		return models.Section{}, err // Err
 	}
 
-	// Check if section number already exists
-	for _, section := range sections {
-		if section.Section_Number == entity.Section_Number {
-			return models.Section{}, errorbase.ErrConflict
-		}
+	// Obtener el último ID
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return models.Section{}, err // ErrGettingLastInsertedID
 	}
 
-	// Set new ID
-	entity.Id = getLastId(sections)
-	sections[entity.Id] = entity
+	section.Id = int(lastInsertID)
 
-	// Save new section
-	if err := r.storage.Save(entity); err != nil {
-		return models.Section{}, err
-	}
-	return entity, nil
+	return section, nil
 }
 
-// Patch is a method that updates a Section by its ID
-func (r *StRepository) Update(id int, entity models.Section) (models.Section, error) {
-	// Load all sections
-	data, err := r.storage.Load()
+// Update is a method that updates a Section by its ID
+func (r *SectionRepository) Update(id int, section models.Section) error {
+	query := "UPDATE sections SET section_number = ?, current_capacity = ?, current_temperature = ?, maximum_capacity = ?, minimum_capacity = ?, minimum_temperature = ?, product_type_id = ?, warehouse_id = ? WHERE id = ?"
+
+	_, err := r.db.Exec(query,
+		section.Section_Number,
+		section.Current_Capacity,
+		section.Current_Temperature,
+		section.Maximum_Capacity,
+		section.Minimum_Capacity,
+		section.Minimum_Temperature,
+		section.Product_Type_Id,
+		section.Warehouse_Id,
+		section.Id,
+	)
 	if err != nil {
-		return models.Section{}, errorbase.ErrStorageOperationFailed
+		return err // ErrExecutingDB
 	}
 
-	// Check if section exists
-	element, ok := data[id]
-	if !ok {
-		return models.Section{}, errorbase.ErrNotFound
-	}
-
-	// Check if ID is new
-	if !(entity.Section_Number == data[id].Section_Number) {
-		for _, section := range data {
-			if section.Section_Number == entity.Section_Number {
-				return models.Section{}, errorbase.ErrConflict
-			}
-		}
-	}
-
-	// Merge the new data with the existing data
-	if err := mergo.Merge(&element, entity, mergo.WithOverride); err != nil {
-		return models.Section{}, err
-	}
-
-	data[id] = element
-	if err := r.storage.Save(data[id]); err != nil {
-		return models.Section{}, errorbase.ErrStorageOperationFailed
-	}
-	return element, nil
-}
-
-// Delete is a method that deletes a Section by its ID
-func (r *StRepository) Delete(id int) (err error) {
-	sections, err := r.storage.Load()
-	if err != nil {
-		return errorbase.ErrStorageOperationFailed
-	}
-
-	sectionDelete, err := r.FindByID(id)
-	if err != nil {
-		return errorbase.ErrNotFound
-	}
-
-	delete(sections, sectionDelete.Id)
-	err = r.storage.Delete(id)
-	if err != nil {
-		return errorbase.ErrStorageOperationFailed
-	}
 	return nil
 }
 
-func getLastId(section map[int]models.Section) int {
-	maxId := 0
-	for id := range section {
-		if id > maxId {
-			maxId = id
-		}
+// Delete is a method that deletes a Section by its ID
+func (r *SectionRepository) Delete(id int) (err error) {
+	query := "DELETE FROM sections WHERE id = ?"
+
+	_, err = r.db.Exec(query,
+		id)
+	if err != nil {
+		return err
 	}
-	return maxId + 1
+
+	return nil
 }

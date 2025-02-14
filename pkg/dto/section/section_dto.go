@@ -7,18 +7,18 @@ import (
 )
 
 type SectionResponse struct {
-	Id                  int `json:"id"`
-	Section_Number      int `json:"section_number"`
-	Current_Temperature int `json:"current_temperature"`
-	Minimum_Temperature int `json:"minimum_temperature"`
-	Current_Capacity    int `json:"current_capacity"`
-	Minimum_Capacity    int `json:"minimum_capacity"`
-	Maximum_Capacity    int `json:"maximum_capacity"`
-	Warehouse_Id        int `json:"warehouse_id"`
-	Product_Type_Id     int `json:"product_type_id"`
+	Id                  int     `json:"id"`
+	Section_Number      string  `json:"section_number"`
+	Current_Temperature float64 `json:"current_temperature"`
+	Minimum_Temperature float64 `json:"minimum_temperature"`
+	Current_Capacity    int     `json:"current_capacity"`
+	Minimum_Capacity    int     `json:"minimum_capacity"`
+	Maximum_Capacity    int     `json:"maximum_capacity"`
+	Warehouse_Id        int     `json:"warehouse_id"`
+	Product_Type_Id     int     `json:"product_type_id"`
 }
 
-func GenerateSectionsResponseList(sections map[int]models.Section) []SectionResponse {
+func GenerateSectionsResponseList(sections []models.Section) []SectionResponse {
 	var list []SectionResponse
 	for _, value := range sections {
 		list = append(list, SectionResponse{
@@ -66,4 +66,29 @@ func GenerateSectionRequest(section SectionResponse) models.Section {
 		Product_Type_Id:     section.Product_Type_Id,
 	}
 	return SectionResponse
+}
+
+func ChangeToModelPatch(reqBody SectionResponse, existingSection models.Section) models.Section {
+	if reqBody.Current_Temperature == 0 {
+		reqBody.Current_Temperature = existingSection.Current_Temperature
+	}
+	if reqBody.Minimum_Temperature == 0 {
+		reqBody.Minimum_Temperature = existingSection.Minimum_Temperature
+	}
+	if reqBody.Current_Capacity == 0 {
+		reqBody.Current_Capacity = existingSection.Current_Capacity
+	}
+	if reqBody.Minimum_Capacity == 0 {
+		reqBody.Minimum_Capacity = existingSection.Minimum_Capacity
+	}
+	if reqBody.Maximum_Capacity == 0 {
+		reqBody.Maximum_Capacity = existingSection.Maximum_Capacity
+	}
+	if reqBody.Warehouse_Id == 0 {
+		reqBody.Warehouse_Id = existingSection.Warehouse_Id
+	}
+	if reqBody.Product_Type_Id == 0 {
+		reqBody.Product_Type_Id = existingSection.Product_Type_Id
+	}
+	return GenerateSectionRequest(reqBody)
 }

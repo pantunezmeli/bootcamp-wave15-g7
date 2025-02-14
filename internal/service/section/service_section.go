@@ -24,7 +24,7 @@ func NewSectionService(rp section.ISectionRepository) *SectionService {
 func (s *SectionService) ListSections() ([]dto.SectionResponse, error) {
 	list, err := s.repository.FindAll()
 	if err != nil {
-		return nil, errorbase.ErrEmptyList
+		return nil, err
 	}
 
 	// Generate the response and return it
@@ -71,22 +71,69 @@ func (s *SectionService) CreateSection(section models.Section) (dto.SectionRespo
 }
 
 // PatchSection is a method that updates a Section by its ID
-func (s *SectionService) PatchSection(id int, entity dto.SectionResponse) (dto.SectionResponse, error) {
-	// Check if the ID is valid
-	if id <= 0 {
-		return dto.SectionResponse{}, errorbase.ErrInvalidId
+func (s *SectionService) PatchSection(id int, changes dto.SectionResponse) (dto.SectionResponse, error) {
+	// * ████████████████ New code ████████████████
+
+	sectionToUpdate, err := s.repository.FindByID(id)
+	if err != nil {
+		return dto.SectionResponse{}, errorbase.ErrNotFound
 	}
 
-	sectionReq := dto.GenerateSectionRequest(entity)
+	newSection := dto.ChangeToModelPatch(changes, sectionToUpdate)
 
-	section, err := s.repository.Update(id, sectionReq)
+	newSection.Id = sectionToUpdate.Id
+
+	err = s.repository.Update(newSection.Id, newSection)
 	if err != nil {
 		return dto.SectionResponse{}, err
 	}
 
-	// Generate the response and return it
-	sectionResponse := dto.GenerateSectionResponse(section)
+	sectionResponse := dto.GenerateSectionResponse(newSection)
 	return sectionResponse, err
+
+	// * ████████████████ Original Repository code ████████████████
+
+	// Check if section exists
+	// element, ok := data[id]
+	// if !ok {
+	// 	return models.Section{}, errorbase.ErrNotFound
+	// }
+
+	// Check if ID is new
+	// if !(entity.Section_Number == data[id].Section_Number) {
+	// 	for _, section := range data {
+	// 		if section.Section_Number == entity.Section_Number {
+	// 			return models.Section{}, errorbase.ErrConflict
+	// 		}
+	// 	}
+	// }
+
+	// Merge the new data with the existing data
+	// if err := mergo.Merge(&element, entity, mergo.WithOverride); err != nil {
+	// 	return models.Section{}, err
+	// }
+
+	// data[id] = element
+	// if err := r.storage.Save(data[id]); err != nil {
+	// 	return models.Section{}, errorbase.ErrStorageOperationFailed
+	// }
+	// return element, nil
+
+	// Check if the ID is valid
+
+	// * ████████████████ Old code ████████████████
+
+	// sectionReq := dto.GenerateSectionRequest(entity)
+
+	// err := s.repository.Update(id, sectionReq)
+	// if err != nil {
+	// 	return dto.SectionResponse{}, err
+	// }
+
+	// // Generate the response and return it
+	// sectionResponse := dto.GenerateSectionResponse(sectionReq)
+	// return sectionResponse, err
+
 }
 
 // DeleteSection is a method that deletes a Section by its ID
@@ -102,10 +149,6 @@ func (s *SectionService) DeleteSection(id int) (err error) {
 }
 
 func (service *SectionService) ValidateAllParameters(reqBody dto.SectionResponse) (err error) {
-	if reqBody.Section_Number == 0 {
-		err = errors.New("section number is required")
-		return
-	}
 	if reqBody.Current_Temperature == 0 {
 		err = errors.New("current temperature is required")
 		return

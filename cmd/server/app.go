@@ -28,7 +28,6 @@ import (
 	//Sections
 	sectionRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	sectionService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
-	sectionStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section_storage"
 
 	//Buyer
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
@@ -121,8 +120,7 @@ func (a *ServerChi) Run() (err error) {
 	productHandler := handler.NewProductHandler(productService)
 
 	// Sections
-	sectionStorage := sectionStorage.NewSectionJSONFile(sectionFilePath)
-	sectionRepository := sectionRepository.NewStRepository(sectionStorage)
+	sectionRepository := sectionRepository.NewSectionRepository(dbConn)
 	sectionService := sectionService.NewSectionService(sectionRepository)
 	sectionHandler := handler.NewSectionDefault(sectionService)
 
@@ -191,7 +189,7 @@ func (a *ServerChi) Run() (err error) {
 		})
 
 		r.Route("/productBatches", func(rt chi.Router) {
-			rt.Get("/", productBatchHandler.Create)
+			rt.Post("/", productBatchHandler.Create())
 		})
 	})
 

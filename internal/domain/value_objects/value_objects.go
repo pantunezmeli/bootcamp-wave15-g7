@@ -15,9 +15,7 @@ var (
 
 // * ##################### Id ######################
 // Estructura
-type Id struct {
-	value int
-}
+type Id int
 type CardNumber struct {
 	value string
 }
@@ -28,9 +26,9 @@ type Name struct {
 // Validación
 func NewId(value int) (id Id, err error) {
 	if value <= 0 {
-		return Id{}, ErrInvalidId
+		return 0, ErrInvalidId
 	}
-	return Id{value: value}, nil
+	return Id(value), nil
 }
 func NewCardNumber(value string) (cardNumber CardNumber, err error) {
 	if value == "" {
@@ -47,7 +45,7 @@ func NewName(value string) (name Name, err error) {
 
 // Seteo sin validación
 func NewOptionalId(value int) Id {
-	return Id{value: value}
+	return Id(value)
 }
 func NewOptionalCardNumber(value string) CardNumber {
 	return CardNumber{value: value}
@@ -58,7 +56,7 @@ func NewOptionalName(value string) Name {
 
 // Obtener el valor
 func (id Id) GetId() int {
-	return id.value
+	return int(id)
 }
 func (cardNumber CardNumber) GetCardNumber() string {
 	return cardNumber.value

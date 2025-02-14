@@ -2,7 +2,6 @@ package dto
 
 import (
 	"sort"
-	"time"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
@@ -10,35 +9,23 @@ import (
 
 // ProductBatch is a struct that represents a product batch
 type ProductBatchResponse struct {
-	Id                 int       `json:"id"`
-	BatchNumber        string    `json:"batch_number"`
-	CurrentQuantity    int       `json:"current_quantity"`
-	CurrentTemperature float64   `json:"current_temperature"`
-	DueDate            time.Time `json:"due_date"`
-	InitialQuantity    int       `json:"initial_quantity"`
-	ManufacturingDate  time.Time `json:"manufacturing_date"`
-	ManufacturingHour  time.Time `json:"manufacturing_hour"`
-	MinumumTemperature float64   `json:"minimum_temperature"`
-	ProductID          int       `json:"product_id"`
-	SectionID          int       `json:"section_id"`
+	Id                 int                              `json:"id"`
+	BatchNumber        value_objects.BatchNumber        `json:"batch_number"`
+	CurrentQuantity    value_objects.CurrentQuantity    `json:"current_quantity"`
+	CurrentTemperature value_objects.CurrentTemperature `json:"current_temperature"`
+	DueDate            value_objects.DueDate            `json:"due_date"`
+	InitialQuantity    value_objects.InitialQuantity    `json:"initial_quantity"`
+	ManufacturingDate  value_objects.ManufacturingDate  `json:"manufacturing_date"`
+	ManufacturingHour  value_objects.ManufacturingHour  `json:"manufacturing_hour"`
+	MinimumTemperature value_objects.MinimumTemperature `json:"minimum_temperature"`
+	ProductID          int                              `json:"product_id"`
+	SectionID          int                              `json:"section_id"`
 }
 
 func GenerateProductBatchesResponseList(ProductBatches map[int]models.ProductBatch) []ProductBatchResponse {
-	var list []ProductBatchResponse
-	for _, value := range ProductBatches {
-		list = append(list, ProductBatchResponse{
-			Id:                 value.Id.GetId(),
-			BatchNumber:        value.BatchNumber.GetBatchNumber(),
-			CurrentQuantity:    value.CurrentQuantity.GetCurrentQuantity(),
-			CurrentTemperature: value.CurrentTemperature.GetCurrentTemperature(),
-			DueDate:            value.DueDate.GetDueDate(),
-			InitialQuantity:    value.InitialQuantity.GetInitialQuantity(),
-			ManufacturingDate:  value.ManufacturingDate.GetManufacturingDate(),
-			ManufacturingHour:  value.ManufacturingHour.GetManufacturingHour(),
-			MinumumTemperature: value.MinumumTemperature.GetMinumumTemperature(),
-			ProductID:          value.ProductID.GetId(),
-			SectionID:          value.SectionID.GetId(),
-		})
+	list := make([]ProductBatchResponse, 0, len(ProductBatches))
+	for _, v := range ProductBatches {
+		list = append(list, GenerateProductBatchModelToDto(v))
 	}
 	sort.Slice(list, func(i, j int) bool {
 		return list[i].Id < list[j].Id
@@ -47,59 +34,25 @@ func GenerateProductBatchesResponseList(ProductBatches map[int]models.ProductBat
 }
 
 func GenerateProductBatchModelToDto(ProductBatch models.ProductBatch) ProductBatchResponse {
-	ProductBatchResponse := ProductBatchResponse{
+	return ProductBatchResponse{
 		Id:                 ProductBatch.Id.GetId(),
-		BatchNumber:        ProductBatch.BatchNumber.GetBatchNumber(),
-		CurrentQuantity:    ProductBatch.CurrentQuantity.GetCurrentQuantity(),
-		CurrentTemperature: ProductBatch.CurrentTemperature.GetCurrentTemperature(),
-		DueDate:            ProductBatch.DueDate.GetDueDate(),
-		InitialQuantity:    ProductBatch.InitialQuantity.GetInitialQuantity(),
-		ManufacturingDate:  ProductBatch.ManufacturingDate.GetManufacturingDate(),
-		ManufacturingHour:  ProductBatch.ManufacturingHour.GetManufacturingHour(),
-		MinumumTemperature: ProductBatch.MinumumTemperature.GetMinumumTemperature(),
+		BatchNumber:        ProductBatch.BatchNumber,
+		CurrentQuantity:    ProductBatch.CurrentQuantity,
+		CurrentTemperature: ProductBatch.CurrentTemperature,
+		DueDate:            ProductBatch.DueDate,
+		InitialQuantity:    ProductBatch.InitialQuantity,
+		ManufacturingDate:  ProductBatch.ManufacturingDate,
+		ManufacturingHour:  ProductBatch.ManufacturingHour,
+		MinimumTemperature: ProductBatch.MinimumTemperature,
 		ProductID:          ProductBatch.ProductID.GetId(),
 		SectionID:          ProductBatch.SectionID.GetId(),
 	}
-	return ProductBatchResponse
 }
 
 func GenerateProductBatchDtoToModel(ProductBatchResponse ProductBatchResponse) (models.ProductBatch, error) {
 	id, err := value_objects.NewId(ProductBatchResponse.Id)
 	if err != nil {
 		// handle the error appropriately
-		return models.ProductBatch{}, err
-	}
-	batchNumber, err := value_objects.NewBatchNumber(ProductBatchResponse.BatchNumber)
-	if err != nil {
-		// handle the error appropriately
-		return models.ProductBatch{}, err
-	}
-	currentQuantity, err := value_objects.NewCurrentQuantity(ProductBatchResponse.CurrentQuantity)
-	if err != nil {
-		return models.ProductBatch{}, err
-	}
-	currentTemperature, err := value_objects.NewCurrentTemperature(ProductBatchResponse.CurrentTemperature)
-	if err != nil {
-		return models.ProductBatch{}, err
-	}
-	dueDate, err := value_objects.NewDueDate(ProductBatchResponse.DueDate)
-	if err != nil {
-		return models.ProductBatch{}, err
-	}
-	initialQuantity, err := value_objects.NewInitialQuantity(ProductBatchResponse.InitialQuantity)
-	if err != nil {
-		return models.ProductBatch{}, err
-	}
-	manufacturingDate, err := value_objects.NewManufacturingDate(ProductBatchResponse.ManufacturingDate)
-	if err != nil {
-		return models.ProductBatch{}, err
-	}
-	manufacturingHour, err := value_objects.NewManufacturingHour(ProductBatchResponse.ManufacturingHour)
-	if err != nil {
-		return models.ProductBatch{}, err
-	}
-	minumumTemperature, err := value_objects.NewMinumumTemperature(ProductBatchResponse.MinumumTemperature)
-	if err != nil {
 		return models.ProductBatch{}, err
 	}
 	productId, err := value_objects.NewId(ProductBatchResponse.ProductID)
@@ -110,16 +63,17 @@ func GenerateProductBatchDtoToModel(ProductBatchResponse ProductBatchResponse) (
 	if err != nil {
 		return models.ProductBatch{}, err
 	}
+
 	return models.ProductBatch{
 		Id:                 id,
-		BatchNumber:        batchNumber,
-		CurrentQuantity:    currentQuantity,
-		CurrentTemperature: currentTemperature,
-		DueDate:            dueDate,
-		InitialQuantity:    initialQuantity,
-		ManufacturingDate:  manufacturingDate,
-		ManufacturingHour:  manufacturingHour,
-		MinumumTemperature: minumumTemperature,
+		BatchNumber:        ProductBatchResponse.BatchNumber,
+		CurrentQuantity:    ProductBatchResponse.CurrentQuantity,
+		CurrentTemperature: ProductBatchResponse.CurrentTemperature,
+		DueDate:            ProductBatchResponse.DueDate,
+		InitialQuantity:    ProductBatchResponse.InitialQuantity,
+		ManufacturingDate:  ProductBatchResponse.ManufacturingDate,
+		ManufacturingHour:  ProductBatchResponse.ManufacturingHour,
+		MinimumTemperature: ProductBatchResponse.MinimumTemperature,
 		ProductID:          productId,
 		SectionID:          sectionId,
 	}, nil

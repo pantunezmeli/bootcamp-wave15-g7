@@ -50,3 +50,13 @@ var (
 	ErrInvalidSectionProductBatch   = errors.New("invalid section product batch")
 	ErrInvalidSectionProductBatchID = errors.New("invalid section product batch id")
 )
+
+type ErrInvalidParameter struct {
+	Parameter string
+}
+
+func (e ErrInvalidParameter) Error() string {
+
+	return "invalid parameter: " + e.Parameter
+
+}

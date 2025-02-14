@@ -32,18 +32,7 @@ func (h *LocalityDefault) Create() http.HandlerFunc{
 
 		res, err := h.sv.Save(reqBody)
 		if err != nil {
-			var missingParamErr *locality.ErrMissingParameters
-			var invalidParamErr *locality.ErrInvalidParameter
-			switch {
-			case errors.Is(err, repository.ErrProvinceNotFound):
-				dto.JSONError(w, http.StatusConflict, "province id not found")
-			case errors.As(err, &missingParamErr):
-				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
-			case errors.As(err, &invalidParamErr):
-				dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
-			default:
-				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			}
+			handleLocalityError(w, err)
 			return
 		}
 
@@ -62,12 +51,7 @@ func (h *LocalityDefault) GetById() http.HandlerFunc {
 
 		res, err := h.sv.GetById(idParsed)
 		if err != nil {
-			switch {
-			case errors.Is(err, repository.ErrLocalityNotFound):
-				dto.JSONError(w, http.StatusNotFound, ErrLocalityNotExist.Error())
-			default:
-				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			}
+			handleLocalityError(w, err)
 			return
 		}
 
@@ -95,12 +79,7 @@ func (h *LocalityDefault) GetReportSellers() http.HandlerFunc{
 		res, err := h.sv.GetReportSellers(id)
 
 		if err != nil {
-			switch {
-			case errors.Is(err, repository.ErrLocalityNotFound):
-				dto.JSONError(w, http.StatusNotFound, ErrLocalityNotExist.Error())
-			default:
-				dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			}
+			handleLocalityError(w, err)
 			return
 		}
 
@@ -109,5 +88,31 @@ func (h *LocalityDefault) GetReportSellers() http.HandlerFunc{
 		})
 
 		
+	}
+}
+
+func handleLocalityError(w http.ResponseWriter, err error) {
+	errorMap := map[error]int{
+		repository.ErrProvinceNotFound: http.StatusConflict,
+		repository.ErrLocalityNotFound: http.StatusNotFound,
+	}
+
+	for key, status := range errorMap {
+		if errors.Is(err, key) {
+			dto.JSONError(w, status, key.Error())
+			return
+		}
+	}
+
+	var missingParamErr *locality.ErrMissingParameters
+	var invalidParamErr *locality.ErrInvalidParameter
+
+	switch {
+	case errors.As(err, &missingParamErr):
+		dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("missing parameter: %s", missingParamErr.Error()))
+	case errors.As(err, &invalidParamErr):
+		dto.JSONError(w, http.StatusUnprocessableEntity, fmt.Sprintf("invalid parameter: %s", invalidParamErr.Error()))
+	default:
+		dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 	}
 }

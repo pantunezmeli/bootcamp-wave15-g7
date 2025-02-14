@@ -58,7 +58,7 @@ func (h *SellerDefault) GetById() http.HandlerFunc {
 
 		res, err := h.sv.GetById(idParsed)
 		if err != nil {
-			handleError(w, err)
+			handleSellerError(w, err)
 			return
 		}
 
@@ -80,7 +80,7 @@ func (h *SellerDefault) Create() http.HandlerFunc{
 
 		res, err := h.sv.Save(reqBody)
 		if err != nil {
-			handleError(w, err)
+			handleSellerError(w, err)
 			return
 		}
 
@@ -100,7 +100,7 @@ func (h *SellerDefault) Delete() http.HandlerFunc{
 
 		err := h.sv.Delete(idParsed)
 		if err != nil {
-			handleError(w, err)
+			handleSellerError(w, err)
 			return
 		}
 
@@ -125,7 +125,7 @@ func (h *SellerDefault) Update() http.HandlerFunc {
 
 		res, err := h.sv.Update(reqBody, idParsed)
 		if err != nil {
-			handleError(w, err)
+			handleSellerError(w, err)
 			return
 		}
 
@@ -148,7 +148,7 @@ func validateId(r *http.Request, w http.ResponseWriter) (int, bool) {
 	return idParsed, false
 }
 
-func handleError(w http.ResponseWriter, err error) {
+func handleSellerError(w http.ResponseWriter, err error) {
 	var missingParamErr *seller.ErrMissingParameters
 	var invalidParamErr *seller.ErrInvalidParameter
 	switch {

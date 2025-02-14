@@ -38,9 +38,7 @@ func (h *DefaultHandler) Get() http.HandlerFunc {
 		// process
 		employees, err := h.sv.FindAll()
 		if err != nil {
-
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			return
+			h.handleError(w, err)
 		}
 
 		// response
@@ -62,12 +60,7 @@ func (h *DefaultHandler) GetById() http.HandlerFunc {
 		// process
 		employee, err := h.sv.FindById(id)
 		if err != nil {
-			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
-				return
-			}
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			return
+			h.handleError(w, err)
 		}
 
 		// response
@@ -89,20 +82,7 @@ func (h *DefaultHandler) Create() http.HandlerFunc {
 		// process
 		newEmployee, err := h.sv.New(employeeData)
 		if err != nil {
-			if errors.Is(err, sv.ErrEmptyField) {
-				dto.JSONError(w, http.StatusUnprocessableEntity, ErrEmptyField.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrCardNumberAlreadyExists) {
-				dto.JSONError(w, http.StatusConflict, ErrCardNumberExists.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrWarehouseNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrWarehouseNotFound.Error())
-				return
-			}
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			return
+			h.handleError(w, err)
 		}
 
 		// response
@@ -130,20 +110,7 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		// process
 		updatedEmployee, err := h.sv.Edit(id, employeeData)
 		if err != nil {
-			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrCardNumberAlreadyExists) {
-				dto.JSONError(w, http.StatusConflict, ErrCardNumberExists.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrWarehouseNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrWarehouseNotFound.Error())
-				return
-			}
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			return
+			h.handleError(w, err)
 		}
 
 		// response
@@ -164,16 +131,7 @@ func (h *DefaultHandler) Delete() http.HandlerFunc {
 		// process
 		err = h.sv.DeleteById(id)
 		if err != nil {
-			if errors.Is(err, sv.ErrInboundOrderNeedsEmployee) {
-				dto.JSONError(w, http.StatusConflict, ErrInboundOrderNeedsEmployee.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
-				return
-			}
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			return
+			h.handleError(w, err)
 		}
 
 		// response
@@ -193,17 +151,29 @@ func (h *DefaultHandler) ReportInboundOrders() http.HandlerFunc {
 		// process
 		employee, err := h.sv.ReportInboundOrders(id)
 		if err != nil {
-			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
-				return
-			}
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			return
+			h.handleError(w, err)
 		}
 
 		// response
 		response.JSON(w, http.StatusOK, map[string]any{
 			"data": employee,
 		})
+	}
+}
+
+func (h *DefaultHandler) handleError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, sv.ErrEmptyField):
+		dto.JSONError(w, http.StatusUnprocessableEntity, ErrEmptyField.Error())
+	case errors.Is(err, sv.ErrCardNumberAlreadyExists):
+		dto.JSONError(w, http.StatusConflict, ErrCardNumberExists.Error())
+	case errors.Is(err, sv.ErrWarehouseNotFound):
+		dto.JSONError(w, http.StatusNotFound, ErrWarehouseNotFound.Error())
+	case errors.Is(err, sv.ErrEmployeeNotFound):
+		dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
+	case errors.Is(err, sv.ErrInboundOrderNeedsEmployee):
+		dto.JSONError(w, http.StatusConflict, ErrInboundOrderNeedsEmployee.Error())
+	default:
+		dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 	}
 }

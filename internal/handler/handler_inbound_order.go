@@ -11,6 +11,7 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/inboundorder"
 )
 
+var ErrOrderNumberExists error = errors.New("order number already exists")
 var ErrProductBatchNotFound = errors.New("product batch not found")
 
 func NewInboundOrderHandler(service sv.InboundOrderService) *InboundOrderHandler {
@@ -33,33 +34,29 @@ func (h *InboundOrderHandler) Create() http.HandlerFunc {
 		// process
 		newInboundOrder, err := h.sv.New(inboundOrderData)
 		if err != nil {
-			if errors.Is(err, sv.ErrEmptyField) {
-				dto.JSONError(w, http.StatusUnprocessableEntity, ErrEmptyField.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrOrderNumberAlreadyExists) {
-				dto.JSONError(w, http.StatusConflict, ErrCardNumberExists.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrEmployeeNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrProductBatchNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrProductBatchNotFound.Error())
-				return
-			}
-			if errors.Is(err, sv.ErrWarehouseNotFound) {
-				dto.JSONError(w, http.StatusNotFound, ErrWarehouseNotFound.Error())
-				return
-			}
-			dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
-			return
+			h.handleError(w, err)
 		}
 
 		// response
 		response.JSON(w, http.StatusCreated, map[string]any{
 			"data": newInboundOrder,
 		})
+	}
+}
+
+func (h *InboundOrderHandler) handleError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, sv.ErrEmptyField):
+		dto.JSONError(w, http.StatusUnprocessableEntity, ErrEmptyField.Error())
+	case errors.Is(err, sv.ErrOrderNumberAlreadyExists):
+		dto.JSONError(w, http.StatusConflict, ErrOrderNumberExists.Error())
+	case errors.Is(err, sv.ErrEmployeeNotFound):
+		dto.JSONError(w, http.StatusNotFound, ErrEmployeeNotFound.Error())
+	case errors.Is(err, sv.ErrProductBatchNotFound):
+		dto.JSONError(w, http.StatusNotFound, ErrProductBatchNotFound.Error())
+	case errors.Is(err, sv.ErrWarehouseNotFound):
+		dto.JSONError(w, http.StatusNotFound, ErrWarehouseNotFound.Error())
+	default:
+		dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
 	}
 }

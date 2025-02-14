@@ -1,6 +1,10 @@
 package errorbase
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
 
 var (
 	ErrInvalidId               = errors.New("invalid id")
@@ -22,3 +26,24 @@ var (
 	ErrTrackingCodeExist       = errors.New("tracking code already exist")
 	ErrInvalidIdField          = errors.New("invalid id field")
 )
+
+type ErrorFKNotExist struct {
+	FK []string
+}
+
+func (e *ErrorFKNotExist) Error() string {
+	return fmt.Sprintf("FK invalid: %s", strings.Join(e.FK, ", "))
+}
+
+func (e *ErrorFKNotExist) AddFK(fk string) {
+	e.FK = append(e.FK, fk)
+}
+
+func (e *ErrorFKNotExist) HasErrors() bool {
+	return len(e.FK) > 0
+}
+
+func (e *ErrorFKNotExist) Is(target error) bool {
+	_, ok := target.(*ErrorFKNotExist)
+	return ok
+}

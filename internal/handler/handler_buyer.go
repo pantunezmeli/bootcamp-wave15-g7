@@ -27,7 +27,7 @@ func (handler *BuyerHandler) Get() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		buyers, err := handler.service.GetBuyers()
 		if errors.Is(err, errorbase.ErrEmptyList) {
-			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrEmptyList)
+			dtoResponse.JSONError(writer, http.StatusNoContent, MSG_ErrEmptyList)
 			return
 		}
 

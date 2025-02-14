@@ -7,6 +7,7 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/purchase"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/purchase"
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/querys"
 )
 
 type PurchaseService struct {
@@ -44,12 +45,12 @@ func (service *PurchaseService) GetReportById(id int) (models.ReportPurchaseOrde
 
 func (service *PurchaseService) CreatePurchase(entity dto.PurchaseOrderResponse) (dto.PurchaseOrderResponse, error) {
 
-	orderNumberExist := service.repository.OrderNumberExist(entity.OrderNumber)
+	orderNumberExist := service.repository.ElementExist(entity.OrderNumber, querys.OrderNumberExist)
 	if orderNumberExist {
 		return dto.PurchaseOrderResponse{}, errorbase.ErrOrderNumberExist
 	}
 
-	trackingCode := service.repository.TrackingCodeExist(entity.TrackingCode)
+	trackingCode := service.repository.ElementExist(entity.TrackingCode, querys.TrackingCodeExist)
 	if trackingCode {
 		return dto.PurchaseOrderResponse{}, errorbase.ErrTrackingCodeExist
 	}

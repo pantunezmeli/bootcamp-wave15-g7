@@ -2,7 +2,7 @@ package seller
 
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	seller_vo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/seller"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
 )
 
@@ -48,7 +48,7 @@ func (s *SellerStorage) Save(modelWithoutId models.Seller) (seller models.Seller
 	
 	newId := nextId(sellersMap)
 	
-	id, err := value_objects.NewSellerId(newId)
+	id, err := seller_vo.NewSellerId(newId)
 	if err != nil {
 		return
 	} 
@@ -82,7 +82,7 @@ func (s *SellerStorage) Delete(id int) (err error){
 
 func (s *SellerStorage) CheckCid(sellerModel models.Seller, sellersMap map[int]models.Seller) (err error){
 	for _, seller := range sellersMap{
-		if *seller.Cid.Value() == *sellerModel.Cid.Value() && *sellerModel.ID.Value() != *seller.ID.Value() {
+		if seller.Cid == sellerModel.Cid && sellerModel.ID != seller.ID {
 			err = ErrCidAlreadyExists
 			return
 		}
@@ -100,7 +100,7 @@ func(s *SellerStorage) Update(sellerModel models.Seller) (sellerUpdated models.S
 	}
 	
 	sellerUpdated = sellerModel
-	sellersMap[*sellerModel.ID.Value()] = sellerUpdated
+	sellersMap[int(sellerModel.ID)] = sellerUpdated
 	err = s.storage.Save(sellersMap)
 	return
 }

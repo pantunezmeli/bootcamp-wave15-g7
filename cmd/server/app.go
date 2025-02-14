@@ -22,7 +22,11 @@ import (
 	// Sellers
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	sellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
-	sellerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/seller_storage"
+
+	//Localities
+	localityRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/locality"
+	localityService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/locality"
+
 
 	// Employees
 	employeeRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
@@ -99,10 +103,14 @@ func (a *ServerChi) Run() (err error) {
 	defer dbConn.Close()
 
 	// Sellers
-	sellerStorage := sellerStorage.NewSellerJSONFile(sellerFilePath)
-	sellerRepository := sellerRepository.NewSellerStorage(*sellerStorage)
+	sellerRepository := sellerRepository.NewSellerMySql(dbConn)
 	sellerService := sellerService.NewSellerDefault(sellerRepository)
 	sellerHandler := handler.NewSellerDefault(sellerService)
+
+	// Localities
+	localityRepository := localityRepository.NewLocalityMySql(dbConn)
+	localityService := localityService.NewLocalityDefault(localityRepository)
+	localityHandler := handler.NewLocalityDefault(localityService)
 
 	// Employees
 	employeeStorage := employeeStorage.NewEmployeeJSONFile(employeeFilePath)
@@ -165,6 +173,12 @@ func (a *ServerChi) Run() (err error) {
 			r.Delete("/{id}", sellerHandler.Delete())
 			r.Patch("/{id}", sellerHandler.Update())
 
+		})
+
+		r.Route("/localities", func(r chi.Router) {
+			r.Get("/reportSellers", localityHandler.GetReportSellers())
+			r.Post("/", localityHandler.Create())
+			r.Get("/{id}", localityHandler.GetById())
 		})
 
 		r.Route("/warehouses", func(rt chi.Router) {

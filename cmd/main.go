@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/cmd/server"
@@ -11,6 +12,7 @@ func main() {
 	serverConfig := &server.ConfigServerChi{
 		ServerAddress: config.GetEnv("SERVER_ADDRESS", ":8080"),
 	}
+	fmt.Printf("Running on localhost %s", serverConfig.ServerAddress)
 
 	app := server.NewServerChi(serverConfig)
 

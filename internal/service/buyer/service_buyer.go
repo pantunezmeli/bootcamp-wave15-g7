@@ -16,9 +16,9 @@ func NewBuyerService(rp buyer.IRepositoryBuyer) *BuyerService {
 	return &BuyerService{repository: rp}
 }
 
-func (repo *BuyerService) GetBuyers() ([]dto.BuyerResponse, error) {
+func (service *BuyerService) GetBuyers() ([]dto.BuyerResponse, error) {
 
-	list, err := repo.repository.GetAll()
+	list, err := service.repository.GetAll()
 	if err != nil {
 		return nil, errorbase.ErrEmptyList
 	}
@@ -27,12 +27,12 @@ func (repo *BuyerService) GetBuyers() ([]dto.BuyerResponse, error) {
 	return buyers, nil
 }
 
-func (repo *BuyerService) GetBuyer(id int) (dto.BuyerResponse, error) {
+func (service *BuyerService) GetBuyer(id int) (dto.BuyerResponse, error) {
 
 	if id <= 0 {
 		return dto.BuyerResponse{}, errorbase.ErrInvalidId
 	}
-	buyer, err := repo.repository.GetById(id)
+	buyer, err := service.repository.GetById(id)
 	if err != nil {
 		return dto.BuyerResponse{}, errorbase.ErrNotFound
 	}
@@ -41,8 +41,8 @@ func (repo *BuyerService) GetBuyer(id int) (dto.BuyerResponse, error) {
 	return buyerResponse, nil
 }
 
-func (repo *BuyerService) CreateBuyer(entity models.Buyer) (dto.BuyerResponse, error) {
-	buyer, err := repo.repository.Create(entity)
+func (service *BuyerService) CreateBuyer(entity models.Buyer) (dto.BuyerResponse, error) {
+	buyer, err := service.repository.Create(entity)
 
 	if err != nil {
 		return dto.BuyerResponse{}, err
@@ -52,13 +52,13 @@ func (repo *BuyerService) CreateBuyer(entity models.Buyer) (dto.BuyerResponse, e
 	return buyerResponse, nil
 }
 
-func (repo *BuyerService) UpdateBuyer(id int, entity dto.BuyerUpdate) (dto.BuyerResponse, error) {
+func (service *BuyerService) UpdateBuyer(id int, entity dto.BuyerUpdate) (dto.BuyerResponse, error) {
 
 	if id <= 0 {
 		return dto.BuyerResponse{}, errorbase.ErrInvalidId
 	}
 
-	buyerExist, err2 := repo.GetBuyer(id)
+	buyerExist, err2 := service.repository.GetById(id)
 	if err2 != nil {
 		return dto.BuyerResponse{}, errorbase.ErrNotFound
 	}
@@ -69,7 +69,7 @@ func (repo *BuyerService) UpdateBuyer(id int, entity dto.BuyerUpdate) (dto.Buyer
 
 	buyerReq := dto.GenerateBuyerRequestUpdate(id, entity, buyerExist)
 
-	buyer, err := repo.repository.Update(id, buyerReq)
+	buyer, err := service.repository.Update(id, buyerReq)
 	if err != nil {
 		return dto.BuyerResponse{}, err
 	}
@@ -78,12 +78,12 @@ func (repo *BuyerService) UpdateBuyer(id int, entity dto.BuyerUpdate) (dto.Buyer
 	return buyerResponse, nil
 }
 
-func (repo *BuyerService) DeleteBuyer(id int) error {
+func (service *BuyerService) DeleteBuyer(id int) error {
 	if id <= 0 {
 		return errorbase.ErrInvalidId
 	}
 
-	err := repo.repository.Delete(id)
+	err := service.repository.Delete(id)
 	if err != nil {
 		return err
 	}

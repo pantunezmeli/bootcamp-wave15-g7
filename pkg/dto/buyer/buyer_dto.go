@@ -11,19 +11,19 @@ import (
 
 type BuyerResponse struct {
 	Id             int    `json:"id"`
-	Card_Number_Id int    `json:"card_number_id"`
+	Card_Number_Id string `json:"card_number_id"`
 	First_Name     string `json:"first_name"`
 	Last_Name      string `json:"last_name"`
 }
 
 type BuyerUpdate struct {
-	CardNumberID *int    `json:"card_number_id,omitempty"`
+	CardNumberID *string `json:"card_number_id,omitempty"`
 	FirstName    *string `json:"first_name,omitempty"`
 	LastName     *string `json:"last_name,omitempty"`
 }
 
 func ValidateBuyerFields(buyer BuyerUpdate) error {
-	if buyer.CardNumberID != nil && *buyer.CardNumberID == 0 {
+	if buyer.CardNumberID != nil && strings.TrimSpace(*buyer.CardNumberID) == "" {
 		return errors.New("card_number_id is empty")
 	}
 
@@ -47,7 +47,7 @@ func ConvertBuyerResponseToUpdate(response BuyerResponse) BuyerUpdate {
 }
 
 func ConvertBuyerUpdateToResponse(buyerUpdate BuyerUpdate) BuyerResponse {
-	var cardNumberID int
+	var cardNumberID string
 	var firstName string
 	var lastName string
 
@@ -68,7 +68,7 @@ func ConvertBuyerUpdateToResponse(buyerUpdate BuyerUpdate) BuyerResponse {
 	}
 }
 
-func GenerateResponseList(buyers map[int]models.Buyer) []BuyerResponse {
+func GenerateResponseList(buyers []models.Buyer) []BuyerResponse {
 	var list []BuyerResponse
 	for _, value := range buyers {
 		list = append(list, BuyerResponse{
@@ -94,7 +94,7 @@ func GenerateBuyerResponse(buyer models.Buyer) BuyerResponse {
 	return buyerResponse
 }
 
-func GenerateBuyerRequestUpdate(id int, buyerUpdate BuyerUpdate, buyerExist BuyerResponse) models.Buyer {
+func GenerateBuyerRequestUpdate(id int, buyerUpdate BuyerUpdate, buyerExist models.Buyer) models.Buyer {
 	fmt.Println(*buyerUpdate.CardNumberID)
 	buyerResponse := models.Buyer{
 		Id: id,

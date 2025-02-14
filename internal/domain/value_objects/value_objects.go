@@ -3,8 +3,8 @@ package value_objects
 import "errors"
 
 var (
-	ErrInvalidId              = errors.New("invalid id")
-	ErrInvalidWareHouseCode   = errors.New("invalid warehouse code")
+	ErrInvalidId = errors.New("invalid id")
+	//ErrInvalidWareHouseCode   = errors.New("invalid warehouse code")
 	ErrInvalidTelephone       = errors.New("invalid telephone")
 	ErrInvalidMinimunCapacity = errors.New("invalid minimun capacity")
 	ErrMinimunTemperature     = errors.New("invalid minimun temperature")
@@ -92,23 +92,6 @@ func (cardNumber CardNumber) GetCardNumber() string {
 }
 func (name Name) GetName() string {
 	return name.value
-}
-
-// * ##################### WareHouse_Code ######################
-
-type WareHouseCode struct {
-	value string
-}
-
-func NewWareHouseCode(value string) (code WareHouseCode, err error) {
-	if len(value) < 3 {
-		return WareHouseCode{}, ErrInvalidWareHouseCode
-	}
-	return WareHouseCode{value: value}, nil
-}
-
-func (code WareHouseCode) GetWareHouseCode() string {
-	return code.value
 }
 
 // * ##################### Address ######################

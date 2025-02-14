@@ -10,12 +10,12 @@ import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/db"
 	handler "github.com/pantunezmeli/bootcamp-wave15-g7/internal/handler"
 
-	//Products
+	// Products
 	productRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	productService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
 	productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
 
-	//Sellers
+	// Sellers
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
 	sellerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/seller"
 
@@ -29,19 +29,26 @@ import (
 	employeeService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 	employeeStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/employee_storage"
 
-	//Sections
+	// Sections
 	sectionRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/section"
 	sectionService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/section"
 	sectionStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/section"
 
-	//Buyer
+	// Buyer
 	buyerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/buyer"
 	buyerService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
-	buyerStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/buyer_storage"
+
+	// Purchase
+	purchaseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/purchase"
+	purchaseService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/purchase"
 
 	// Warehouse
 	warehouseRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
 	warehouseService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse"
+
+	// Carrier
+	carrierRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/carrier"
+	carrierService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/carrier"
 )
 
 const (
@@ -108,10 +115,15 @@ func (a *ServerChi) Run() (err error) {
 	employeeHandler := handler.NewDefaultHandler(employeeService)
 
 	// Buyers
-	buyerStorage := buyerStorage.NewBuyerJSONFile(buyerFilePath)
-	buyerRepository := buyerRepository.NewBuyerRepository(buyerStorage)
+	//buyerStorage := buyerStorage.NewBuyerJSONFile(buyerFilePath)
+	buyerRepository := buyerRepository.NewBuyerRepository(dbConn)
 	buyerService := buyerService.NewBuyerService(buyerRepository)
 	buyerHandler := handler.NewBuyerHandler(buyerService)
+
+	// Purchases
+	purchaseRepository := purchaseRepository.NewBuyerRepository(dbConn)
+	purchaseService := purchaseService.NewBuyerService(purchaseRepository)
+	purchaseHandler := handler.NewPurchaseHandler(purchaseService)
 
 	// Warehouses
 	warehouseRepository := warehouseRepository.NewWareHouseRepository(dbConn)
@@ -129,6 +141,11 @@ func (a *ServerChi) Run() (err error) {
 	sectionRepository := sectionRepository.NewStRepository(sectionStorage)
 	sectionService := sectionService.NewSectionService(sectionRepository)
 	sectionHandler := handler.NewSectionDefault(sectionService)
+
+	// Carriers
+	carrierRepository := carrierRepository.NewCarrierRepository(dbConn)
+	carrierService := carrierService.NewCarrierService(carrierRepository)
+	carrierHandler := handler.NewCarrierHandler(carrierService)
 
 	// router
 	rt := chi.NewRouter()
@@ -193,6 +210,18 @@ func (a *ServerChi) Run() (err error) {
 			rt.Post("/", buyerHandler.Create())
 			rt.Patch("/{id}", buyerHandler.Update())
 			rt.Delete("/{id}", buyerHandler.Delete())
+		})
+
+		r.Route("/reportPurchaseOrders", func(rt chi.Router) {
+			rt.Get("/", purchaseHandler.Get())
+			rt.Get("/{id}", purchaseHandler.GetById())
+			rt.Post("/", purchaseHandler.Create())
+
+		})
+
+		r.Route("/carriers", func(rt chi.Router) {
+			rt.Post("/", carrierHandler.Create())
+			rt.Get("/reportCarries", carrierHandler.GetCarriesAmount())
 		})
 	})
 

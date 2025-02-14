@@ -3,11 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/buyer"
@@ -33,6 +31,11 @@ func (handler *BuyerHandler) Get() http.HandlerFunc {
 			return
 		}
 
+		if errors.Is(err, errorbase.ErrDatabaseOperationFailed) {
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
+			return
+		}
+
 		if err != nil {
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
@@ -48,7 +51,7 @@ func (handler *BuyerHandler) GetById() http.HandlerFunc {
 		id, err2 := strconv.Atoi(idParam)
 
 		if err2 != nil {
-			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrRequest)
+			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrRequest)
 			return
 		}
 		buyer, err := handler.service.GetBuyer(id)
@@ -58,6 +61,9 @@ func (handler *BuyerHandler) GetById() http.HandlerFunc {
 			return
 		case errors.Is(err, errorbase.ErrNotFound):
 			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrNotFound)
+			return
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrRequest)
@@ -87,11 +93,10 @@ func (handler *BuyerHandler) Create() http.HandlerFunc {
 		case errors.Is(err, errorbase.ErrEmptyParameters):
 			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrUnprocessable)
 			return
-		case errors.Is(err, errorbase.ErrStorageOperationFailed):
-			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
-			fmt.Println(err)
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
 		}
@@ -132,8 +137,8 @@ func (handler *BuyerHandler) Update() http.HandlerFunc {
 		case errors.Is(err, errorbase.ErrUnprocessable):
 			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrUnprocessable)
 			return
-		case errors.Is(err, errorbase.ErrStorageOperationFailed):
-			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
@@ -162,8 +167,8 @@ func (handler *BuyerHandler) Delete() http.HandlerFunc {
 		case errors.Is(err, errorbase.ErrNotFound):
 			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrNotFound)
 			return
-		case errors.Is(err, errorbase.ErrStorageOperationFailed):
-			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrStorageOperationFailed)
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
+			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
 		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
@@ -171,10 +176,4 @@ func (handler *BuyerHandler) Delete() http.HandlerFunc {
 		}
 		jsonResponse(writer, http.StatusNoContent, nil)
 	}
-}
-
-func jsonResponse(writer http.ResponseWriter, statusCode int, data any) {
-	response.JSON(writer, statusCode, map[string]any{
-		"data": data,
-	})
 }

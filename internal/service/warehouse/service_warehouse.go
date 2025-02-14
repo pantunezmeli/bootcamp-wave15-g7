@@ -2,8 +2,9 @@ package warehouse
 
 import (
 	"errors"
+	"fmt"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
+	customErrors "github.com/pantunezmeli/bootcamp-wave15-g7/internal/errors"
 	repository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/warehouse"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/warehouse"
 )
@@ -26,29 +27,18 @@ func NewWareHouseService(rp repository.IWareHouseRepository) *WarehouseService {
 // ! 1)
 func (s *WarehouseService) FindAll() (w map[int]dto.WareHouseDoc, err error) {
 
-	wareHouses, err := s.rp.GetAllWareHouses()
+	warehouses, err := s.rp.GetAllWareHouses()
 
 	if err != nil {
-		return map[int]dto.WareHouseDoc{}, err
-	}
-	w = s.MapWareHouseToDTO(wareHouses)
-
-	return
-}
-
-// TODO mover al DTO
-func (s *WarehouseService) MapWareHouseToDTO(w []models.WareHouse) (r map[int]dto.WareHouseDoc) {
-	r = make(map[int]dto.WareHouseDoc)
-	for _, wh := range w {
-		r[wh.Id.GetId()] = dto.WareHouseDoc{
-			Id:                 wh.Id.GetId(),
-			WareHouseCode:      wh.WareHouseCode.GetWareHouseCode(),
-			Address:            wh.Address.GetAddress(),
-			Telephone:          wh.Telephone.GetTelephone(),
-			MinimunCapacity:    wh.MinimunCapacity.GetMinimunCapacity(),
-			MinimunTemperature: wh.MinimunTemperature.GetMinimunTemperature(),
+		switch {
+		case errors.Is(err, customErrors.ErrMappingData):
+			return map[int]dto.WareHouseDoc{}, customErrors.ErrConvertion{Err: err}
+		default:
+			return map[int]dto.WareHouseDoc{}, customErrors.ErrDatabase{Err: fmt.Errorf("unexpected error: %w", err)}
 		}
 	}
+	w = dto.MapWarehousesToDTO(warehouses)
+
 	return
 }
 
@@ -56,12 +46,19 @@ func (s *WarehouseService) MapWareHouseToDTO(w []models.WareHouse) (r map[int]dt
 func (s *WarehouseService) GetWareHouseById(id int) (w dto.WareHouseDoc, err error) {
 	wh, err := s.rp.GetWareHouseById(id)
 	if err != nil {
-		return dto.WareHouseDoc{}, ErrWareHouseNotFound
+		switch {
+		case errors.Is(err, customErrors.ErrMappingData):
+			return dto.WareHouseDoc{}, customErrors.ErrConvertion{Err: err}
+		case errors.Is(err, customErrors.ErrWarehouseNotFound):
+			return dto.WareHouseDoc{}, customErrors.ErrNotFound{Err: err}
+		default:
+			return dto.WareHouseDoc{}, customErrors.ErrDatabase{Err: fmt.Errorf("unexpected error: %w", err)}
+		}
 	}
 
 	whDTO, err := dto.WareHouseDoc{}.ConvertToDTO(wh)
 	if err != nil {
-		return dto.WareHouseDoc{}, err
+		return dto.WareHouseDoc{}, customErrors.ErrConvertion{Err: err}
 	}
 	return whDTO, nil
 }
@@ -74,18 +71,22 @@ func (s *WarehouseService) AddWareHouse(req dto.WareHouseDoc) (dto.WareHouseDoc,
 		return dto.WareHouseDoc{}, ErrInvalidParameter{Parameter: err.Error()}
 	}
 
-	_, err = s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
-	if err == nil {
-		return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
-	}
-
-	if err != repository.ErrWareHouseCodeNotFound {
-		return dto.WareHouseDoc{}, err
-	}
-
 	createdWarehouse, err := s.rp.CreateNewWareHouse(warehouse)
 	if err != nil {
-		return dto.WareHouseDoc{}, err
+		switch {
+		case errors.Is(err, customErrors.ErrForeignKeyViolation):
+			return dto.WareHouseDoc{}, customErrors.ErrForeignKey{Err: err}
+		case errors.Is(err, customErrors.ErrWarehouseCodeDuplicate):
+			return dto.WareHouseDoc{}, customErrors.ErrDuplicate{Err: err}
+		case errors.Is(err, customErrors.ErrDBGenericError):
+			return dto.WareHouseDoc{}, customErrors.ErrDatabase{Err: err}
+		case errors.Is(err, customErrors.ErrInsertingData):
+			return dto.WareHouseDoc{}, customErrors.ErrDatabase{Err: err}
+		case errors.Is(err, customErrors.ErrGettingLastID), errors.Is(err, customErrors.ErrConvertingID):
+			return dto.WareHouseDoc{}, customErrors.ErrDatabase{Err: err}
+		default:
+			return dto.WareHouseDoc{}, customErrors.ErrDatabase{Err: fmt.Errorf("unexpected error: %w", err)}
+		}
 	}
 
 	whDTO, err := dto.WareHouseDoc{}.ConvertToDTO(createdWarehouse)
@@ -109,12 +110,12 @@ func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (whDTO dt
 		return dto.WareHouseDoc{}, ErrInvalidParameter{Parameter: err.Error()}
 	}
 
-	if warehouse.WareHouseCode.GetWareHouseCode() != existingWarehouse.WareHouseCode.GetWareHouseCode() {
-		_, err := s.rp.GetWareHouseByCode(warehouse.WareHouseCode.GetWareHouseCode())
-		if err == nil {
-			return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
-		}
-	}
+	// if warehouse.WareHouseCode != existingWarehouse.WareHouseCode {
+	// 	_, err := s.rp.GetWareHouseByCode(string(warehouse.WareHouseCode))
+	// 	if err == nil {
+	// 		return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
+	// 	}
+	// }
 
 	warehouse.Id = existingWarehouse.Id
 

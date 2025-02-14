@@ -11,7 +11,6 @@ type IWareHouseRepository interface {
 	GetWareHouseById(id int) (wh models.WareHouse, err error)
 
 	//! 3)
-	GetWareHouseByCode(code string) (wh models.WareHouse, err error)
 	CreateNewWareHouse(wh models.WareHouse) (w models.WareHouse, err error)
 
 	// //! 4)

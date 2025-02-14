@@ -3,11 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
+	customErrors "github.com/pantunezmeli/bootcamp-wave15-g7/internal/errors"
 	service "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/warehouse"
 	e "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/warehouse"
@@ -17,7 +19,6 @@ type WareHouseHandler struct {
 	sv service.IWareHouseService
 }
 
-// Constructor
 func NewWareHouseHandler(sv service.IWareHouseService) *WareHouseHandler {
 	return &WareHouseHandler{sv: sv}
 }
@@ -28,8 +29,20 @@ func (h *WareHouseHandler) Get() http.HandlerFunc {
 
 		wh, err := h.sv.FindAll()
 		if err != nil {
-			e.JSONError(w, http.StatusInternalServerError, "please try again later")
-			return
+			var errMap customErrors.ErrConvertion
+			var errDB customErrors.ErrDatabase
+
+			switch {
+			case errors.As(err, &errMap):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			case errors.As(err, &errDB):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			default:
+				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
+				return
+			}
 		}
 
 		var whList []dto.WareHouseDoc
@@ -57,12 +70,24 @@ func (h *WareHouseHandler) GetById() http.HandlerFunc {
 		wh, err := h.sv.GetWareHouseById(id)
 
 		if err != nil {
-			if errors.Is(err, service.ErrWareHouseNotFound) {
-				e.JSONError(w, http.StatusNotFound, "warehouse not found")
+			var errNotFound customErrors.ErrNotFound
+			var errMap customErrors.ErrConvertion
+			var errDB customErrors.ErrDatabase
+
+			switch {
+			case errors.As(err, &errNotFound):
+				e.JSONError(w, http.StatusNotFound, fmt.Sprintf("warehouse with id %d not found", id))
+				return
+			case errors.As(err, &errMap):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			case errors.As(err, &errDB):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			default:
+				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
 				return
 			}
-			e.JSONError(w, http.StatusInternalServerError, "please try again later")
-			return
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
@@ -84,27 +109,39 @@ func (h *WareHouseHandler) Create() http.HandlerFunc {
 		}
 
 		if req.WareHouseCode == "" || req.Address == "" || req.Telephone == "" ||
-			req.MinimunCapacity <= 0 || req.MinimunTemperature < -100 {
+			req.LocalityId <= 0 {
 			e.JSONError(w, http.StatusUnprocessableEntity, "missing or invalid required fields")
 			return
 		}
 
 		wh, err := h.sv.AddWareHouse(req)
-
 		if err != nil {
-			if errors.Is(err, service.ErrWareHouseCodeAlreadyExists) {
-				e.JSONError(w, http.StatusConflict, "warehouse with warehouse_code already exists")
+			var errFK customErrors.ErrForeignKey
+			var errDuplicate customErrors.ErrDuplicate
+			var errValidation customErrors.ErrInvalidParameter
+			var errDB customErrors.ErrDatabase
+			var errDTO customErrors.ErrConvertion
+
+			switch {
+			case errors.As(err, &errValidation):
+				e.JSONError(w, http.StatusBadRequest, "some values are not valid")
+				return
+			case errors.As(err, &errFK):
+				e.JSONError(w, http.StatusNotFound, "locality does not exists")
+				return
+			case errors.As(err, &errDuplicate):
+				e.JSONError(w, http.StatusConflict, fmt.Sprintf("warehouse with warehouse code %s already exists", req.WareHouseCode))
+				return
+			case errors.As(err, &errDB):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			case errors.As(err, &errDTO):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			default:
+				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
 				return
 			}
-
-			var invalidFieldErr *service.ErrInvalidParameter
-			if errors.As(err, &invalidFieldErr) {
-				e.JSONError(w, http.StatusBadRequest, err.Error())
-				return
-			}
-
-			e.JSONError(w, http.StatusInternalServerError, "please try again later")
-			return
 		}
 
 		response.JSON(w, http.StatusCreated, map[string]any{

@@ -55,12 +55,12 @@ func (w WareHouseDoc) ConvertToModel(req WareHouseDoc) (models.WareHouse, error)
 
 func (w WareHouseDoc) ConvertToDTO(req models.WareHouse) (wh WareHouseDoc, err error) {
 	return WareHouseDoc{
-		Id:                 value_objects.Id.GetId(req.Id),                                                 // Convertir value object Id a int
-		WareHouseCode:      value_objects.WareHouseCode.GetWareHouseCode(req.WareHouseCode),                // Convertir value object WareHouseCode a string
-		Address:            value_objects.Address.GetAddress(req.Address),                                  // Convertir value object Address a string
-		Telephone:          value_objects.Telephone.GetTelephone(req.Telephone),                            // Convertir value object Telephone a string
-		MinimunCapacity:    value_objects.MinimunCapacity.GetMinimunCapacity(req.MinimunCapacity),          // Convertir value object MinimunCapacity a int
-		MinimunTemperature: value_objects.MinimunTemperature.GetMinimunTemperature(req.MinimunTemperature), // Convertir value object MinimunTemperature a int
+		Id:                 value_objects.Id.GetId(req.Id),
+		WareHouseCode:      value_objects.WareHouseCode.GetWareHouseCode(req.WareHouseCode),
+		Address:            value_objects.Address.GetAddress(req.Address),
+		Telephone:          value_objects.Telephone.GetTelephone(req.Telephone),
+		MinimunCapacity:    value_objects.MinimunCapacity.GetMinimunCapacity(req.MinimunCapacity),
+		MinimunTemperature: value_objects.MinimunTemperature.GetMinimunTemperature(req.MinimunTemperature),
 	}, nil
 }
 

@@ -7,6 +7,7 @@ import (
 var (
 	ErrInvalidLocalityId  = errors.New("invalid locality id")
 	ErrInvalidCompanyName = errors.New("invalid company name")
+	ErrInvalidCid         = errors.New("invalid cid")
 )
 
 // ############################# Locality ID ######################################

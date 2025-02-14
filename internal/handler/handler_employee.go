@@ -148,9 +148,11 @@ func (h *DefaultHandler) ReportInboundOrders() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
 		id := r.URL.Query().Get("id")
-		if _, errId := strconv.Atoi(id); errId != nil {
-			dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
-			return
+		if id != "" {
+			if _, errId := strconv.Atoi(id); errId != nil {
+				dto.JSONError(w, http.StatusBadRequest, ErrInvalidId.Error())
+				return
+			}
 		}
 
 		// process

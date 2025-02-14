@@ -83,6 +83,11 @@ func (r ProductRecordsRepository) getAllEntity(rows *sql.Rows, records *[]m.Reco
 		*records = append(*records, record)
 	}
 
+	if errRows := rows.Err(); errRows != nil {
+		err = errdb.ErrDB{Message: "Error map Records Data"}
+		return
+	}
+
 	if len(*records) == 0 {
 		err = ErrRecordsNotFound
 		return
@@ -96,11 +101,6 @@ func (r ProductRecordsRepository) getEntity(rows *sql.Rows, record *m.RecordsDat
 
 	if errScan := rows.Scan(&idProduct, &record.Description, &record.RecordsCount); errScan != nil {
 		return errdb.ErrDB{Message: "Error reading Records Data"}
-	}
-
-	if errRows := rows.Err(); errRows != nil {
-		err = errdb.ErrDB{Message: "Error map Records Data"}
-		return
 	}
 
 	record.ProductId, err = value_objects.NewProductId(idProduct)

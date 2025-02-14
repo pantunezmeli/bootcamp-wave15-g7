@@ -1,11 +1,13 @@
 package value_objects
 
 import (
+	"strings"
+
 	errorbase "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/error_base"
 )
 
 type CardNumberId struct {
-	value int
+	value string
 }
 
 type FirstName struct {
@@ -16,19 +18,20 @@ type LastName struct {
 	last_Name string
 }
 
-func NewCardNumberId(id int) (cardNumber CardNumberId, err error) {
-
-	if id <= 0 {
+func NewCardNumberId(id string) (cardNumber CardNumberId, err error) {
+	id = strings.TrimSpace(id)
+	if id == "" {
 		return CardNumberId{}, errorbase.ErrInvalidId
 	}
 	return CardNumberId{value: id}, nil
 }
 
-func (c CardNumberId) GetCardNumberId() int {
+func (c CardNumberId) GetCardNumberId() string {
 	return c.value
 }
 
 func NewFirstName(firstName string) (FirstName, error) {
+	firstName = strings.TrimSpace(firstName)
 	if firstName == "" {
 		return FirstName{}, errorbase.ErrEmptyParameters
 	}
@@ -40,6 +43,7 @@ func (f FirstName) GetFirstName() string {
 }
 
 func NewLastName(lastName string) (LastName, error) {
+	lastName = strings.TrimSpace(lastName)
 	if lastName == "" {
 		return LastName{}, errorbase.ErrEmptyParameters
 	}

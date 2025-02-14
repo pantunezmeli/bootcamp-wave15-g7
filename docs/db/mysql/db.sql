@@ -158,7 +158,7 @@ DROP TABLE IF EXISTS `inbound_orders`;
 CREATE TABLE inbound_orders (
    `id` INT PRIMARY KEY auto_increment,
    `order_date` DATETIME(6),
-   `order_number` VARCHAR(255),
+   `order_number` VARCHAR(255) unique,
 	`employee_id` int,
 	`product_batch_id` int,
    `warehouses_id` int,

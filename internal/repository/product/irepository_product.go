@@ -2,7 +2,7 @@ package product
 
 import (
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	err "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product/errordb"
 )
 
 type ErrProductRepository struct {
@@ -14,15 +14,15 @@ func (e ErrProductRepository) Error() string {
 }
 
 var (
-	ErrProductNotFound = ErrProductRepository{msg: "Product not found"}
+	ErrProductNotFound         = err.ErrNotFound{Message: "Product Not Found"}
+	ErrProductCodeAlreadyExist = err.ErrConflict{Message: "Product Code Already Exist"}
 )
 
 type IProductRepository interface {
 	GetAll() (map[int]models.Product, error)
 	GetByID(id int) (models.Product, error)
-	CreateProduct(product models.Product) error
+	CreateProduct(product *models.Product) error
 	DeleteProduct(id int) error
-	ProductCodeExist(productCode string) (bool, error)
-	GetLastID() value_objects.Id
+	ProductCodeExist(productCode string) error
 	UpdateProduct(product models.Product) error
 }

@@ -6,8 +6,10 @@ import (
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
+	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product/errsv"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 	product2 "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/product"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -119,17 +121,25 @@ func (h ProductHandle) Update() http.HandlerFunc {
 func validErrorResponse(w http.ResponseWriter, err error) {
 
 	switch {
-	case errors.As(err, &product.ErrNotFoundProduct{}):
+	case errors.As(err, &errsv.ErrNotFoundEntity{}):
 		dto.JSONError(w, http.StatusNotFound, err.Error())
+		log.Println(err.Error())
 
-	case errors.As(err, &product.ErrValidProduct{}):
+	case errors.As(err, &errsv.ErrValidEntity{}):
 		dto.JSONError(w, http.StatusUnprocessableEntity, err.Error())
+		log.Println(err.Error())
 
-	case errors.As(err, &product.ErrProductConflict{}):
+	case errors.As(err, &errsv.ErrConflict{}):
 		dto.JSONError(w, http.StatusConflict, err.Error())
+		log.Println(err.Error())
+
+	case errors.As(err, &errsv.ErrInvalidRequest{}):
+		dto.JSONError(w, http.StatusBadRequest, err.Error())
+		log.Println(err.Error())
 
 	default:
 		dto.JSONError(w, http.StatusInternalServerError, ErrInternalServerError.Error())
+		log.Printf(err.Error())
 	}
 
 }

@@ -13,7 +13,11 @@ import (
 	// Products
 	productRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/product"
 	productService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product"
-	productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
+	//productStorage "github.com/pantunezmeli/bootcamp-wave15-g7/internal/storage/product_storage"
+
+	//ProductRecords
+	productRecordsRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/productrecords"
+	productRecordsService "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/product_records"
 
 	// Sellers
 	sellerRepository "github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/seller"
@@ -52,12 +56,12 @@ import (
 )
 
 const (
-	productFilePath   = "../docs/db/product_data.json"
-	buyerFilePath     = "../docs/db/buyer_data.json"
-	warehouseFilePath = "../docs/db/warehouse_data.json"
-	employeeFilePath  = "../docs/db/employee_data.json"
-	sellerFilePath    = "../docs/db/seller_data.json"
-	sectionFilePath   = "../docs/db/section_data.json"
+	productFilePath   = "../docs/db/json/product_data.json"
+	buyerFilePath     = "../docs/db/json/buyer_data.json"
+	warehouseFilePath = "../docs/db/json/warehouse_data.json"
+	employeeFilePath  = "../docs/db/json/employee_data.json"
+	sellerFilePath    = "../docs/db/json/seller_data.json"
+	sectionFilePath   = "../docs/db/json/section_data.json"
 )
 
 type ConfigServerChi struct {
@@ -131,10 +135,15 @@ func (a *ServerChi) Run() (err error) {
 	warehouseHandler := handler.NewWareHouseHandler(warehouseService)
 
 	// Product
-	productStorage := productStorage.NewProductJSONFile(productFilePath)
-	productRepository := productRepository.NewProductRepositoryMap(productStorage)
+	//productStorage := productStorage.NewProductJSONFile(productFilePath)
+	productRepository := productRepository.NewProductRepositoryMysql(dbConn)
 	productService := productService.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
+
+	//ProductRecords
+	productRecordsRepository := productRecordsRepository.NewProductRecordsRepository(dbConn)
+	productRecordsService := productRecordsService.NewProductRecordsService(productRecordsRepository)
+	productRecordsHandler := handler.NewHandlerProductRecords(productRecordsService)
 
 	// Sections
 	sectionStorage := sectionStorage.NewSectionJSONFile(sectionFilePath)
@@ -194,6 +203,11 @@ func (a *ServerChi) Run() (err error) {
 			rt.Post("/", productHandler.Create())
 			rt.Patch("/{id}", productHandler.Update())
 			rt.Delete("/{id}", productHandler.Delete())
+			rt.Get("/reportRecords", productRecordsHandler.GetRecords())
+		})
+
+		r.Route("/productRecords", func(rt chi.Router) {
+			rt.Post("/", productRecordsHandler.Create())
 		})
 
 		r.Route("/employees", func(rt chi.Router) {

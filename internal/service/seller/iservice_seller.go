@@ -11,6 +11,7 @@ const (
 	CidString = "cid"
 	TelephoneString = "telephone"
 	CompanyNameString = "company_name"
+	LocalityIdString = "locality_id"
 )
 type ErrMissingParameters struct {
 	missingParameter string;
@@ -31,7 +32,7 @@ func(e *ErrInvalidParameter) Error() string {
 type SellerService interface {
 	GetAll() (sellers []seller_dto.SellerDoc, err error)
 	GetById(int) (seller seller_dto.SellerDoc, err error)
-	Save(seller_dto.SellerDoc) (seller seller_dto.SellerDoc, err error)
+	Save(seller_dto.SellerRequest) (seller seller_dto.SellerDoc, err error)
 	Delete(id int) (err error)
-	Update(reqBody seller_dto.SellerDoc) (seller seller_dto.SellerDoc, err error)
+	Update(reqBody seller_dto.SellerRequest, id int) (seller seller_dto.SellerDoc, err error)
 }

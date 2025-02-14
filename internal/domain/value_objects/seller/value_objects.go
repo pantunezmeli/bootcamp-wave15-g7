@@ -1,4 +1,4 @@
-package value_objects
+package seller
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ var (
 	validTelephoneRegex = `^[0-9+\-()\s]+$`
 
 	ErrSellerInvalidId        = errors.New("id should be a positive number")
-	ErrInvalidCid             = errors.New("cid should be a positive number")
+	ErrInvalidCid             = errors.New("cid should be a valid string")
 	ErrCompanyNameTooShort    = errors.New("company name must be at least 2 characters long")
 	ErrCompanyNameTooLong     = errors.New("company name must not exceed 100 characters")
 	ErrAddressTooShort        = errors.New("address must be at least 2 characters long")
@@ -26,47 +26,29 @@ var (
 	ErrSellerInvalidTelephone = errors.New("telephone contains invalid characters")
 )
 
-// type Id struct {
-// 	value int
-// }
-
-type SellerId struct {
-	value int
-}
-
+type SellerId int
 func NewSellerId(value int) (id SellerId, err error) {
 	if value <= 0 {
 		err = ErrSellerInvalidId
 		return
 	}
-	id = SellerId{value: value}
+	id = SellerId(value)
 	return
 }
 
-func (id SellerId) Value() *int {
-	return &id.value
-}
 
-type Cid struct {
-	value int
-}
+type Cid string
 
-func NewCid(value int) (cid Cid, err error) {
-	if value <= 0 {
+func NewCid(value string) (cid Cid, err error) {
+	if len(value) <= 1 {
 		err = ErrInvalidCid
-		return
 	}
-	cid = Cid{value: value}
+	cid = Cid(value)
 	return
 }
 
-func (c Cid) Value() *int {
-	return &c.value
-}
 
-type CompanyName struct {
-	value string
-}
+type CompanyName string
 
 func NewCompanyName(value string) (companyName CompanyName, err error) {
 	value = strings.TrimSpace(value)
@@ -74,38 +56,22 @@ func NewCompanyName(value string) (companyName CompanyName, err error) {
 		return
 	}
 
-	companyName = CompanyName{value}
+	companyName = CompanyName(value)
 	return
 }
 
-func (c CompanyName) Value() *string {
-	return &c.value
-}
-
-type SellerAddress struct {
-	value string
-}
+type SellerAddress string
 
 func NewSellerAddress(value string) (address SellerAddress, err error) {
 	if err = validateLength(value, AddressMin, AddressMax, ErrAddressTooShort, ErrAddressTooLong); err != nil {
 		return
 	}
-	address = SellerAddress{value}
+	address = SellerAddress(value)
 	return
 
 }
 
-func (a SellerAddress) Value() *string {
-	return &a.value
-}
-
-// type Telephone struct {
-// 	value string
-// }
-
-type SellerTelephone struct {
-	value string
-}
+type SellerTelephone string
 
 func NewSellerTelephone(value string) (telephone SellerTelephone, err error) {
 	if err = validateLength(value, TelephoneMin, TelephoneMax, ErrTelephoneTooShort, ErrTelephoneTooLong); err != nil {
@@ -115,19 +81,8 @@ func NewSellerTelephone(value string) (telephone SellerTelephone, err error) {
 	if err = validateTelephone(value); err != nil {
 		return
 	}
-	telephone = SellerTelephone{value}
+	telephone = SellerTelephone(value)
 	return
-}
-
-// 	if err = validateTelephone(value); err != nil{
-// 		return
-// 	}
-// 	telephone = Telephone{value}
-// 	return
-// }
-
-func (t SellerTelephone) Value() *string {
-	return &t.value
 }
 
 func validateLength(value string, min, max int, errMin, errMax error) error {
@@ -143,7 +98,8 @@ func validateLength(value string, min, max int, errMin, errMax error) error {
 func validateTelephone(value string) error {
 	validTelephone := regexp.MustCompile(validTelephoneRegex)
 	if !validTelephone.MatchString(value) {
-		return ErrInvalidTelephone
+		return ErrSellerInvalidTelephone
 	}
 	return nil
 }
+

@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/bootcamp-go/web/response"
+	customErrors "github.com/pantunezmeli/bootcamp-wave15-g7/internal/errors"
 	service "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/carrier"
 	e "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
 	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/carrier"
@@ -39,11 +40,11 @@ func (h *CarrierHandler) Create() http.HandlerFunc {
 
 		carrier, err := h.sv.AddCarrier(req)
 		if err != nil {
-			var errFK service.ErrForeignKey
-			var errDuplicate service.ErrDuplicate
-			var errValidation service.ErrInvalidParameter
-			var errDB service.ErrDatabase
-			var errDTO service.ErrConvertion
+			var errFK customErrors.ErrForeignKey
+			var errDuplicate customErrors.ErrDuplicate
+			var errValidation customErrors.ErrInvalidParameter
+			var errDB customErrors.ErrDatabase
+			var errDTO customErrors.ErrConvertion
 
 			switch {
 			case errors.As(err, &errValidation):
@@ -75,21 +76,26 @@ func (h *CarrierHandler) Create() http.HandlerFunc {
 func (h *CarrierHandler) GetCarriesAmount() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.URL.Query().Get("id")
-		if idStr == "" {
-			e.JSONError(w, http.StatusBadRequest, "missing locality ID")
-			return
-		}
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			e.JSONError(w, http.StatusBadRequest, "invalid id parameter")
-			return
+
+		var id *int
+		if idStr != "" {
+			parsedID, err := strconv.Atoi(idStr)
+			if err != nil {
+				e.JSONError(w, http.StatusBadRequest, "invalid id parameter")
+				return
+			}
+			id = &parsedID
 		}
 
 		res, err := h.sv.GetCarriesAmount(id)
 		if err != nil {
-			var errDB service.ErrDatabase
-			var errDTO service.ErrConvertion
+			var errDB customErrors.ErrDatabase
+			var errDTO customErrors.ErrConvertion
+			var errNotFound customErrors.ErrNotFound
 			switch {
+			case errors.As(err, &errNotFound):
+				e.JSONError(w, http.StatusNotFound, "locality not found")
+				return
 			case errors.As(err, &errDB):
 				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
 				return
@@ -104,7 +110,7 @@ func (h *CarrierHandler) GetCarriesAmount() http.HandlerFunc {
 				return
 			}
 		}
-		response.JSON(w, http.StatusCreated, map[string]any{
+		response.JSON(w, http.StatusOK, map[string]any{
 			"data": res,
 		})
 	}

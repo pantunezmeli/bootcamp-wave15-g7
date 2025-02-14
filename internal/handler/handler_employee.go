@@ -39,6 +39,7 @@ func (h *DefaultHandler) Get() http.HandlerFunc {
 		employees, err := h.sv.FindAll()
 		if err != nil {
 			h.handleError(w, err)
+			return
 		}
 
 		// response
@@ -61,6 +62,7 @@ func (h *DefaultHandler) GetById() http.HandlerFunc {
 		employee, err := h.sv.FindById(id)
 		if err != nil {
 			h.handleError(w, err)
+			return
 		}
 
 		// response
@@ -83,6 +85,7 @@ func (h *DefaultHandler) Create() http.HandlerFunc {
 		newEmployee, err := h.sv.New(employeeData)
 		if err != nil {
 			h.handleError(w, err)
+			return
 		}
 
 		// response
@@ -111,6 +114,7 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 		updatedEmployee, err := h.sv.Edit(id, employeeData)
 		if err != nil {
 			h.handleError(w, err)
+			return
 		}
 
 		// response
@@ -132,6 +136,7 @@ func (h *DefaultHandler) Delete() http.HandlerFunc {
 		err = h.sv.DeleteById(id)
 		if err != nil {
 			h.handleError(w, err)
+			return
 		}
 
 		// response
@@ -152,6 +157,7 @@ func (h *DefaultHandler) ReportInboundOrders() http.HandlerFunc {
 		employee, err := h.sv.ReportInboundOrders(id)
 		if err != nil {
 			h.handleError(w, err)
+			return
 		}
 
 		// response

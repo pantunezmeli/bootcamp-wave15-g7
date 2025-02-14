@@ -35,6 +35,7 @@ func (h *InboundOrderHandler) Create() http.HandlerFunc {
 		newInboundOrder, err := h.sv.New(inboundOrderData)
 		if err != nil {
 			h.handleError(w, err)
+			return
 		}
 
 		// response

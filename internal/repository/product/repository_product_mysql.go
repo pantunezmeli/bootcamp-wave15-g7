@@ -76,7 +76,7 @@ func (r RepositoryProductMysql) GetByID(id int) (product m.Product, err error) {
 
 func (r RepositoryProductMysql) CreateProduct(product *m.Product) (err error) {
 	result, errQuery := r.db.Exec(`insert into products (description, expiration_rate, freezing_rate, height, length, net_weight, product_code, recommended_freezing_temperature, width, product_type_id, seller_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		product.Description, product.ExpirationRate, product.FreezingRate, product.Height, product.Length, product.NetWeight, product.ProductCode, product.RecommendedFreezingTemperature, product.Width, product.ProductTypeID, product.SellerID.Value())
+		product.Description, product.ExpirationRate, product.FreezingRate, product.Height, product.Length, product.NetWeight, product.ProductCode, product.RecommendedFreezingTemperature, product.Width, product.ProductTypeID, product.SellerID)
 	if errQuery != nil {
 		err = errQuery
 		r.errorMysql(&err, "Error creating product")
@@ -124,7 +124,7 @@ func (r RepositoryProductMysql) ProductCodeExist(productCode string) (err error)
 
 func (r RepositoryProductMysql) UpdateProduct(product m.Product) (err error) {
 	_, errQuery := r.db.Exec(`update products set  description = ?, expiration_rate = ?, freezing_rate = ?, height = ?, length = ?, net_weight = ?, product_code = ?, recommended_freezing_temperature = ?, width = ?, product_type_id = ?, seller_id = ? where id = ?`,
-		product.Description, product.ExpirationRate, product.FreezingRate, product.Height, product.Length, product.NetWeight, product.ProductCode, product.RecommendedFreezingTemperature, product.Width, product.ProductTypeID, product.SellerID.Value(), product.ID)
+		product.Description, product.ExpirationRate, product.FreezingRate, product.Height, product.Length, product.NetWeight, product.ProductCode, product.RecommendedFreezingTemperature, product.Width, product.ProductTypeID, product.SellerID, product.ID)
 	if errQuery != nil {
 		err = errQuery
 		r.errorMysql(&err, "Error update product")
@@ -153,9 +153,8 @@ func (r RepositoryProductMysql) getAllEntity(rows *sql.Rows, products *map[int]m
 }
 
 func (r RepositoryProductMysql) getEntity(rows *sql.Rows, p *m.Product) (err error) {
-	var idSeller int
 
-	if errScan := rows.Scan(&p.ID, &p.Description, &p.ExpirationRate, &p.FreezingRate, &p.Height, &p.Length, &p.NetWeight, &p.ProductCode, &p.RecommendedFreezingTemperature, &p.Width, &p.ProductTypeID, &idSeller); errScan != nil {
+	if errScan := rows.Scan(&p.ID, &p.Description, &p.ExpirationRate, &p.FreezingRate, &p.Height, &p.Length, &p.NetWeight, &p.ProductCode, &p.RecommendedFreezingTemperature, &p.Width, &p.ProductTypeID, &p.SellerID); errScan != nil {
 		return errdb.ErrDB{Message: "Error reading product"}
 	}
 
@@ -164,7 +163,6 @@ func (r RepositoryProductMysql) getEntity(rows *sql.Rows, p *m.Product) (err err
 		return
 	}
 
-	p.SellerID, err = value_objects.NewSellerId(idSeller)
 	return
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects"
+	sellerVo "github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/value_objects/seller"
 )
 
 type ProductDTO struct {
@@ -22,7 +23,7 @@ type ProductDTO struct {
 	SellerID                       int     `json:"seller_id,omitempty"`
 }
 
-func ParseDTOProduct(productTypeID value_objects.ProductTypeId, sellerID value_objects.SellerId, product ProductDTO) models.Product {
+func ParseDTOProduct(productTypeID value_objects.ProductTypeId, sellerID sellerVo.SellerId, product ProductDTO) models.Product {
 	id, _ := value_objects.NewProductId(product.ID)
 
 	return models.Product{
@@ -69,6 +70,6 @@ func ParserProductToDTO(p models.Product) ProductDTO {
 		RecommendedFreezingTemperature: p.RecommendedFreezingTemperature,
 		Width:                          p.Width,
 		ProductTypeID:                  int(p.ProductTypeID),
-		SellerID:                       *p.SellerID.Value(),
+		SellerID:                       int(p.SellerID),
 	}
 }

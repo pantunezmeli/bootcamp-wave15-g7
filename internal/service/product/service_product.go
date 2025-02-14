@@ -60,10 +60,15 @@ func (p ProductService) UpdateProduct(id int, patch product2.UpdateProductReques
 	return product2.ParserProductToDTO(productSearch), nil
 }
 
-func (p ProductService) GetAll() ([]product2.ProductDTO, error) {
+func (p ProductService) GetAll() (productsDto []product2.ProductDTO, err error) {
 	products, errSearch := p.rp.GetAll()
 	if errSearch != nil {
-		return make([]product2.ProductDTO, 0), errSearch
+		if errors.Is(errSearch, rp.ErrProductNotFound) {
+			err = errsv.ErrNotFoundEntity{Message: "Product not found"}
+			return
+		}
+		err = errsv.ErrService{Message: "Error searching product"}
+		return
 	}
 	return product2.ParserMapProductToListDTO(products), nil
 }

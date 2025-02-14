@@ -8,6 +8,5 @@ type IRepositoryPurchase interface {
 	GetReportPurchaseOrders() ([]models.ReportPurchaseOrders, error)
 	GetReportPurchaseOrdersById(id int) (models.ReportPurchaseOrders, error)
 	CreatePurchaseOrder(entity models.PurchaseOrder) (models.PurchaseOrder, error)
-	OrderNumberExist(order string) bool
-	TrackingCodeExist(code string) bool
+	ElementExist(number string, query string) bool
 }

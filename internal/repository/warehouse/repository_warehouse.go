@@ -3,7 +3,6 @@ package warehouse
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
@@ -98,17 +97,14 @@ func (r *WareHouseRepository) CreateNewWareHouse(warehouse models.WareHouse) (mo
 		if errors.As(err, &mysqlErr) {
 			switch mysqlErr.Number {
 			case 1452:
-				fmt.Println("Entré en el caso de que no existe la foranea")
 				return models.WareHouse{}, customErrors.ErrForeignKeyViolation
 			case 1062:
-				fmt.Println("Entré en el ya existe un warehouse code igual")
 				return models.WareHouse{}, customErrors.ErrWarehouseCodeDuplicate
 			default:
-				fmt.Println("Entré en el caso de que tengo un error genérico de BD")
 				return models.WareHouse{}, customErrors.ErrDBGenericError
 			}
 		}
-		fmt.Println("Error insertando el elemento en la BD")
+
 		return models.WareHouse{}, customErrors.ErrInsertingData
 	}
 
@@ -136,11 +132,22 @@ func (r *WareHouseRepository) UpdateWarehouse(warehouse models.WareHouse) error 
 		warehouse.WareHouseCode,
 		warehouse.Address,
 		warehouse.Telephone,
-		warehouse.Id,
 		warehouse.LocalityId,
+		warehouse.Id,
 	)
 	if err != nil {
-		return err // ErrExecutingDB
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) {
+			switch mysqlErr.Number {
+			case 1452:
+				return customErrors.ErrForeignKeyViolation
+			case 1062:
+				return customErrors.ErrWarehouseCodeDuplicate
+			default:
+				return customErrors.ErrDBGenericError
+			}
+		}
+		return customErrors.ErrDBGenericError
 	}
 
 	return nil

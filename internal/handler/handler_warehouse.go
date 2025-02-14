@@ -174,24 +174,32 @@ func (h *WareHouseHandler) Update() http.HandlerFunc {
 		wh, err := h.sv.EditWareHouse(id, req)
 
 		if err != nil {
-			if errors.Is(err, service.ErrWareHouseNotFound) {
+			var errFK customErrors.ErrForeignKey
+			var errDuplicate customErrors.ErrDuplicate
+			var errNotFound customErrors.ErrNotFound
+			var errDB customErrors.ErrDatabase
+			var errDTO customErrors.ErrConvertion
+
+			switch {
+			case errors.As(err, &errNotFound):
 				e.JSONError(w, http.StatusNotFound, "warehouse not found")
 				return
-			}
-
-			if errors.Is(err, service.ErrWareHouseCodeAlreadyExists) {
-				e.JSONError(w, http.StatusConflict, "warehouse with taht code already exists")
+			case errors.As(err, &errFK):
+				e.JSONError(w, http.StatusConflict, "locality does not exists")
+				return
+			case errors.As(err, &errDuplicate):
+				e.JSONError(w, http.StatusConflict, fmt.Sprintf("warehouse with warehouse code %s already exists", req.WareHouseCode))
+				return
+			case errors.As(err, &errDB):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			case errors.As(err, &errDTO):
+				e.JSONError(w, http.StatusInternalServerError, "something went wrong, try again later")
+				return
+			default:
+				e.JSONError(w, http.StatusInternalServerError, "unexpected error, try again later")
 				return
 			}
-
-			var invalidFieldErr *service.ErrInvalidParameter
-			if errors.As(err, &invalidFieldErr) {
-				e.JSONError(w, http.StatusBadRequest, err.Error())
-				return
-			}
-
-			e.JSONError(w, http.StatusInternalServerError, "please try again later")
-			return
 		}
 
 		response.JSON(w, http.StatusOK, map[string]any{

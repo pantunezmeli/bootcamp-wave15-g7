@@ -102,7 +102,7 @@ func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (whDTO dt
 
 	existingWarehouse, err := s.rp.GetWareHouseById(id)
 	if err != nil {
-		return dto.WareHouseDoc{}, ErrWareHouseNotFound
+		return dto.WareHouseDoc{}, customErrors.ErrNotFound{Err: err}
 	}
 
 	warehouse, err := req.ConvertToModelPatch(req, existingWarehouse)
@@ -110,23 +110,25 @@ func (s *WarehouseService) EditWareHouse(id int, req dto.WareHouseDoc) (whDTO dt
 		return dto.WareHouseDoc{}, ErrInvalidParameter{Parameter: err.Error()}
 	}
 
-	// if warehouse.WareHouseCode != existingWarehouse.WareHouseCode {
-	// 	_, err := s.rp.GetWareHouseByCode(string(warehouse.WareHouseCode))
-	// 	if err == nil {
-	// 		return dto.WareHouseDoc{}, ErrWareHouseCodeAlreadyExists
-	// 	}
-	// }
-
 	warehouse.Id = existingWarehouse.Id
 
 	err = s.rp.UpdateWarehouse(warehouse)
 	if err != nil {
-		return dto.WareHouseDoc{}, err
+		switch {
+		case errors.Is(err, customErrors.ErrForeignKeyViolation):
+			return dto.WareHouseDoc{}, customErrors.ErrForeignKey{Err: err}
+		case errors.Is(err, customErrors.ErrWarehouseCodeDuplicate):
+			return dto.WareHouseDoc{}, customErrors.ErrDuplicate{Err: err}
+		case errors.Is(err, customErrors.ErrDBGenericError):
+			return dto.WareHouseDoc{}, customErrors.ErrDatabase{Err: err}
+		default:
+			return dto.WareHouseDoc{}, customErrors.ErrDatabase{Err: fmt.Errorf("unexpected error: %w", err)}
+		}
 	}
 
 	whDTO, err = dto.WareHouseDoc{}.ConvertToDTO(warehouse)
 	if err != nil {
-		return dto.WareHouseDoc{}, err
+		return dto.WareHouseDoc{}, customErrors.ErrConvertion{Err: err}
 	}
 	return
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	sv "github.com/pantunezmeli/bootcamp-wave15-g7/internal/service/employee"
 	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	dtoEmployee "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/employee"
 )
 
 var (
@@ -79,7 +80,7 @@ func (h *DefaultHandler) GetById() http.HandlerFunc {
 func (h *DefaultHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// request
-		var employeeData dto.EmployeeDoc
+		var employeeData dtoEmployee.EmployeeDoc
 		if err := request.JSON(r, &employeeData); err != nil {
 			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return
@@ -120,7 +121,7 @@ func (h *DefaultHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		var employeeData dto.EmployeeDoc
+		var employeeData dtoEmployee.EmployeeDoc
 		if err := request.JSON(r, &employeeData); err != nil {
 			dto.JSONError(w, http.StatusBadRequest, ErrInvalidBody.Error())
 			return

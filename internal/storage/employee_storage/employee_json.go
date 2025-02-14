@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/domain/models"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/employee"
 )
 
 var ErrCardNumberExists = errors.New("card number already exists")

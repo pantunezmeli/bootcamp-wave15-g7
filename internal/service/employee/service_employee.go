@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/employee"
 )
 
 func NewDefaultService(repository employee.EmployeeRepository) *DefaultService {

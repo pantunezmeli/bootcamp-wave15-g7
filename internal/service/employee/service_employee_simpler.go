@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/pantunezmeli/bootcamp-wave15-g7/internal/repository/employee"
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/employee"
 )
 
 // Unlike DefaultService, SimpleService calls repository just once in all its methods (existence of id is repository's responsability)

@@ -3,7 +3,7 @@ package employee
 import (
 	"errors"
 
-	"github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto"
+	dto "github.com/pantunezmeli/bootcamp-wave15-g7/pkg/dto/employee"
 )
 
 var ErrEmployeeNotFound = errors.New("employee not found")

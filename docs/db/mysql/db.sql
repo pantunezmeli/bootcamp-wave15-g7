@@ -161,10 +161,10 @@ CREATE TABLE inbound_orders (
    `order_number` VARCHAR(255) unique,
 	`employee_id` int,
 	`product_batch_id` int,
-   `warehouses_id` int,
+   `warehouse_id` int,
    FOREIGN KEY (`employee_id`) REFERENCES employees(`id`),
    FOREIGN KEY (`product_batch_id`) REFERENCES product_batches(`id`),
-   FOREIGN KEY (`warehouses_id`) REFERENCES warehouses(`id`)
+   FOREIGN KEY (`warehouse_id`) REFERENCES warehouses(`id`)
 );
 
 
@@ -674,7 +674,7 @@ INSERT INTO `product_batches` (`batch_number`, `current_quantity`, `current_temp
 ('BATCH019', 70, -6.00, '2025-12-01 23:59:59.000000', 85, '2024-02-19 15:30:00.000000', '2024-02-19 15:30:00.000000', -8.00, 19, 19),
 ('BATCH020', 200, 0.00, '2025-12-15 23:59:59.000000', 220, '2024-02-20 16:45:00.000000', '2024-02-20 16:45:00.000000', -1.00, 20, 20);
 
-INSERT INTO `inbound_orders` (`order_date`, `order_number`, `employee_id`, `product_batch_id`, `warehouses_id`) VALUES
+INSERT INTO `inbound_orders` (`order_date`, `order_number`, `employee_id`, `product_batch_id`, `warehouse_id`) VALUES
 ('2024-02-01 08:30:00.000000', 'INB001', 1, 1, 1),
 ('2024-02-02 09:45:00.000000', 'INB002', 2, 2, 2),
 ('2024-02-03 10:15:00.000000', 'INB003', 3, 3, 3),

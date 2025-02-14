@@ -18,7 +18,7 @@ type InboundOrderSQL struct {
 }
 
 func (r *InboundOrderSQL) New(inboundOrder models.InboundOrder) (newInboundOrder models.InboundOrder, err error) {
-	query := "INSERT INTO inbound_orders (order_date, order_number, employee_id, product_batch_id, warehouses_id) VALUES (?, ?, ?, ?, ?)"
+	query := "INSERT INTO inbound_orders (order_date, order_number, employee_id, product_batch_id, warehouse_id) VALUES (?, ?, ?, ?, ?)"
 	result, err := r.db.Exec(query, inboundOrder.OrderDate.GetDate(), inboundOrder.OrderNumber.GetOrderNumber(), inboundOrder.EmployeeId.GetId(), inboundOrder.ProductBatchId.GetId(), inboundOrder.WareHouseId.GetId())
 	if err != nil {
 		mysqlErr, ok := err.(*mysql.MySQLError)

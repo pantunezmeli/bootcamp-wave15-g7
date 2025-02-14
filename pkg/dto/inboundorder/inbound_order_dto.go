@@ -11,7 +11,7 @@ type InboundOrderDoc struct {
 	OrderNumber    string `json:"order_number"`
 	EmployeeId     int    `json:"employee_id"`
 	ProductBatchId int    `json:"product_batch_id"`
-	WareHouseId    int    `json:"warehouses_id"`
+	WareHouseId    int    `json:"warehouse_id"`
 }
 
 func InboundOrderDtoToModel(dto InboundOrderDoc) (inboundOrder models.InboundOrder, err error) {

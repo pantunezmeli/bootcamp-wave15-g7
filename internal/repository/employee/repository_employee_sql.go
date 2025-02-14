@@ -265,6 +265,7 @@ func (r *EmployeeSQL) ReportInboundOrders(id string) (employees map[int]models.E
 
 			err = rows.Scan(&employeeId, &cardNumber, &firstName, &lastName, &warehouseId, &inboundOrders)
 			if err != nil {
+				err = ErrDatabase
 				return
 			}
 

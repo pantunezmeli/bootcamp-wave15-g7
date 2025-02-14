@@ -20,4 +20,5 @@ var (
 	ErrWareHouseFKNotExist     = errors.New("warehouse FK  not exist")
 	ErrOrderNumberExist        = errors.New("order number already exist")
 	ErrTrackingCodeExist       = errors.New("tracking code already exist")
+	ErrInvalidIdField          = errors.New("invalid id field")
 )

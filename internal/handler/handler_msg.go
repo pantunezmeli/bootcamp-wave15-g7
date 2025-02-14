@@ -28,6 +28,7 @@ var (
 	MSG_ErrCarrierFKNotExist     = "The associated carrier does not exist in the system"
 	MSG_ErrOrderStatusFKNotExist = "The associated order status does not exist in the system"
 	MSG_ErrWareHouseFKNotExist   = "The associated warehouse does not exist in the system"
+	MSG_ErrInvalidIdField        = "the id cannot be zero or empty"
 )
 
 // MSG

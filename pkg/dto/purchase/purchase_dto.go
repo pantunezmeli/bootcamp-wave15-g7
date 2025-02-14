@@ -25,7 +25,7 @@ func GeneratePurchaseResponseList(purchases []models.PurchaseOrder) []PurchaseOr
 		list = append(list, PurchaseOrderResponse{
 			ID:            value.ID,
 			OrderNumber:   value.Order_number,
-			OrderDate:     value.Order_date.Format("2006-01-02 15:04:05"),
+			OrderDate:     value.Order_date.Format("2006-01-02"),
 			TrackingCode:  value.Tracking_code,
 			BuyerID:       value.Buyer_ID,
 			CarrierID:     value.Carrier_ID,
@@ -44,7 +44,7 @@ func GeneratePurchaseResponse(new models.PurchaseOrder) PurchaseOrderResponse {
 	purchase := PurchaseOrderResponse{
 		ID:            new.ID,
 		OrderNumber:   new.Order_number,
-		OrderDate:     new.Order_date.Format("2006-01-02 15:04:05"),
+		OrderDate:     new.Order_date.Format("2006-01-02"),
 		TrackingCode:  new.Tracking_code,
 		BuyerID:       new.Buyer_ID,
 		CarrierID:     new.Carrier_ID,
@@ -56,9 +56,9 @@ func GeneratePurchaseResponse(new models.PurchaseOrder) PurchaseOrderResponse {
 
 func GeneratePurchaseResponseToEntity(new PurchaseOrderResponse) (models.PurchaseOrder, error) {
 
-	parsedTime, err := time.Parse("2006-01-02 15:04:05", new.OrderDate)
+	parsedTime, err := time.Parse("2006-01-02", new.OrderDate)
 	if err != nil {
-		return models.PurchaseOrder{}, errorbase.ErrInvalidNumber
+		return models.PurchaseOrder{}, errorbase.ErrInvalidRequest
 	}
 
 	purchase := models.PurchaseOrder{

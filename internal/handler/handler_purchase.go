@@ -56,22 +56,23 @@ func (handler *PurchaseHandler) GetById() http.HandlerFunc {
 		}
 
 		reportPurchase, err := handler.service.GetReportById(id)
-		if errors.Is(err, errorbase.ErrNotFound) {
+
+		switch {
+		case errors.Is(err, errorbase.ErrNotFound):
 			dtoResponse.JSONError(writer, http.StatusNotFound, MSG_ErrNotFound)
 			return
-		}
-
-		if errors.Is(err, errorbase.ErrDatabaseOperationFailed) {
+		case errors.Is(err, errorbase.ErrDatabaseOperationFailed):
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrOperationDB)
 			return
-		}
-
-		if err != nil {
+		case errors.Is(err, errorbase.ErrInvalidId):
+			dtoResponse.JSONError(writer, http.StatusBadRequest, MSG_ErrInvalidId)
+			return
+		case err != nil:
 			dtoResponse.JSONError(writer, http.StatusInternalServerError, MSG_ErrInternalError)
 			return
 		}
-		jsonResponse(writer, http.StatusOK, reportPurchase)
 
+		jsonResponse(writer, http.StatusOK, reportPurchase)
 	}
 }
 
@@ -95,11 +96,13 @@ func (controller *PurchaseHandler) Create() http.HandlerFunc {
 		case errors.Is(err2, errorbase.ErrTrackingCodeExist):
 			dtoResponse.JSONError(writer, http.StatusConflict, MSG_ErrTrackingCodeExist)
 			return
-		case errors.Is(err2, errorbase.ErrEmptyParameters):
+		case errors.Is(err2, errorbase.ErrEmptyParameters),
+			errors.Is(err2, errorbase.ErrInvalidRequest):
 			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrUnprocessable)
 			return
-		case errors.Is(err2, errorbase.ErrInvalidNumber):
-			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrRequest)
+		case errors.Is(err2, errorbase.ErrInvalidIdField):
+			log.Println(err2.Error())
+			dtoResponse.JSONError(writer, http.StatusUnprocessableEntity, MSG_ErrInvalidIdField)
 			return
 		case errors.Is(err2, errorbase.ErrBuyerFKNotExist):
 			dtoResponse.JSONError(writer, http.StatusConflict, MSG_ErrBuyerFKNotExist)

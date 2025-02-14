@@ -28,11 +28,11 @@ type OrderDate struct {
 }
 
 func NewOrderDate(orderDate time.Time) (OrderDate, error) {
-	formattedDate := orderDate.Format("2006-01-02 15:04:05")
+	formattedDate := orderDate.Format("2006-01-02")
 
-	parsedDate, err := time.Parse("2006-01-02 15:04:05", formattedDate)
+	parsedDate, err := time.Parse("2006-01-02", formattedDate)
 	if err != nil {
-		return OrderDate{}, errorbase.ErrInvalidNumber
+		return OrderDate{}, errorbase.ErrInvalidRequest
 	}
 
 	return OrderDate{value: parsedDate}, nil
@@ -63,8 +63,9 @@ type BuyerID struct {
 }
 
 func NewBuyerID(buyerID int) (BuyerID, error) {
+
 	if buyerID <= 0 {
-		return BuyerID{}, errorbase.ErrInvalidId
+		return BuyerID{}, errorbase.ErrInvalidIdField
 	}
 	return BuyerID{value: buyerID}, nil
 }
@@ -79,7 +80,7 @@ type CarrierID struct {
 
 func NewCarrierID(carrierID int) (CarrierID, error) {
 	if carrierID <= 0 {
-		return CarrierID{}, errorbase.ErrInvalidId
+		return CarrierID{}, errorbase.ErrInvalidIdField
 	}
 	return CarrierID{value: carrierID}, nil
 }
@@ -94,7 +95,7 @@ type OrderStatusID struct {
 
 func NewOrderStatusID(orderStatusID int) (OrderStatusID, error) {
 	if orderStatusID <= 0 {
-		return OrderStatusID{}, errorbase.ErrInvalidId
+		return OrderStatusID{}, errorbase.ErrInvalidIdField
 	}
 	return OrderStatusID{value: orderStatusID}, nil
 }
@@ -109,7 +110,7 @@ type WarehouseID struct {
 
 func NewWarehouseID(warehouseID int) (WarehouseID, error) {
 	if warehouseID <= 0 {
-		return WarehouseID{}, errorbase.ErrInvalidId
+		return WarehouseID{}, errorbase.ErrInvalidIdField
 	}
 	return WarehouseID{value: warehouseID}, nil
 }
